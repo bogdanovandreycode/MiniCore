@@ -1,6 +1,6 @@
 <?php
 
-namespace Vendor\Undermarket\Core\Config;
+namespace MiniCore\Config;
 
 use Symfony\Component\Yaml\Yaml;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Vendor\Undermarket\Core\Http;
+namespace MiniCore\Http;
 
 class Request
 {

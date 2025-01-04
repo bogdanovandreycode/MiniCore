@@ -1,9 +1,9 @@
 <?php
 
-namespace Vendor\Undermarket\Core\Fields;
+namespace MiniCore\Fields;
 
-use Vendor\Undermarket\Core\Form\FieldInterface;
-use Vendor\Undermarket\Core\Form\Enums\ShapeType;
+use MiniCore\Form\FieldInterface;
+use MiniCore\Form\Enums\ShapeType;
 
 class AvatarField implements FieldInterface
 {

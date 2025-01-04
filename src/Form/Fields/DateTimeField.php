@@ -1,8 +1,8 @@
 <?php
 
-namespace Vendor\Undermarket\Core\Form\Fields;
+namespace MiniCore\Form\Fields;
 
-use Vendor\Undermarket\Core\Form\FieldInterface;
+use MiniCore\Form\FieldInterface;
 
 class DateTimeField implements FieldInterface
 {

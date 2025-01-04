@@ -1,12 +1,12 @@
 <?php
 
-namespace Vendor\Undermarket\Core\Database;
+namespace MiniCore\Database;
 
-use Vendor\Undermarket\Core\Database\DataBase;
-use Vendor\Undermarket\Core\Database\DefaultAction\DeleteAction;
-use Vendor\Undermarket\Core\Database\DefaultAction\InsertAction;
-use Vendor\Undermarket\Core\Database\DefaultAction\SelectAction;
-use Vendor\Undermarket\Core\Database\DefaultAction\UpdateAction;
+use MiniCore\Database\DataBase;
+use MiniCore\Database\DefaultAction\DeleteAction;
+use MiniCore\Database\DefaultAction\InsertAction;
+use MiniCore\Database\DefaultAction\SelectAction;
+use MiniCore\Database\DefaultAction\UpdateAction;
 
 abstract class Table
 {

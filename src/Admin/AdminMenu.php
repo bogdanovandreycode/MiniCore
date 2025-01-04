@@ -1,6 +1,6 @@
 <?php
 
-namespace Vendor\Undermarket\Core\Admin;
+namespace MiniCore\Admin;
 
 class AdminMenu
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace Vendor\Undermarket\Core\Http;
+namespace MiniCore\Http;
 
-use Vendor\Undermarket\Core\API\EndpointInterface;
+use MiniCore\API\EndpointInterface;
 
 class Router
 {

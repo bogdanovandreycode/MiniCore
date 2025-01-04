@@ -1,6 +1,6 @@
 <?php
 
-namespace Vendor\Undermarket\Core\API;
+namespace MiniCore\API;
 
 interface EndpointInterface
 {

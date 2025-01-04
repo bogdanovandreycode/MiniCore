@@ -1,6 +1,6 @@
 <?php
 
-namespace Vendor\Undermarket\Core\UI;
+namespace MiniCore\UI;
 
 class AlertManager
 {

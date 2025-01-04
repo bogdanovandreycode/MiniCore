@@ -1,6 +1,6 @@
 <?php
 
-namespace Vendor\Undermarket\Core\Form;
+namespace MiniCore\Form;
 
 interface FieldInterface
 {

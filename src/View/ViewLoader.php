@@ -1,6 +1,6 @@
 <?php
 
-namespace Vendor\Undermarket\Core\View;
+namespace MiniCore\View;
 
 use Symfony\Component\Yaml\Yaml;
 

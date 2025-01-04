@@ -1,6 +1,6 @@
 <?php
 
-namespace Vendor\Undermarket\Core\Auth;
+namespace MiniCore\Auth;
 
 class AuthController
 {

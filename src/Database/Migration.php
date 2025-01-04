@@ -1,6 +1,6 @@
 <?php
 
-namespace Vendor\Undermarket\Core\Database;
+namespace MiniCore\Database;
 
 interface Migration
 {

@@ -1,10 +1,10 @@
 <?php
 
-namespace Vendor\Undermarket\Core\Config;
+namespace MiniCore\Config;
 
 use Symfony\Component\Yaml\Yaml;
-use Vendor\Undermarket\Core\Http\Router;
-use Vendor\Undermarket\Core\API\EndpointInterface;
+use MiniCore\Http\Router;
+use MiniCore\API\EndpointInterface;
 
 class RouteLoader
 {

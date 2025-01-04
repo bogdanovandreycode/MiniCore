@@ -1,6 +1,6 @@
 <?php
 
-namespace Vendor\Undermarket\Core\Entity;
+namespace MiniCore\Entity;
 
 abstract class BaseEntity
 {

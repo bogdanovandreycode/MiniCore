@@ -1,6 +1,6 @@
 <?php
 
-namespace Vendor\Undermarket\Core\Form\Enums;
+namespace MiniCore\Form\Enums;
 
 enum ShapeType: string
 {

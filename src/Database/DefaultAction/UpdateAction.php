@@ -1,10 +1,10 @@
 <?php
 
-namespace Vendor\Undermarket\Core\Database\DefaultAction;
+namespace MiniCore\Database\DefaultAction;
 
-use Vendor\Undermarket\Core\Database\ActionInterface;
-use Vendor\Undermarket\Core\Database\DataAction;
-use Vendor\Undermarket\Core\Database\DataBase;
+use MiniCore\Database\ActionInterface;
+use MiniCore\Database\DataAction;
+use MiniCore\Database\DataBase;
 
 class UpdateAction implements ActionInterface
 {

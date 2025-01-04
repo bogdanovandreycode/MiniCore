@@ -1,9 +1,9 @@
 <?php
 
-namespace Vendor\Undermarket\Core\API;
+namespace MiniCore\API;
 
-use Vendor\Undermarket\Core\Http\Request;
-use Vendor\Undermarket\Core\Http\Response;
+use MiniCore\Http\Request;
+use MiniCore\Http\Response;
 
 abstract class RestController
 {
