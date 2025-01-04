@@ -8,6 +8,7 @@ use PDOException;
 class DataBase
 {
     private static PDO $connection;
+    private static array $tables = [];
 
     public static function getConnection(): PDO
     {
@@ -37,5 +38,56 @@ class DataBase
     {
         $stmt = self::$connection->prepare($sql);
         return $stmt->execute($params);
+    }
+
+    public static function addTable(Table $table): void
+    {
+        self::$tables[] = $table;
+    }
+
+    public static function removeTable(Table $table): void
+    {
+        $index = array_search($table, self::$tables, true);
+
+        if ($index !== false) {
+            unset(self::$tables[$index]);
+            self::$tables = array_values(self::$tables); // Reindex the array
+        }
+    }
+
+    public static function createTables(): void
+    {
+        foreach (self::$tables as $table) {
+            if (!$table->exist()) {
+                $table->create();
+            }
+        }
+    }
+
+    public static function dropTables(): void
+    {
+        foreach (self::$tables as $table) {
+            if ($table->exist()) {
+                $table->drop();
+            }
+        }
+    }
+
+    public static function migrate(Migration $migration): void
+    {
+        if ($migration->up()) {
+            echo "Migration applied successfully.\n";
+        } else {
+            echo "Migration failed.\n";
+        }
+    }
+
+    public static function rollback(Migration $migration): void
+    {
+        if ($migration->down()) {
+            echo "Rollback migration applied successfully.\n";
+        } else {
+            echo "Rollback migration failed.\n";
+        }
     }
 }
