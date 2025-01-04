@@ -1,24 +1,32 @@
 <?php
 
-namespace MinoCore;
+namespace MiniCore;
 
 use MiniCore\Config\Env;
 use MiniCore\Http\Router;
 use MiniCore\Http\Request;
 use MiniCore\Http\Response;
 use MiniCore\View\ViewLoader;
+use MiniCore\Config\RouteLoader;
+use MiniCore\Config\AdminConfigLoader;
 
 class Boot
 {
     private static Request $request;
+    private static string $rootDir;
+    private static string $configDir;
+    private static string $viewDir;
 
     /**
      * Main entry point for the library.
      *
      * @return void
      */
-    public static function initialize(): void
+    public static function run(string $rootDir, string $configDir, string $viewDir): void
     {
+        self::$rootDir = $rootDir;
+        self::$configDir = $configDir;
+        self::$viewDir = $viewDir;
         self::loadEnvironment();
         self::startSession();
         self::setupErrorHandling();
@@ -42,7 +50,6 @@ class Boot
         }
     }
 
-
     /**
      * Load environment variables.
      *
@@ -50,17 +57,17 @@ class Boot
      */
     private static function loadEnvironment(): void
     {
-        Env::load(__DIR__ . '/Config', 'app.env');
+        Env::load(self::$configDir, 'app.env');
 
         self::$request = Request::fromGlobals();
 
         ViewLoader::loadConfig(
-            __DIR__ . '/Config/views.yml',
-            __DIR__ . '/Views'
+            self::$configDir . '/views.yml',
+            self::$viewDir,
         );
 
-        AdminConfigLoader::load(__DIR__ . '/Config/admin.yml');
-        RouteLoader::load(__DIR__ . '/Config/routes.yml');
+        AdminConfigLoader::load(self::$configDir . '/admin.yml');
+        RouteLoader::load(self::$configDir . '/routes.yml');
     }
 
 
@@ -78,7 +85,7 @@ class Boot
         } else {
             ini_set('display_errors', '0');
             ini_set('log_errors', '1');
-            ini_set('error_log', __DIR__ . '/../storage/logs/error.log');
+            ini_set('error_log', self::$rootDir . '/../storage/logs/error.log');
         }
 
         set_exception_handler(function ($e) {
