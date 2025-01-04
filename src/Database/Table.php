@@ -40,6 +40,13 @@ abstract class Table
         );
     }
 
+    public function exist(): bool
+    {
+        $query = "SHOW TABLES LIKE :table_name";
+        $result = DataBase::query($query, ['table_name' => $this->name]);
+        return !empty($result);
+    }
+
     public function getSchemeToString(): string
     {
         $fields = '';
