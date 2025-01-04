@@ -1,0 +1,22 @@
+{
+    "name": "arraydev/minicore",
+    "description": "A minimal set of tools for creating websites in vanilla php",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "MiniCore\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Dadadam",
+            "email": "bogdanov.andrey.code@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "vlucas/phpdotenv": "^5.6",
+        "symfony/yaml": "^7.2"
+    }
+}
