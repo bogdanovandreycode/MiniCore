@@ -4,6 +4,8 @@ namespace MiniCore\Module;
 
 abstract class AbstractModule
 {
+    private string $modulePath;
+
     public function __construct(
         protected string $id,
         protected string $name,
@@ -11,7 +13,10 @@ abstract class AbstractModule
         protected string $author,
         protected string $version,
         protected string $license,
-    ) {}
+    ) {
+        // Устанавливаем путь к модулю
+        $this->modulePath = dirname((new \ReflectionClass($this))->getFileName());
+    }
 
     public function getId(): string
     {
@@ -31,6 +36,11 @@ abstract class AbstractModule
     public function getDescription(): string
     {
         return $this->description;
+    }
+
+    public function getPath(): string
+    {
+        return $this->modulePath;
     }
 
     /**
