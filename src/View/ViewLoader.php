@@ -8,12 +8,13 @@ use MiniCore\Module\ModuleManager;
 class ViewLoader
 {
     private static array $views = []; // Views configuration
-    private static string $viewsPath = ''; // Path to the views directory
+    private static array $viewsPaths = []; // Array of views paths for resolving templates
 
     /**
      * Load views configuration from a YAML file.
      *
      * @param string $configPath Path to the views.yml file.
+     * @param string $viewsPath Path to the views directory.
      * @return void
      */
     public static function loadConfig(string $configPath, string $viewsPath): void
@@ -32,8 +33,9 @@ class ViewLoader
             throw new \Exception("Views path is not a directory or does not exist: $viewsPath");
         }
 
-        self::$views = $data['views'];
-        self::$viewsPath = $viewsPath;
+        // Merge views
+        self::$views = array_merge(self::$views, $data['views']);
+        self::$viewsPaths[] = $viewsPath;
     }
 
     /**
@@ -74,33 +76,55 @@ class ViewLoader
             throw new \Exception("No template defined for view '$viewName'.");
         }
 
+        // Resolve the template path
+        $templatePath = self::resolveTemplatePath($template);
+        if (!$templatePath) {
+            throw new \Exception("Template '$template' not found in registered view paths.");
+        }
+
         // Render the main template
-        $content = self::renderTemplate($template, $data);
+        $content = self::renderTemplate($templatePath, $data);
 
         // Render with layout if specified
         if ($layout) {
+            $layoutPath = self::resolveTemplatePath($layout);
+            if (!$layoutPath) {
+                throw new \Exception("Layout '$layout' not found in registered view paths.");
+            }
+
             $data['content'] = $content; // Pass the rendered content to the layout
-            return self::renderTemplate($layout, $data);
+            return self::renderTemplate($layoutPath, $data);
         }
 
         return $content;
     }
 
     /**
+     * Resolve the full path of a template file from the registered views paths.
+     *
+     * @param string $template Template file path relative to the views directories.
+     * @return string|null Full path to the template or null if not found.
+     */
+    private static function resolveTemplatePath(string $template): ?string
+    {
+        foreach (self::$viewsPaths as $viewsPath) {
+            $templateFile = $viewsPath . DIRECTORY_SEPARATOR . $template;
+            if (file_exists($templateFile)) {
+                return $templateFile;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Render a specific template file.
      *
-     * @param string $template Template file path relative to the template directory.
+     * @param string $templateFile Full path to the template file.
      * @param array $data Data to pass to the template.
      * @return string The rendered content.
      */
-    private static function renderTemplate(string $template, array $data): string
+    private static function renderTemplate(string $templateFile, array $data): string
     {
-        $templateFile = self::$viewsPath . DIRECTORY_SEPARATOR . $template;
-
-        if (!file_exists($templateFile)) {
-            throw new \Exception("Template '$template' not found in path '$templateFile'.");
-        }
-
         extract($data);
         ob_start();
         include $templateFile;
