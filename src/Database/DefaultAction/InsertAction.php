@@ -19,19 +19,26 @@ class InsertAction implements ActionInterface
 
     public function execute(DataAction $data): mixed
     {
-        $columns = implode(', ', $data->getKeyColumns());
-        $placeholders = implode(', ', array_map(fn($key) => ":$key", $data->getKeyColumns()));
-        $sql = "INSERT INTO {$this->tableName} ($columns) VALUES ($placeholders)";
-        $result = DataBase::execute($sql, $data->getColumns());
-        return $result;
+        // Получаем колонки для INSERT
+        $columns = $data->getColumns();
+        if (empty($columns)) {
+            throw new \RuntimeException("No columns provided for insert operation.");
+        }
+
+        // Генерируем список колонок и плейсхолдеров
+        $columnsList = implode(', ', $columns);
+        $placeholders = implode(', ', array_map(fn($column) => ":$column", $columns));
+
+        // Формируем SQL
+        $sql = "INSERT INTO {$this->tableName} ($columnsList) VALUES ($placeholders)";
+
+        // Выполняем запрос
+        return DataBase::execute($sql, $data->getParameters());
     }
 
     public function validate(DataAction $data): bool
     {
-        if (empty($data->getColumns())) {
-            return false;
-        }
-
-        return true;
+        // Проверяем наличие колонок для вставки
+        return !empty($data->getColumns());
     }
 }

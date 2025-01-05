@@ -19,22 +19,25 @@ class DeleteAction implements ActionInterface
 
     public function execute(DataAction $data): mixed
     {
-        $sql = "DELETE FROM {$this->tableName} ";
+        // Формируем SQL
+        $sql = "DELETE FROM {$this->tableName}";
 
-        foreach ($data->getProperties() as $key => $value) {
-            $sql .= $key . ' ' . $value . ' ';
+        // Добавляем условия (WHERE и другие)
+        foreach ($data->getProperties() as $property) {
+            $sql .= " {$property['type']} {$property['condition']}";
         }
 
-        $result = DataBase::query($sql, $data->getColumns());
-        return $result;
+        // Параметры для prepared statements
+        $parameters = $data->getParameters();
+
+        // Выполняем запрос
+        return DataBase::execute($sql, $parameters);
     }
 
     public function validate(DataAction $data): bool
     {
-        if (empty($data->getColumns())) {
-            return false;
-        }
-
-        return true;
+        // Проверка: наличие хотя бы одного условия для удаления
+        $hasConditions = !empty($data->getProperties());
+        return $hasConditions;
     }
 }

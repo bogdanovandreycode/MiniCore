@@ -4,57 +4,64 @@ namespace MiniCore\Database;
 
 final class DataAction
 {
-    public function __construct(
-        private array $columns,
-        private array $properties,
-    ) {}
+    private array $columns = [];        // Колонки для SELECT
+    private array $properties = [];     // Универсальные свойства (с порядком добавления)
+    private array $parameters = [];     // Параметры для prepared statements
 
-    public function getColumn(string $name): mixed
+    /**
+     * Добавить колонку для SELECT.
+     */
+    public function addColumn(string $name): void
     {
-        return $this->columns[$name] ?? null;
+        $this->columns[] = $name;
     }
 
-    public function getColumns(): mixed
+    /**
+     * Получить все колонки для SELECT.
+     */
+    public function getColumns(): array
     {
         return $this->columns;
     }
 
-    public function getKeyColumns(): mixed
+    /**
+     * Добавить свойство с учётом порядка добавления.
+     */
+    public function addProperty(string $type, string $condition, array $parameters = []): void
     {
-        return array_keys($this->columns);
+        $this->properties[] = [
+            'type' => strtoupper($type),
+            'condition' => $condition,
+        ];
+        $this->addParameters($parameters);
     }
 
-    public function setColumn(string $name, mixed $value): void
-    {
-        $this->columns[$name] = $value;
-    }
-
-    public function setColumns(array $columns): void
-    {
-        foreach ($columns as $key => $value) {
-            $this->columns[$key] = $value;
-        }
-    }
-
-    public function getPropery(string $name): mixed
-    {
-        return $this->properties[$name] ?? null;
-    }
-
-    public function getProperties(): mixed
+    /**
+     * Получить все свойства.
+     */
+    public function getProperties(): array
     {
         return $this->properties;
     }
 
-    public function setProperty(string $name, mixed $value): void
+    public function getProperty(string $name): array
     {
-        $this->properties[$name] = $value;
+        return $this->properties[$name] ?? [];
     }
 
-    public function setProperties(array $properties): void
+    /**
+     * Добавить параметры для prepared statements.
+     */
+    public function addParameters(array $parameters): void
     {
-        foreach ($properties as $key => $value) {
-            $this->properties[$key] = $value;
-        }
+        $this->parameters = array_merge($this->parameters, $parameters);
+    }
+
+    /**
+     * Получить все параметры.
+     */
+    public function getParameters(): array
+    {
+        return $this->parameters;
     }
 }

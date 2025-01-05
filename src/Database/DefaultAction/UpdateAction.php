@@ -19,44 +19,42 @@ class UpdateAction implements ActionInterface
 
     public function execute(DataAction $data): mixed
     {
+        // Формирование части SET
+        $updateColumns = $data->getColumns();
         $setClauses = [];
-        $params = [];
 
-        foreach ($data->getColumns() as $key => $value) {
-            if (!str_ends_with($key, '_where')) {
-                $setClauses[] = "$key = :set_$key";
-                $params["set_$key"] = $value;
-            }
+        foreach ($updateColumns as $column) {
+            $setClauses[] = "$column = :set_$column";
         }
 
         $setClause = implode(', ', $setClauses);
-        $whereClause = $data->getProperties()['WHERE'] ?? '';
 
-        foreach ($data->getColumns() as $key => $value) {
-            if (str_ends_with($key, '_where')) {
-                $actualKey = substr($key, 0, -6);
+        // Формирование условий WHERE
+        $whereConditions = implode(' ', $data->getProperty('WHERE'));
 
-                if (strpos($whereClause, ":$key") !== false) {
-                    $whereClause = str_replace(":$key", ":where_$actualKey", $whereClause);
-                }
-
-                $params["where_$actualKey"] = $value;
-            }
-        }
-
+        // Генерация SQL
         $sql = "UPDATE {$this->tableName} SET $setClause";
 
-        if (!empty($whereClause)) {
-            $sql .= " WHERE $whereClause";
+        if (!empty($whereConditions)) {
+            $sql .= " WHERE $whereConditions";
         }
 
-        $result = DataBase::execute($sql, $params);
-        return $result;
-    }
+        // Параметры для prepared statements
+        $parameters = [];
 
+        foreach ($updateColumns as $column) {
+            $parameters["set_$column"] = $data->getParameters()["set_$column"] ?? null;
+        }
+
+        $parameters = array_merge($parameters, $data->getParameters());
+
+        // Выполнение SQL
+        return DataBase::execute($sql, $parameters);
+    }
 
     public function validate(DataAction $data): bool
     {
+        // Проверка наличия колонок для обновления
         if (empty($data->getColumns())) {
             return false;
         }

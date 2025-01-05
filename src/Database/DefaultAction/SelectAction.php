@@ -19,20 +19,28 @@ class SelectAction implements ActionInterface
 
     public function execute(DataAction $data): mixed
     {
-        $sql = "SELECT ";
-        $sql .= implode(', ', $data->getKeyColumns());
+        // Формируем SELECT
+        $selectColumns = $data->getColumns();
+        $sql = "SELECT " . (!empty($selectColumns) ? implode(', ', $selectColumns) : '*');
+
+        // Указываем таблицу
         $sql .= " FROM {$this->tableName}";
 
-        foreach ($data->getProperties() as $key => $value) {
-            $sql .= $key . ' ' . $value . ' ';
+        // Формируем свойства в порядке добавления
+        foreach ($data->getProperties() as $property) {
+            $sql .= " {$property['type']} {$property['condition']}";
         }
 
-        $result = DataBase::query($sql, $data->getColumns());
-        return $result;
+        // Параметры
+        $parameters = $data->getParameters();
+
+        // Выполняем запрос
+        return DataBase::query($sql, $parameters);
     }
 
     public function validate(DataAction $data): bool
     {
+        // Проверяем, есть ли хотя бы одна колонка для выборки
         if (empty($data->getColumns())) {
             return false;
         }
