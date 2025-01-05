@@ -1,6 +1,6 @@
 <?php
 
-namespace Vendor\Undermarket\Models;
+namespace MiniCore\Database\DefauiltTable;
 
 use MiniCore\Database\Table;
 
