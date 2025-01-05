@@ -2,8 +2,9 @@
 
 namespace MiniCore\Config;
 
-use Symfony\Component\Yaml\Yaml;
 use MiniCore\Http\Router;
+use Symfony\Component\Yaml\Yaml;
+use MiniCore\Module\ModuleManager;
 use MiniCore\API\EndpointInterface;
 
 class RouteLoader
@@ -24,6 +25,26 @@ class RouteLoader
 
         foreach ($routes as $route) {
             self::registerRoute($route);
+        }
+    }
+
+    /**
+     * Load routes from all active modules.
+     *
+     * @return void
+     */
+    public static function loadFromModules(): void
+    {
+        foreach (ModuleManager::getModules() as $module) {
+            $routeConfig = $module->getPath() . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 'routes.yml';
+
+            if (file_exists($routeConfig)) {
+                $routes = Yaml::parseFile($routeConfig);
+
+                foreach ($routes as $route) {
+                    self::registerRoute($route);
+                }
+            }
         }
     }
 

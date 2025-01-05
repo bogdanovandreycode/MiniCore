@@ -8,6 +8,7 @@ use MiniCore\Http\Request;
 use MiniCore\Http\Response;
 use MiniCore\View\ViewLoader;
 use MiniCore\Config\RouteLoader;
+use MiniCore\Module\ModuleManager;
 use MiniCore\Config\AdminConfigLoader;
 
 class Boot
@@ -16,20 +17,28 @@ class Boot
     private static string $rootDir;
     private static string $configDir;
     private static string $viewDir;
+    private static string $moduleDir;
 
     /**
      * Main entry point for the library.
      *
+     * @param string $rootDir Root directory of the project.
+     * @param string $configDir Path to the configuration directory.
+     * @param string $viewDir Path to the views directory.
+     * @param string $moduleDir Path to the modules directory.
      * @return void
      */
-    public static function run(string $rootDir, string $configDir, string $viewDir): void
+    public static function run(string $rootDir, string $configDir, string $viewDir, string $moduleDir): void
     {
         self::$rootDir = $rootDir;
         self::$configDir = $configDir;
         self::$viewDir = $viewDir;
+        self::$moduleDir = $moduleDir;
+
         self::loadEnvironment();
-        self::startSession();
         self::setupErrorHandling();
+        self::startSession();
+        self::initializeModules();
         self::handleRequest();
     }
 
@@ -70,6 +79,23 @@ class Boot
         RouteLoader::load(self::$configDir . '/routes.yml');
     }
 
+    /**
+     * Initialize modules.
+     *
+     * @return void
+     */
+    private static function initializeModules(): void
+    {
+        // Load modules
+        ModuleManager::loadModules(self::$moduleDir, self::$configDir . '/modules.yml');
+
+        // Initialize modules
+        ModuleManager::initializeModules();
+
+        // Load module-specific routes and views
+        RouteLoader::loadFromModules();
+        ViewLoader::loadFromModules();
+    }
 
     /**
      * Set up error and exception handling.

@@ -3,6 +3,7 @@
 namespace MiniCore\View;
 
 use Symfony\Component\Yaml\Yaml;
+use MiniCore\Module\ModuleManager;
 
 class ViewLoader
 {
@@ -35,6 +36,22 @@ class ViewLoader
         self::$viewsPath = $viewsPath;
     }
 
+    /**
+     * Load views configuration from all active modules.
+     *
+     * @return void
+     */
+    public static function loadFromModules(): void
+    {
+        foreach (ModuleManager::getModules() as $moduleId => $module) {
+            $configPath = $module->getPath() . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 'views.yml';
+            $viewsPath = $module->getPath() . DIRECTORY_SEPARATOR . 'Views';
+
+            if (file_exists($configPath) && is_dir($viewsPath)) {
+                self::loadConfig($configPath, $viewsPath);
+            }
+        }
+    }
 
     /**
      * Render a view with optional layout.
