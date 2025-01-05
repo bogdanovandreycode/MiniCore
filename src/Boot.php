@@ -11,13 +11,13 @@ use MiniCore\Database\DataBase;
 use MiniCore\Config\RouteLoader;
 use MiniCore\Module\ModuleManager;
 use MiniCore\Config\AdminConfigLoader;
-use Vendor\Undermarket\Models\PostsTable;
-use Vendor\Undermarket\Models\RolesTable;
-use Vendor\Undermarket\Models\UsersTable;
-use Vendor\Undermarket\Models\PostMetaTable;
-use Vendor\Undermarket\Models\SettingsTable;
-use Vendor\Undermarket\Models\UserMetaTable;
-use Vendor\Undermarket\Models\UserRolesTable;
+use MiniCore\Database\DefauiltTable\PostsTable;
+use MiniCore\Database\DefauiltTable\RolesTable;
+use MiniCore\Database\DefauiltTable\UsersTable;
+use MiniCore\Database\DefauiltTable\PostMetaTable;
+use MiniCore\Database\DefauiltTable\SettingsTable;
+use MiniCore\Database\DefauiltTable\UserMetaTable;
+use MiniCore\Database\DefauiltTable\UserRolesTable;
 
 class Boot
 {
