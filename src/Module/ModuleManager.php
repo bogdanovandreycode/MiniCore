@@ -11,7 +11,7 @@ class ModuleManager
     private static array $loadedModules = []; // Initialized modules
 
     /**
-     *Loads modules from the specified path and configuration file.
+     * Loads modules from the specified path and configuration file.
      *
      * @param string $modulesPath Path to the modules directory.
      * @param string $configPath Path to the modules configuration file (modules.yml).
@@ -29,23 +29,15 @@ class ModuleManager
                 continue;
             }
 
-            $modulePath = $modulesPath . DIRECTORY_SEPARATOR . $moduleId;
+            $moduleNamespace = "Modules\\$moduleId";
+            $className = "$moduleNamespace\\Module";
 
-            if (!is_dir($modulePath)) {
-                throw new \Exception("Module directory not found: $modulePath");
+            if (!is_dir($modulesPath . DIRECTORY_SEPARATOR . $moduleId)) {
+                throw new \Exception("Module directory not found: $modulesPath/$moduleId");
             }
-
-            $bootFile = $modulePath . DIRECTORY_SEPARATOR . 'Boot.php';
-
-            if (!file_exists($bootFile)) {
-                throw new \Exception("Boot file not found for module '$moduleId'.");
-            }
-
-            require_once $bootFile;
-            $className = "Modules\\$moduleId\\{$moduleId}Module";
 
             if (!class_exists($className)) {
-                throw new \Exception("Module class '$className' not found in '$moduleId'.");
+                throw new \Exception("Module class '$className' not found in namespace '$moduleNamespace'. Ensure the class is autoloaded and follows PSR-4 conventions.");
             }
 
             /** @var AbstractModule $module */
