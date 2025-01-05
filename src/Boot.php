@@ -7,9 +7,17 @@ use MiniCore\Http\Router;
 use MiniCore\Http\Request;
 use MiniCore\Http\Response;
 use MiniCore\View\ViewLoader;
+use MiniCore\Database\DataBase;
 use MiniCore\Config\RouteLoader;
 use MiniCore\Module\ModuleManager;
 use MiniCore\Config\AdminConfigLoader;
+use Vendor\Undermarket\Models\PostsTable;
+use Vendor\Undermarket\Models\RolesTable;
+use Vendor\Undermarket\Models\UsersTable;
+use Vendor\Undermarket\Models\PostMetaTable;
+use Vendor\Undermarket\Models\SettingsTable;
+use Vendor\Undermarket\Models\UserMetaTable;
+use Vendor\Undermarket\Models\UserRolesTable;
 
 class Boot
 {
@@ -38,6 +46,7 @@ class Boot
         self::loadEnvironment();
         self::setupErrorHandling();
         self::startSession();
+        self::setupDatabase();
         self::initializeModules();
         self::handleRequest();
     }
@@ -95,6 +104,24 @@ class Boot
         // Load module-specific routes and views
         RouteLoader::loadFromModules();
         ViewLoader::loadFromModules();
+    }
+
+    /**
+     * Set up the database connection.
+     *
+     * @return void
+     */
+    private static function setupDatabase(): void
+    {
+        DataBase::setConnection(Env::get('DB_HOST'), Env::get('DB_NAME'), Env::get('DB_USER'), Env::get('DB_PASSWORD'));
+        DataBase::addTable(new UsersTable());
+        DataBase::addTable(new UserMetaTable());
+        DataBase::addTable(new PostsTable());
+        DataBase::addTable(new PostMetaTable());
+        DataBase::addTable(new RolesTable());
+        DataBase::addTable(new UserRolesTable());
+        DataBase::addTable(new SettingsTable());
+        DataBase::createTables();
     }
 
     /**

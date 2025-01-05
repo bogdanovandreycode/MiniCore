@@ -5,15 +5,15 @@ namespace Vendor\Undermarket\Models;
 use MiniCore\Database\Table;
 use MiniCore\Database\DataAction;
 
-class UserMetaTable extends Table
+class PostMetaTable extends Table
 {
     public function __construct()
     {
         parent::__construct(
-            'usermeta',
+            'postmeta',
             [
                 'meta_id' => 'INT AUTO_INCREMENT PRIMARY KEY',
-                'user_id' => 'INT NOT NULL',
+                'post_id' => 'INT NOT NULL',
                 'meta_key' => 'VARCHAR(255) NOT NULL',
                 'meta_value' => 'TEXT',
                 'created_at' => 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
@@ -50,25 +50,26 @@ class UserMetaTable extends Table
     /**
      * Обновить мета-данные
      *
-     * @param int $userId ID пользователя
+     * @param int $postId ID пользователя
      * @param string $key Ключ мета-данных
      * @param string $value Значение мета-данных
      * @return bool Результат выполнения
      */
-    public function updateMeta(int $userId, string $key, string $value): bool
+    public function updateMeta(int $postId, string $key, string $value): bool
     {
         $existingMeta = $this->getMeta($key, true);
 
         if ($existingMeta === null) {
-            return $this->addMeta($userId, $key, $value);
+            return $this->addMeta($postId, $key, $value);
         }
 
         $dataAction = new DataAction();
         $dataAction->addColumn('meta_value');
         $dataAction->addParameters(['meta_value' => $value]);
-        $dataAction->addProperty('WHERE', 'meta_key = :meta_key AND user_id = :user_id', [
+
+        $dataAction->addProperty('WHERE', 'meta_key = :meta_key AND post_id = :post_id', [
             'meta_key' => $key,
-            'user_id' => $userId,
+            'post_id' => $postId,
         ]);
 
         return $this->actions['update']->execute($dataAction);
@@ -77,20 +78,20 @@ class UserMetaTable extends Table
     /**
      * Добавить мета-данные
      *
-     * @param int $userId ID пользователя
+     * @param int $postId ID пользователя
      * @param string $key Ключ мета-данных
      * @param string $value Значение мета-данных
      * @return bool Результат выполнения
      */
-    public function addMeta(int $userId, string $key, string $value): bool
+    public function addMeta(int $postId, string $key, string $value): bool
     {
         $dataAction = new DataAction();
-        $dataAction->addColumn('user_id');
+        $dataAction->addColumn('post_id');
         $dataAction->addColumn('meta_key');
         $dataAction->addColumn('meta_value');
 
         $dataAction->addParameters([
-            'user_id' => $userId,
+            'post_id' => $postId,
             'meta_key' => $key,
             'meta_value' => $value,
         ]);
