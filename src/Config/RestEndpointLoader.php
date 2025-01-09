@@ -11,7 +11,7 @@ class RestEndpointLoader
     /**
      * Load endpoints from a YAML file and register them.
      *
-     * @param string $configPath The path to the rest_endpoints.yml file.
+     * @param string $configPath The path to the endpoints.yml file.
      * @return void
      */
     public static function load(string $configPath): void

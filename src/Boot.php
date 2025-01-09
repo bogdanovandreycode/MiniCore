@@ -2,6 +2,7 @@
 
 namespace MiniCore;
 
+use MiniCore\API\RestEndpointLoader;
 use MiniCore\Config\Env;
 use MiniCore\Http\Router;
 use MiniCore\Http\Request;
@@ -85,6 +86,7 @@ class Boot
         );
 
         RouteLoader::load(self::$configDir . '/routes.yml');
+        RestEndpointLoader::load(self::$configDir . '/endpoints.yml');
     }
 
     /**
@@ -102,6 +104,7 @@ class Boot
 
         // Load module-specific routes and views
         RouteLoader::loadFromModules();
+        RestEndpointLoader::loadFromModules();
         ViewLoader::loadFromModules();
     }
 
