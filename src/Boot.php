@@ -2,7 +2,6 @@
 
 namespace MiniCore;
 
-use MiniCore\API\RestEndpointLoader;
 use MiniCore\Config\Env;
 use MiniCore\Http\Router;
 use MiniCore\Http\Request;
@@ -11,6 +10,7 @@ use MiniCore\View\ViewLoader;
 use MiniCore\Database\DataBase;
 use MiniCore\Config\RouteLoader;
 use MiniCore\Module\ModuleManager;
+use MiniCore\Config\RestEndpointLoader;
 use MiniCore\Database\DefaultTable\PostsTable;
 use MiniCore\Database\DefaultTable\RolesTable;
 use MiniCore\Database\DefaultTable\UsersTable;

@@ -1,10 +1,11 @@
 <?php
 
-namespace MiniCore\API;
+namespace MiniCore\Config;
 
 use MiniCore\Http\Router;
 use Symfony\Component\Yaml\Yaml;
 use MiniCore\Module\ModuleManager;
+use MiniCore\API\EndpointInterface;
 
 class RestEndpointLoader
 {
