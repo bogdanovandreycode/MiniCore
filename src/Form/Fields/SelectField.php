@@ -4,8 +4,48 @@ namespace MiniCore\Form\Fields;
 
 use MiniCore\Form\FieldInterface;
 
+/**
+ * Class SelectField
+ *
+ * Represents a dropdown select field in a form.
+ * Allows the user to choose one option from a list of predefined options.
+ * Additional HTML attributes can be applied for customization (e.g., CSS classes, styles).
+ *
+ * @package MiniCore\Form\Fields
+ *
+ * @example
+ * // Select field with custom attributes and no default value
+ * $selectField = new SelectField(
+ *     name: 'gender',
+ *     options: [
+ *         'male' => 'Male',
+ *         'female' => 'Female',
+ *         'other' => 'Other'
+ *     ],
+ *     attributes: [
+ *         'class' => 'form-control',
+ *         'required' => 'required'
+ *     ]
+ * );
+ * echo $selectField->render();
+ *
+ * // Output:
+ * // <select name="gender" class="form-control" required>
+ * //     <option value="male">Male</option>
+ * //     <option value="female">Female</option>
+ * //     <option value="other">Other</option>
+ * // </select>
+ */
 class SelectField implements FieldInterface
 {
+    /**
+     * SelectField constructor.
+     *
+     * @param string $name       The name attribute of the select field.
+     * @param mixed  $value      The selected option value.
+     * @param array  $options    The list of options in the format ['value' => 'Label'].
+     * @param array  $attributes Additional HTML attributes (e.g., class, style).
+     */
     public function __construct(
         public string $name = '',
         public mixed $value = '',
@@ -16,7 +56,7 @@ class SelectField implements FieldInterface
     /**
      * Render the select field as an HTML string.
      *
-     * @return string The rendered HTML of the select field
+     * @return string The rendered HTML of the select field.
      */
     public function render(): string
     {
@@ -43,6 +83,8 @@ class SelectField implements FieldInterface
 
     /**
      * Get the name of the select field.
+     *
+     * @return string The name attribute.
      */
     public function getName(): string
     {
@@ -51,6 +93,8 @@ class SelectField implements FieldInterface
 
     /**
      * Get the value of the select field.
+     *
+     * @return mixed The selected option value.
      */
     public function getValue(): mixed
     {
@@ -59,6 +103,8 @@ class SelectField implements FieldInterface
 
     /**
      * Get the additional attributes of the select field.
+     *
+     * @return array The HTML attributes as key-value pairs.
      */
     public function getAttributes(): array
     {
@@ -66,9 +112,9 @@ class SelectField implements FieldInterface
     }
 
     /**
-     * Build the attributes as an HTML string.
+     * Build the additional attributes as an HTML string.
      *
-     * @return string The HTML attributes.
+     * @return string The compiled HTML attributes.
      */
     public function buildAttributes(): string
     {

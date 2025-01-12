@@ -4,14 +4,52 @@ namespace MiniCore\Form\Fields;
 
 use MiniCore\Form\FieldInterface;
 
+/**
+ * Class NonceField
+ *
+ * Provides a secure hidden input field for form submissions to prevent CSRF attacks.
+ * Generates and validates a unique token (nonce) for each form action to ensure data integrity.
+ *
+ * @package MiniCore\Form\Fields
+ *
+ * @example
+ * // Generating a Nonce Field for a Form Submission
+ * $nonceField = new NonceField(action: 'submit_form');
+ * echo $nonceField->render();
+ *
+ * // Output:
+ * // <input type="hidden" name="_nonce" value="generated_nonce_value">
+ *
+ * @example
+ * // Validating a Nonce on Form Submission
+ * $nonceField = new NonceField(action: 'submit_form');
+ * $isValid = $nonceField->validate($_POST['_nonce']);
+ *
+ * if ($isValid) {
+ *     echo "Nonce is valid. Processing form data...";
+ * } else {
+ *     echo "Invalid or expired nonce.";
+ * }
+ */
 class NonceField implements FieldInterface
 {
+    /**
+     * NonceField constructor.
+     *
+     * @param string $name         The name attribute of the hidden nonce input.
+     * @param string $action       The action identifier for the nonce.
+     * @param string $nonce        The generated nonce value.
+     * @param int    $expiration   The nonce expiration time in seconds.
+     * @param string $userInput    The nonce value received from the form submission.
+     * @param string $errorMessage Error message when the nonce is invalid or expired.
+     * @param array  $attributes   Additional HTML attributes for the nonce input.
+     */
     public function __construct(
         public string $name = '_nonce',
         public string $action = 'default_action',
         public string $nonce = '',
-        public int $expiration = 3600, // The nonce expiration time in seconds
-        public string $userInput = '', // Input value from the request
+        public int $expiration = 3600,
+        public string $userInput = '',
         public string $errorMessage = 'Invalid or expired nonce.',
         public array $attributes = [],
     ) {}
@@ -87,6 +125,8 @@ class NonceField implements FieldInterface
 
     /**
      * Get the name of the nonce field.
+     *
+     * @return string The name attribute of the field.
      */
     public function getName(): string
     {
@@ -94,7 +134,9 @@ class NonceField implements FieldInterface
     }
 
     /**
-     * Get the value of the nonce field (user's input).
+     * Get the user-provided nonce value.
+     *
+     * @return mixed The user's input value.
      */
     public function getValue(): mixed
     {
@@ -102,7 +144,9 @@ class NonceField implements FieldInterface
     }
 
     /**
-     * Get the additional attributes of the nonce field.
+     * Get additional HTML attributes for the nonce field.
+     *
+     * @return array The attributes as key-value pairs.
      */
     public function getAttributes(): array
     {
@@ -126,7 +170,9 @@ class NonceField implements FieldInterface
     }
 
     /**
-     * Get the secret key used to generate and validate nonces.
+     * Retrieve the secret key used for nonce generation and validation.
+     *
+     * @return string|null The secret key.
      */
     private function getSecretKey(): ?string
     {

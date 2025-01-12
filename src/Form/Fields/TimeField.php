@@ -4,8 +4,55 @@ namespace MiniCore\Form\Fields;
 
 use MiniCore\Form\FieldInterface;
 
+/**
+ * Class TimeField
+ *
+ * Represents a customizable time input field with separate inputs for hours, minutes, and optional seconds.
+ * Includes increment and decrement buttons for user-friendly time selection.
+ *
+ * @package MiniCore\Form\Fields
+ *
+ * @example
+ * // Basic time input without seconds
+ * $timeField = new TimeField(
+ *     name: 'start_time',
+ *     interval: 5,
+ *     includeSeconds: false,
+ *     value: ['hours' => 9, 'minutes' => 30]
+ * );
+ * echo $timeField->render();
+ *
+ * // Output:
+ * // <div class="time-field">
+ * //     <div class="time-input">
+ * //         <label>Hours</label>
+ * //         <div class="time-spinner">
+ * //             <button type="button" class="increment" data-type="hours">▲</button>
+ * //             <input type="number" name="start_time[hours]" value="9" min="0" max="23" class="time-hours">
+ * //             <button type="button" class="decrement" data-type="hours">▼</button>
+ * //         </div>
+ * //     </div>
+ * //     <div class="time-input">
+ * //         <label>Minutes</label>
+ * //         <div class="time-spinner">
+ * //             <button type="button" class="increment" data-type="minutes">▲</button>
+ * //             <input type="number" name="start_time[minutes]" value="30" min="0" max="59" class="time-minutes">
+ * //             <button type="button" class="decrement" data-type="minutes">▼</button>
+ * //         </div>
+ * //     </div>
+ * // </div>
+ */
 class TimeField implements FieldInterface
 {
+    /**
+     * TimeField constructor.
+     *
+     * @param string $name The name attribute of the time input.
+     * @param int $interval The step interval for incrementing/decrementing time.
+     * @param bool $includeSeconds Whether to include seconds in the input.
+     * @param array $value Default time value in ['hours' => int, 'minutes' => int, 'seconds' => int].
+     * @param array $attributes Additional HTML attributes for the field.
+     */
     public function __construct(
         public string $name = 'time',
         public int $interval = 1,

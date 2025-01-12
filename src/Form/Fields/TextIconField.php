@@ -4,8 +4,43 @@ namespace MiniCore\Form\Fields;
 
 use MiniCore\Form\FieldInterface;
 
+/**
+ * Class TextIconField
+ *
+ * Represents a text input field with an integrated icon.
+ * This field allows adding icons (e.g., Font Awesome, Material Icons) inside a text input for visual enhancement.
+ *
+ * @package MiniCore\Form\Fields
+ *
+ * @example
+ * // Search input with a search icon
+ * $searchField = new TextIconField(
+ *     name: 'search',
+ *     value: '',
+ *     iconClass: 'fa fa-search',
+ *     attributes: [
+ *         'placeholder' => 'Search...',
+ *         'class' => 'search-input'
+ *     ]
+ * );
+ * echo $searchField->render();
+ *
+ * // Output:
+ * // <div class="text-icon-field">
+ * //     <i class="fa fa-search"></i>
+ * //     <input type="text" name="search" value="" placeholder="Search..." class="search-input"/>
+ * // </div>
+ */
 class TextIconField implements FieldInterface
 {
+    /**
+     * TextIconField constructor.
+     *
+     * @param string $name       The name attribute of the text input.
+     * @param mixed  $value      The default value of the text input.
+     * @param string $iconClass  The CSS class for the icon (e.g., Font Awesome icon class).
+     * @param array  $attributes Additional HTML attributes for customization (e.g., placeholder, class).
+     */
     public function __construct(
         public string $name = '',
         public mixed $value = '',
@@ -36,6 +71,8 @@ class TextIconField implements FieldInterface
 
     /**
      * Get the name of the text field.
+     *
+     * @return string The name attribute.
      */
     public function getName(): string
     {
@@ -44,6 +81,8 @@ class TextIconField implements FieldInterface
 
     /**
      * Get the value of the text field.
+     *
+     * @return mixed The value attribute.
      */
     public function getValue(): mixed
     {
@@ -52,6 +91,8 @@ class TextIconField implements FieldInterface
 
     /**
      * Get the additional attributes of the text field.
+     *
+     * @return array The HTML attributes as key-value pairs.
      */
     public function getAttributes(): array
     {

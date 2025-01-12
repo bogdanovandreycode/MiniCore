@@ -2,16 +2,30 @@
 
 namespace MiniCore\Entity;
 
+/**
+ * Class BaseEntity
+ *
+ * An abstract base class for creating data entities. This class provides
+ * dynamic property access and common methods for handling entity data.
+ *
+ * @package MiniCore\Entity
+ */
 abstract class BaseEntity
 {
     /**
-     * Array to hold the data of the entity.
+     * @var array $data Array to hold the entity's data.
      */
     protected array $data = [];
 
     /**
      * BaseEntity constructor.
-     * Optionally, pass initial data to populate the entity.
+     *
+     * Allows optional initialization of the entity with an array of data.
+     *
+     * @param array $data Initial data for the entity.
+     *
+     * @example
+     * $user = new UserEntity(['name' => 'John', 'email' => 'john@example.com']);
      */
     public function __construct(array $data = [])
     {
@@ -19,7 +33,13 @@ abstract class BaseEntity
     }
 
     /**
-     * Get a property value.
+     * Magic method to get a property value.
+     *
+     * @param string $name The name of the property.
+     * @return mixed|null The value of the property or null if not set.
+     *
+     * @example
+     * echo $user->name; // Outputs 'John'
      */
     public function __get(string $name): mixed
     {
@@ -27,7 +47,13 @@ abstract class BaseEntity
     }
 
     /**
-     * Set a property value.
+     * Magic method to set a property value.
+     *
+     * @param string $name The name of the property.
+     * @param mixed $value The value to set.
+     *
+     * @example
+     * $user->name = 'Jane';
      */
     public function __set(string $name, mixed $value): void
     {
@@ -35,7 +61,13 @@ abstract class BaseEntity
     }
 
     /**
-     * Check if a property is set.
+     * Magic method to check if a property is set.
+     *
+     * @param string $name The name of the property.
+     * @return bool True if set, false otherwise.
+     *
+     * @example
+     * if (isset($user->email)) { ... }
      */
     public function __isset(string $name): bool
     {
@@ -43,7 +75,12 @@ abstract class BaseEntity
     }
 
     /**
-     * Unset a property.
+     * Magic method to unset a property.
+     *
+     * @param string $name The name of the property.
+     *
+     * @example
+     * unset($user->email);
      */
     public function __unset(string $name): void
     {
@@ -51,7 +88,12 @@ abstract class BaseEntity
     }
 
     /**
-     * Get all data as an array.
+     * Convert the entity data to an associative array.
+     *
+     * @return array The entity's data as an array.
+     *
+     * @example
+     * $array = $user->toArray();
      */
     public function toArray(): array
     {
@@ -60,6 +102,11 @@ abstract class BaseEntity
 
     /**
      * Populate the entity with an array of data.
+     *
+     * @param array $data The data to populate the entity with.
+     *
+     * @example
+     * $user->fromArray(['name' => 'Alice', 'email' => 'alice@example.com']);
      */
     public function fromArray(array $data): void
     {
@@ -67,7 +114,12 @@ abstract class BaseEntity
     }
 
     /**
-     * Get the primary key value (assuming 'id' is the primary key by default).
+     * Get the primary key value (default 'id').
+     *
+     * @return mixed|null The ID of the entity or null if not set.
+     *
+     * @example
+     * echo $user->getId(); // Outputs the user's ID
      */
     public function getId(): mixed
     {
@@ -75,7 +127,12 @@ abstract class BaseEntity
     }
 
     /**
-     * Set the primary key value (assuming 'id' is the primary key by default).
+     * Set the primary key value (default 'id').
+     *
+     * @param mixed $id The ID to assign.
+     *
+     * @example
+     * $user->setId(5);
      */
     public function setId(mixed $id): void
     {

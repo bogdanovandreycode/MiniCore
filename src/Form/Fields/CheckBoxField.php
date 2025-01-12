@@ -4,8 +4,36 @@ namespace MiniCore\Form\Fields;
 
 use MiniCore\Form\FieldInterface;
 
+/**
+ * Class CheckBoxField
+ *
+ * Represents a customizable checkbox field for forms.
+ * This implementation renders a stylized toggle switch.
+ *
+ * @package MiniCore\Form\Fields
+ *
+ * @example
+ * // Checkbox with the checked state enabled
+ * $checkbox = new CheckBoxField(name: 'subscribe', value: '1', checked: true);
+ * echo $checkbox->render();
+ *
+ * // Output:
+ * // <label class="switch">
+ * //     <input type="checkbox" name="subscribe" value="1" checked>
+ * //     <span class="slider"></span>
+ * // </label>
+ *
+ */
 class CheckBoxField implements FieldInterface
 {
+    /**
+     * CheckBoxField constructor.
+     *
+     * @param string $name       The name attribute of the checkbox.
+     * @param mixed  $value      The value attribute of the checkbox.
+     * @param bool   $checked    Whether the checkbox should be initially checked.
+     * @param array  $attributes Additional HTML attributes for the checkbox input.
+     */
     public function __construct(
         public string $name = '',
         public mixed $value = '',
@@ -37,6 +65,8 @@ class CheckBoxField implements FieldInterface
 
     /**
      * Get the name of the checkbox field.
+     *
+     * @return string The name attribute.
      */
     public function getName(): string
     {
@@ -45,6 +75,8 @@ class CheckBoxField implements FieldInterface
 
     /**
      * Get the value of the checkbox field.
+     *
+     * @return mixed The value attribute.
      */
     public function getValue(): mixed
     {
@@ -53,6 +85,8 @@ class CheckBoxField implements FieldInterface
 
     /**
      * Get the additional attributes of the checkbox field.
+     *
+     * @return array The HTML attributes as key-value pairs.
      */
     public function getAttributes(): array
     {
@@ -60,9 +94,9 @@ class CheckBoxField implements FieldInterface
     }
 
     /**
-     * Build the attributes as an HTML string.
+     * Build the additional attributes into a formatted HTML string.
      *
-     * @return string The HTML attributes.
+     * @return string The compiled HTML attributes.
      */
     public function buildAttributes(): string
     {

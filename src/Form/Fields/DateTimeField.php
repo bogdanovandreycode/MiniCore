@@ -4,8 +4,43 @@ namespace MiniCore\Form\Fields;
 
 use MiniCore\Form\FieldInterface;
 
+/**
+ * Class DateTimeField
+ *
+ * Represents a customizable date and time input field for forms.
+ * This field includes a date picker and separate inputs for hours, minutes, and optionally seconds.
+ *
+ * @package MiniCore\Form\Fields
+ *
+ * @example
+ * //DateTime field without seconds
+ * $dateTimeField = new DateTimeField(name: 'appointment_datetime');
+ * echo $dateTimeField->render();
+ *
+ * // Output:
+ * // <div class="datetime-field">
+ * //   <div class="date-field">
+ * //       <input type="text" name="appointment_datetime[date]" value="" placeholder="Select a date" class="date-input">
+ * //       <div class="date-icon"><i class="fa fa-calendar"></i></div>
+ * //   </div>
+ * //   <div class="time-field">
+ * //       [Hour input] [Minute input]
+ * //   </div>
+ * // </div>
+ */
 class DateTimeField implements FieldInterface
 {
+    /**
+     * DateTimeField constructor.
+     *
+     * @param string $name             The name attribute of the field.
+     * @param mixed  $dateValue        The pre-filled value for the date input.
+     * @param mixed  $timeValue        Array containing 'hours', 'minutes', and 'seconds' values.
+     * @param bool   $includeSeconds   Whether to include the seconds input.
+     * @param int    $interval         Interval for time selection (e.g., 1, 5, 15 minutes).
+     * @param array  $attributes       Additional HTML attributes for the field.
+     * @param string $placeholderDate  Placeholder text for the date input.
+     */
     public function __construct(
         private string $name = 'datetime',
         public mixed $dateValue = null,
@@ -85,6 +120,8 @@ class DateTimeField implements FieldInterface
 
     /**
      * Get the name of the datetime field.
+     *
+     * @return string The name attribute.
      */
     public function getName(): string
     {
@@ -106,6 +143,8 @@ class DateTimeField implements FieldInterface
 
     /**
      * Get additional attributes of the datetime field.
+     *
+     * @return array The HTML attributes as key-value pairs.
      */
     public function getAttributes(): array
     {
@@ -115,7 +154,7 @@ class DateTimeField implements FieldInterface
     /**
      * Build the attributes as an HTML string.
      *
-     * @return string The HTML attributes.
+     * @return string The compiled HTML attributes.
      */
     public function buildAttributes(): string
     {

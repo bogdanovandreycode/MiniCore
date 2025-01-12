@@ -2,11 +2,34 @@
 
 namespace MiniCore\Form;
 
+/**
+ * Class FormBuilder
+ *
+ * A flexible and dynamic builder for creating HTML forms.
+ * Allows adding fields, field groups, and custom attributes to generate a complete form.
+ *
+ * @package MiniCore\Form
+ */
 class FormBuilder
 {
+    /**
+     * @var string The form action URL (where the form will be submitted).
+     */
     private string $action;
+
+    /**
+     * @var string The form method (GET, POST, etc.).
+     */
     private string $method;
+
+    /**
+     * @var array List of form fields and field groups.
+     */
     private array $fields = [];
+
+    /**
+     * @var array Custom attributes for the form tag.
+     */
     private array $attributes = [];
 
     /**
@@ -14,6 +37,9 @@ class FormBuilder
      *
      * @param string $action The form action URL.
      * @param string $method The form method (e.g., POST, GET).
+     *
+     * @example
+     * $form = new FormBuilder('/submit', 'POST');
      */
     public function __construct(string $action = '', string $method = 'POST')
     {
@@ -24,8 +50,11 @@ class FormBuilder
     /**
      * Add a field to the form.
      *
-     * @param FieldInterface|string $field The field to add (can also be HTML string).
+     * @param FieldInterface|string $field The field to add (can also be raw HTML).
      * @return $this
+     *
+     * @example
+     * $form->addField(new TextField('username'));
      */
     public function addField(FieldInterface|string $field): self
     {
@@ -39,6 +68,12 @@ class FormBuilder
      * @param string $legend The legend for the fieldset.
      * @param array $fields Array of FieldInterface objects.
      * @return $this
+     *
+     * @example
+     * $form->addGroup('User Info', [
+     *     new TextField('first_name'),
+     *     new TextField('last_name')
+     * ]);
      */
     public function addGroup(string $legend, array $fields): self
     {
@@ -61,6 +96,9 @@ class FormBuilder
      * @param string $label The label for the submit button.
      * @param array $attributes Additional attributes for the button.
      * @return $this
+     *
+     * @example
+     * $form->addSubmitButton('Register', ['class' => 'btn-primary']);
      */
     public function addSubmitButton(string $label = 'Submit', array $attributes = []): self
     {
@@ -85,6 +123,9 @@ class FormBuilder
      * @param string $name The name of the attribute.
      * @param string $value The value of the attribute.
      * @return $this
+     *
+     * @example
+     * $form->setAttribute('class', 'custom-form');
      */
     public function setAttribute(string $name, string $value): self
     {
@@ -96,6 +137,9 @@ class FormBuilder
      * Render the form as an HTML string.
      *
      * @return string The rendered HTML form.
+     *
+     * @example
+     * echo $form->render();
      */
     public function render(): string
     {
@@ -113,7 +157,7 @@ class FormBuilder
                 continue;
             }
 
-            $fieldsHtml .= $field; // Direct HTML strings for flexibility
+            $fieldsHtml .= $field; // Support raw HTML strings
         }
 
         return sprintf(

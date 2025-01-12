@@ -4,8 +4,36 @@ namespace MiniCore\Http;
 
 use MiniCore\API\EndpointInterface;
 
+/**
+ * Class Router
+ *
+ * Handles HTTP routing by registering routes and dispatching requests to the appropriate endpoint handlers.
+ * Supports basic route registration for different HTTP methods and provides route normalization for consistent matching.
+ *
+ * @package MiniCore\Http
+ *
+ * @example
+ * // Registering a GET route
+ * Router::register('GET', '/api/user', new UserEndpoint());
+ *
+ * // Handling an incoming request
+ * $request = Request::fromGlobals();
+ * $response = Router::handle($request);
+ */
 class Router
 {
+    /**
+     * Array to store registered routes.
+     *
+     * Structure: [
+     *    'GET' => [
+     *        '/api/user' => EndpointInterface
+     *    ],
+     *    'POST' => [
+     *        '/api/user' => EndpointInterface
+     *    ]
+     * ]
+     */
     private static array $routes = [];
 
     /**
@@ -14,12 +42,16 @@ class Router
      * @param string $method HTTP method (e.g., GET, POST).
      * @param string $path The route path (e.g., /api/user).
      * @param EndpointInterface $endpoint The endpoint that handles the route.
+     *
+     * @return void
+     *
+     * @example
+     * Router::register('POST', '/api/user', new CreateUserEndpoint());
      */
     public static function register(string $method, string $path, EndpointInterface $endpoint): void
     {
         $normalizedMethod = strtoupper($method);
         $normalizedPath = self::normalizePath($path);
-
         self::$routes[$normalizedMethod][$normalizedPath] = $endpoint;
     }
 
@@ -29,6 +61,10 @@ class Router
      * @param Request $request The incoming HTTP request.
      * @return mixed The response from the matched endpoint.
      * @throws \Exception If no matching route is found or the method is not allowed.
+     *
+     * @example
+     * $request = Request::fromGlobals();
+     * $response = Router::handle($request);
      */
     public static function handle(Request $request): mixed
     {
@@ -51,6 +87,10 @@ class Router
      * Get all registered routes.
      *
      * @return array The list of registered routes.
+     *
+     * @example
+     * $routes = Router::getRoutes();
+     * print_r($routes);
      */
     public static function getRoutes(): array
     {
@@ -58,10 +98,14 @@ class Router
     }
 
     /**
-     * Normalize the route path.
+     * Normalize the route path by ensuring it starts with a single '/' and has no trailing slashes.
      *
      * @param string $path The route path.
      * @return string The normalized path.
+     *
+     * @example
+     * $normalized = Router::normalizePath('/api/user/');
+     * echo $normalized; // Output: /api/user
      */
     private static function normalizePath(string $path): string
     {

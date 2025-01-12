@@ -4,8 +4,39 @@ namespace MiniCore\Form\Fields;
 
 use MiniCore\Form\FieldInterface;
 
+/**
+ * Class PhoneField
+ *
+ * Represents a phone number input field in a form.
+ * This field generates an HTML `<input type="tel">` element for collecting phone numbers.
+ * Additional attributes can be passed for customization, such as placeholders or CSS classes.
+ *
+ * @package MiniCore\Form\Fields
+ *
+ * @example
+ * // Phone field with placeholder and validation pattern
+ * $phoneField = new PhoneField(
+ *     name: 'contact_number',
+ *     attributes: [
+ *         'placeholder' => '+1 (555) 123-4567',
+ *         'pattern' => '[+][0-9]{1,3} [0-9]{3}-[0-9]{3}-[0-9]{4}',
+ *         'required' => 'required'
+ *     ]
+ * );
+ * echo $phoneField->render();
+ *
+ * // Output:
+ * // <input type="tel" name="contact_number" value="" placeholder="+1 (555) 123-4567" pattern="[+][0-9]{1,3} [0-9]{3}-[0-9]{3}-[0-9]{4}" required/>
+ */
 class PhoneField implements FieldInterface
 {
+    /**
+     * PhoneField constructor.
+     *
+     * @param string $name       The name attribute of the phone input field.
+     * @param mixed  $value      The default value of the phone field.
+     * @param array  $attributes Additional HTML attributes (e.g., placeholder, pattern, class).
+     */
     public function __construct(
         public string $name = '',
         public mixed $value = '',
@@ -31,6 +62,8 @@ class PhoneField implements FieldInterface
 
     /**
      * Get the name of the phone field.
+     *
+     * @return string The name attribute.
      */
     public function getName(): string
     {
@@ -39,6 +72,8 @@ class PhoneField implements FieldInterface
 
     /**
      * Get the value of the phone field.
+     *
+     * @return mixed The value attribute.
      */
     public function getValue(): mixed
     {
@@ -47,6 +82,8 @@ class PhoneField implements FieldInterface
 
     /**
      * Get the additional attributes of the phone field.
+     *
+     * @return array The HTML attributes as key-value pairs.
      */
     public function getAttributes(): array
     {
@@ -54,9 +91,9 @@ class PhoneField implements FieldInterface
     }
 
     /**
-     * Build the attributes as an HTML string.
+     * Build the additional attributes into an HTML string.
      *
-     * @return string The HTML attributes.
+     * @return string The compiled HTML attributes.
      */
     public function buildAttributes(): string
     {

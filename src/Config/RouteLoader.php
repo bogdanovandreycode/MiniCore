@@ -7,13 +7,37 @@ use Symfony\Component\Yaml\Yaml;
 use MiniCore\Module\ModuleManager;
 use MiniCore\API\EndpointInterface;
 
+/**
+ * Class RouteLoader
+ *
+ * Responsible for loading and registering HTTP routes from YAML configuration files.
+ * Supports loading routes from both the core application and all active modules.
+ * 
+ * Each route is registered in the application's Router, allowing proper request handling.
+ *
+ * @example
+ * // Load routes from the core application configuration:
+ * RouteLoader::load(__DIR__ . '/Config/routes.yml');
+ *
+ * // Load routes from all active modules:
+ * RouteLoader::loadFromModules();
+ */
 class RouteLoader
 {
     /**
-     * Load routes from the YAML file and register them in the router.
+     * Load routes from a YAML configuration file and register them in the router.
      *
-     * @param string $configPath The path to the routes YAML file.
+     * This method reads the specified YAML file and registers each route
+     * by mapping HTTP methods, paths, and handlers.
+     *
+     * @param string $configPath The path to the `routes.yml` file.
      * @return void
+     *
+     * @throws \RuntimeException If the configuration file does not exist or is invalid.
+     *
+     * @example
+     * // Load routes from a specific file:
+     * RouteLoader::load(__DIR__ . '/Config/routes.yml');
      */
     public static function load(string $configPath): void
     {
@@ -29,9 +53,16 @@ class RouteLoader
     }
 
     /**
-     * Load routes from all active modules.
+     * Load and register routes from all active modules.
+     *
+     * This method scans all enabled modules for the `routes.yml` file
+     * and registers their routes, enabling modular route configuration.
      *
      * @return void
+     *
+     * @example
+     * // Automatically load routes from all modules:
+     * RouteLoader::loadFromModules();
      */
     public static function loadFromModules(): void
     {
@@ -51,8 +82,18 @@ class RouteLoader
     /**
      * Register a single route in the router.
      *
-     * @param array $route The route configuration.
+     * Validates the route configuration and registers it in the application's router.
+     *
+     * @param array $route The route configuration containing `method`, `path`, and `handler`.
      * @return void
+     *
+     * @throws \RuntimeException If the configuration is invalid or the handler is missing.
+     *
+     * @example
+     * // Example YAML route configuration:
+     * // - method: GET
+     * //   path: "/users"
+     * //   handler: "Modules\\UserModule\\Controllers\\UserController"
      */
     private static function registerRoute(array $route): void
     {

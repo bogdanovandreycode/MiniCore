@@ -5,17 +5,45 @@ namespace MiniCore\View;
 use Symfony\Component\Yaml\Yaml;
 use MiniCore\Module\ModuleManager;
 
+/**
+ * Class ViewLoader
+ *
+ * Handles loading, managing, and rendering view templates in the application.
+ * It supports loading views from configuration files (`views.yml`) and dynamically loading views from active modules.
+ * Additionally, it supports rendering templates with or without layouts, making it a flexible solution for managing UI templates.
+ *
+ * @package MiniCore\View
+ *
+ * @example
+ * // Loading views configuration
+ * ViewLoader::loadConfig('/path/to/views.yml', '/path/to/views');
+ *
+ * // Rendering a view
+ * echo ViewLoader::render('home.index', ['title' => 'Welcome']);
+ */
 class ViewLoader
 {
-    private static array $views = []; // Views configuration
-    private static array $viewsPaths = []; // Array of views paths for resolving templates
+    /**
+     * @var array $views Loaded views configuration.
+     */
+    private static array $views = [];
+
+    /**
+     * @var array $viewsPaths Registered paths to search for view templates.
+     */
+    private static array $viewsPaths = [];
 
     /**
      * Load views configuration from a YAML file.
      *
-     * @param string $configPath Path to the views.yml file.
+     * @param string $configPath Path to the `views.yml` file.
      * @param string $viewsPath Path to the views directory.
      * @return void
+     *
+     * @throws \Exception If the configuration file or views path does not exist.
+     *
+     * @example
+     * ViewLoader::loadConfig('/app/Config/views.yml', '/app/Views');
      */
     public static function loadConfig(string $configPath, string $viewsPath): void
     {
@@ -33,7 +61,6 @@ class ViewLoader
             throw new \Exception("Views path is not a directory or does not exist: $viewsPath");
         }
 
-        // Merge views
         self::$views = array_merge(self::$views, $data['views']);
         self::$viewsPaths[] = $viewsPath;
     }
@@ -42,6 +69,10 @@ class ViewLoader
      * Load views configuration from all active modules.
      *
      * @return void
+     *
+     * @example
+     * // Load views from all active modules
+     * ViewLoader::loadFromModules();
      */
     public static function loadFromModules(): void
     {
@@ -58,9 +89,14 @@ class ViewLoader
     /**
      * Render a view with optional layout.
      *
-     * @param string $viewName The name of the view as defined in views.yml.
-     * @param array $data Data to pass to the view.
+     * @param string $viewName The view identifier defined in `views.yml`.
+     * @param array $data Data to pass to the view template.
      * @return string The rendered HTML content.
+     *
+     * @throws \Exception If the view or template is not found.
+     *
+     * @example
+     * echo ViewLoader::render('blog.post', ['title' => 'My Blog Post']);
      */
     public static function render(string $viewName, array $data = []): string
     {
@@ -76,23 +112,20 @@ class ViewLoader
             throw new \Exception("No template defined for view '$viewName'.");
         }
 
-        // Resolve the template path
         $templatePath = self::resolveTemplatePath($template);
         if (!$templatePath) {
             throw new \Exception("Template '$template' not found in registered view paths.");
         }
 
-        // Render the main template
         $content = self::renderTemplate($templatePath, $data);
 
-        // Render with layout if specified
         if ($layout) {
             $layoutPath = self::resolveTemplatePath($layout);
             if (!$layoutPath) {
                 throw new \Exception("Layout '$layout' not found in registered view paths.");
             }
 
-            $data['content'] = $content; // Pass the rendered content to the layout
+            $data['content'] = $content;
             return self::renderTemplate($layoutPath, $data);
         }
 
@@ -102,7 +135,7 @@ class ViewLoader
     /**
      * Resolve the full path of a template file from the registered views paths.
      *
-     * @param string $template Template file path relative to the views directories.
+     * @param string $template Template file relative path.
      * @return string|null Full path to the template or null if not found.
      */
     private static function resolveTemplatePath(string $template): ?string
@@ -120,7 +153,7 @@ class ViewLoader
      * Render a specific template file.
      *
      * @param string $templateFile Full path to the template file.
-     * @param array $data Data to pass to the template.
+     * @param array $data Data to extract into the template.
      * @return string The rendered content.
      */
     private static function renderTemplate(string $templateFile, array $data): string

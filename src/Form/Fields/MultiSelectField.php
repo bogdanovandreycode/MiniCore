@@ -4,9 +4,54 @@ namespace MiniCore\Form\Fields;
 
 use MiniCore\Form\FieldInterface;
 
+/**
+ * Class MultiSelectField
+ *
+ * Represents a customizable multi-select input field using checkboxes.
+ * This field allows users to select multiple options from a given list.
+ *
+ * @package MiniCore\Form\Fields
+ *
+ * @example
+ * // Multi-select field with additional CSS classes and attributes
+ * $multiSelect = new MultiSelectField(
+ *     name: 'hobbies',
+ *     options: [
+ *         'reading' => 'Reading',
+ *         'traveling' => 'Traveling',
+ *         'gaming' => 'Gaming'
+ *     ],
+ *     selected: ['gaming'],
+ *     attributes: ['class' => 'custom-multi-select', 'data-type' => 'hobby']
+ * );
+ * echo $multiSelect->render();
+ *
+ * // Output:
+ * // <div class="multi-select-field custom-multi-select" data-type="hobby">
+ * //     <label class="multi-select-option">
+ * //         <input type="checkbox" name="hobbies[]" value="reading">
+ * //         <span class="option-label">Reading</span>
+ * //     </label>
+ * //     <label class="multi-select-option">
+ * //         <input type="checkbox" name="hobbies[]" value="traveling">
+ * //         <span class="option-label">Traveling</span>
+ * //     </label>
+ * //     <label class="multi-select-option">
+ * //         <input type="checkbox" name="hobbies[]" value="gaming" checked>
+ * //         <span class="option-label">Gaming</span>
+ * //     </label>
+ * // </div>
+ */
 class MultiSelectField implements FieldInterface
 {
-
+    /**
+     * MultiSelectField constructor.
+     *
+     * @param string $name       The name attribute of the multi-select field.
+     * @param array  $options    An associative array of value => label pairs.
+     * @param array  $selected   An array of selected option values.
+     * @param array  $attributes Additional HTML attributes for the field.
+     */
     public function __construct(
         public string $name = '',
         public array $options = [],
@@ -47,6 +92,8 @@ class MultiSelectField implements FieldInterface
 
     /**
      * Get the name of the multi-select field.
+     *
+     * @return string The name attribute.
      */
     public function getName(): string
     {
@@ -54,7 +101,9 @@ class MultiSelectField implements FieldInterface
     }
 
     /**
-     * Get the value of the multi-select field.
+     * Get the selected values of the multi-select field.
+     *
+     * @return array The selected values.
      */
     public function getValue(): mixed
     {
@@ -63,6 +112,8 @@ class MultiSelectField implements FieldInterface
 
     /**
      * Get the additional attributes of the multi-select field.
+     *
+     * @return array The HTML attributes.
      */
     public function getAttributes(): array
     {

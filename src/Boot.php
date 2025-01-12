@@ -19,7 +19,24 @@ use MiniCore\Database\DefaultTable\SettingsTable;
 use MiniCore\Database\DefaultTable\UserMetaTable;
 use MiniCore\Database\DefaultTable\UserRolesTable;
 
-
+/**
+ * Class Boot
+ *
+ * Central entry point for initializing and running the MiniCore framework.
+ * This class is responsible for setting up the environment, database connections, loading modules, 
+ * initializing views, managing routing, and handling HTTP requests and responses.
+ *
+ * @package MiniCore
+ *
+ * @example
+ * // Example of running the framework
+ * Boot::run(
+ *     __DIR__,               // Project root directory
+ *     __DIR__ . '/config',   // Config directory
+ *     __DIR__ . '/views',    // Views directory
+ *     __DIR__ . '/modules'   // Modules directory
+ * );
+ */
 class Boot
 {
     private static Request $request;
@@ -29,13 +46,16 @@ class Boot
     private static string $moduleDir;
 
     /**
-     * Main entry point for the library.
+     * Initializes and runs the application.
      *
      * @param string $rootDir Root directory of the project.
      * @param string $configDir Path to the configuration directory.
      * @param string $viewDir Path to the views directory.
      * @param string $moduleDir Path to the modules directory.
      * @return void
+     *
+     * @example
+     * Boot::run('/var/www/project', '/var/www/project/config', '/var/www/project/views', '/var/www/project/modules');
      */
     public static function run(string $rootDir, string $configDir, string $viewDir, string $moduleDir): void
     {
@@ -53,9 +73,12 @@ class Boot
     }
 
     /**
-     * Start a session if not already started.
+     * Starts a session if it is not already started.
      *
      * @return void
+     *
+     * @example
+     * Boot::startSession();
      */
     private static function startSession(): void
     {
@@ -70,9 +93,12 @@ class Boot
     }
 
     /**
-     * Load environment variables.
+     * Loads environment variables and configurations.
      *
      * @return void
+     *
+     * @example
+     * Boot::loadEnvironment();
      */
     private static function loadEnvironment(): void
     {
@@ -90,28 +116,30 @@ class Boot
     }
 
     /**
-     * Initialize modules.
+     * Initializes all active modules.
      *
      * @return void
+     *
+     * @example
+     * Boot::initializeModules();
      */
     private static function initializeModules(): void
     {
-        // Load modules
         ModuleManager::loadModules(self::$moduleDir, self::$configDir . '/modules.yml');
-
-        // Initialize modules
         ModuleManager::initializeModules();
 
-        // Load module-specific routes and views
         RouteLoader::loadFromModules();
         RestEndpointLoader::loadFromModules();
         ViewLoader::loadFromModules();
     }
 
     /**
-     * Set up the database connection.
+     * Sets up the database connection and initializes default tables.
      *
      * @return void
+     *
+     * @example
+     * Boot::setupDatabase();
      */
     private static function setupDatabase(): void
     {
@@ -127,9 +155,12 @@ class Boot
     }
 
     /**
-     * Set up error and exception handling.
+     * Configures error reporting and exception handling.
      *
      * @return void
+     *
+     * @example
+     * Boot::setupErrorHandling();
      */
     private static function setupErrorHandling(): void
     {
@@ -164,9 +195,12 @@ class Boot
     }
 
     /**
-     * Handle the incoming HTTP request (optional, if library handles routing).
+     * Handles the incoming HTTP request and generates a response.
      *
      * @return void
+     *
+     * @example
+     * Boot::handleRequest();
      */
     public static function handleRequest(): void
     {
