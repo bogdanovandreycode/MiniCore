@@ -169,6 +169,8 @@ class Request
      */
     private function normalizePath(string $path): string
     {
+        $path = str_replace('\\', '/', $path);
+        $path = preg_replace('#/+#', '/', $path);
         return '/' . trim(parse_url($path, PHP_URL_PATH) ?? '/', '/');
     }
 
