@@ -1,0 +1,2 @@
+endpoints:
+    - { route: /api/test }
