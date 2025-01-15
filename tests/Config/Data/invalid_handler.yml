@@ -1,4 +1,2 @@
--
-    method: GET
-    path: /api/example
-    handler: NonExistentClass
+endpoints:
+    - { method: GET, route: /api/test, handler: NonExistentClass }

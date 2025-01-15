@@ -85,6 +85,8 @@ class ModuleManager
      */
     private static function findModuleClass(string $moduleId): ?string
     {
+        file_put_contents('test.txt', json_encode(get_declared_classes()));
+
         foreach (get_declared_classes() as $className) {
 
             if (preg_match('/Modules\\\\' . preg_quote($moduleId, '/') . '\\\\Module$/', $className)) {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\View;
+namespace MiniCore\Tests\View;
 
 use PHPUnit\Framework\TestCase;
 use MiniCore\View\ViewLoader;

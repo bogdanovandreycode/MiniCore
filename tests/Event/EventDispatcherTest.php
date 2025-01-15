@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Event;
+namespace MiniCore\Tests\Event;
 
 use PHPUnit\Framework\TestCase;
 use MiniCore\Event\EventDispatcher;
