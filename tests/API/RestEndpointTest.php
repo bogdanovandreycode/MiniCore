@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\API;
+namespace MiniCore\Tests\API;
 
 use PHPUnit\Framework\TestCase;
 use MiniCore\Http\Request;

@@ -16,7 +16,7 @@ use MiniCore\Module\AbstractModule;
  * @example
  * // Example usage:
  * try {
- *     ModuleManager::loadModules(__DIR__ . '/modules', __DIR__ . '/config/modules.yml');
+ *     ModuleManager::loadModules(__DIR__ . '/config/modules.yml');
  *     ModuleManager::initializeModules();
  *     $userModule = ModuleManager::getModule('UserModule');
  *     echo $userModule->getName(); // Output: User Module
@@ -49,36 +49,50 @@ class ModuleManager
      * @throws \Exception If the configuration file or module directories/classes are missing.
      *
      * @example
-     * ModuleManager::loadModules(__DIR__ . '/modules', __DIR__ . '/config/modules.yml');
+     * ModuleManager::loadModules(__DIR__ . '/config/modules.yml');
      */
-    public static function loadModules(string $modulesPath, string $configPath): void
+    public static function loadModules(string $configPath): void
     {
         if (!file_exists($configPath)) {
             throw new \Exception("Modules configuration file not found: $configPath");
         }
 
         $config = Yaml::parseFile($configPath)['modules'] ?? [];
-
         foreach ($config as $moduleId => $moduleConfig) {
             if (!isset($moduleConfig['enabled']) || !$moduleConfig['enabled']) {
-                continue; // Skip disabled modules
+                continue; // Пропустить отключённые модули
             }
 
-            $moduleNamespace = "Modules\\$moduleId";
-            $className = "$moduleNamespace\\Module";
+            // 🔥 Убираем проверку директории
+            $className = self::findModuleClass($moduleId);
 
-            if (!is_dir($modulesPath . DIRECTORY_SEPARATOR . $moduleId)) {
-                throw new \Exception("Module directory not found: $modulesPath/$moduleId");
-            }
-
-            if (!class_exists($className)) {
-                throw new \Exception("Module class '$className' not found. Ensure proper PSR-4 autoloading.");
+            if (!$className || !class_exists($className)) {
+                throw new \Exception("Module class for '$moduleId' not found. Ensure proper PSR-4 autoloading.");
             }
 
             /** @var AbstractModule $module */
             $module = new $className();
             self::$modules[$moduleId] = $module;
         }
+    }
+
+
+    /**
+     * Automatically finds a module class ending with 'Modules\{ModuleName}\Module'.
+     *
+     * @param string $moduleId
+     * @return string|null
+     */
+    private static function findModuleClass(string $moduleId): ?string
+    {
+        foreach (get_declared_classes() as $className) {
+
+            if (preg_match('/Modules\\\\' . preg_quote($moduleId, '/') . '\\\\Module$/', $className)) {
+                return $className;
+            }
+        }
+
+        return null;
     }
 
     /**

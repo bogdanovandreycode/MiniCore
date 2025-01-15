@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="vendor/autoload.php" colors="true">
+<phpunit bootstrap="vendor/autoload.php" colors="true" failOnWarning="true" failOnRisky="true">
     <testsuites>
         <testsuite name="MiniCore Test Suite">
-            <directory>tests</directory>
+            <directory suffix="Test.php">tests</directory>
         </testsuite>
     </testsuites>
+
+    <php>
+        <ini name="error_reporting" value="-1" />
+        <ini name="display_errors" value="1" />
+    </php>
 </phpunit>

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Http;
+namespace MiniCore\Tests\Http;
 
 use PHPUnit\Framework\TestCase;
 use MiniCore\Http\Response;

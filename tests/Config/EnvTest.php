@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Config;
+namespace MiniCore\Tests\Config;
 
 use PHPUnit\Framework\TestCase;
 use MiniCore\Config\Env;

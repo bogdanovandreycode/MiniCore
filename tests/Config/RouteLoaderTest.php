@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\Config;
+namespace MiniCore\Tests\Config;
 
-use PHPUnit\Framework\TestCase;
 use MiniCore\Http\Router;
-use Symfony\Component\Yaml\Yaml;
+use PHPUnit\Framework\TestCase;
 use MiniCore\Config\RouteLoader;
-use Tests\Config\Stub\TestRouteHandler;
+use Symfony\Component\Yaml\Yaml;
+use MiniCore\Tests\Config\Stub\TestRouteHandler;
 
 class RouteLoaderTest extends TestCase
 {

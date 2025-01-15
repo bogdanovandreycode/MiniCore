@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Auth;
+namespace MiniCore\Tests\Auth;
 
 use PHPUnit\Framework\TestCase;
 use MiniCore\Auth\AuthValidator;

@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\Config;
+namespace MiniCore\Tests\Config;
 
 use MiniCore\Http\Router;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Yaml;
-use Tests\Config\Stub\TestEndpoint;
 use MiniCore\Config\RestEndpointLoader;
+use MiniCore\Tests\Config\Stub\TestEndpoint;
 
 class RestEndpointLoaderTest extends TestCase
 {
