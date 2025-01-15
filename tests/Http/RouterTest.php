@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\Http;
+
 use PHPUnit\Framework\TestCase;
 use MiniCore\Http\Router;
 use MiniCore\Http\Request;

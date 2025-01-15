@@ -11,7 +11,7 @@ namespace MiniCore\Database;
  *
  * @package MiniCore\Database
  */
-interface Migration
+interface MigrationInterface
 {
     /**
      * Apply the migration.

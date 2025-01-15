@@ -160,12 +160,12 @@ class DataBase
     /**
      * Apply a database migration.
      *
-     * @param Migration $migration The migration instance.
+     * @param MigrationInterface $migration The migration instance.
      * 
      * @example
      * DataBase::migrate(new CreateUsersTable());
      */
-    public static function migrate(Migration $migration): void
+    public static function migrate(MigrationInterface $migration): void
     {
         if ($migration->up()) {
             echo "Migration applied successfully.\n";
@@ -177,12 +177,12 @@ class DataBase
     /**
      * Roll back a database migration.
      *
-     * @param Migration $migration The migration instance.
+     * @param MigrationInterface $migration The migration instance.
      * 
      * @example
      * DataBase::rollback(new CreateUsersTable());
      */
-    public static function rollback(Migration $migration): void
+    public static function rollback(MigrationInterface $migration): void
     {
         if ($migration->down()) {
             echo "Rollback migration applied successfully.\n";
