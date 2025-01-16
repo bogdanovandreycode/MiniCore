@@ -24,6 +24,11 @@ class ViewLoaderTest extends TestCase
         $this->tempViewsPath = __DIR__ . '/Data/Views';
 
         // Создание директории для шаблонов
+        if (!is_dir(__DIR__ . '/Data')) {
+            mkdir(__DIR__ . '/Data', 0777, true);
+        }
+
+        // Создание директории для шаблонов
         if (!is_dir($this->tempViewsPath)) {
             mkdir($this->tempViewsPath, 0777, true);
         }
