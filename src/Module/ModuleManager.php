@@ -8,18 +8,23 @@ use MiniCore\Module\AbstractModule;
 /**
  * Class ModuleManager
  *
- * Manages the loading, initialization, and access to modules in the MiniCore framework.
- * It reads configuration files, loads module classes, and initializes active modules.
+ * Central manager for handling modules within the MiniCore framework.  
+ * Responsible for loading, initializing, and accessing modules based on configuration files.
+ * Modules are dynamically discovered and instantiated according to PSR-4 autoloading rules.
  *
  * @package MiniCore\Module
  *
- * @example
- * // Example usage:
+ * @example Loading and Initializing Modules:
  * try {
+ *     // Load modules from a YAML config and initialize them
  *     ModuleManager::loadModules(__DIR__ . '/config/modules.yml');
  *     ModuleManager::initializeModules();
+ *
+ *     // Access a specific module
  *     $userModule = ModuleManager::getModule('UserModule');
- *     echo $userModule->getName(); // Output: User Module
+ *     if ($userModule) {
+ *         echo $userModule->getName(); // Example output: User Module
+ *     }
  * } catch (\Exception $e) {
  *     echo 'Error: ' . $e->getMessage();
  * }
@@ -27,28 +32,30 @@ use MiniCore\Module\AbstractModule;
 class ModuleManager
 {
     /**
-     * Array of all registered modules.
+     * Array of all loaded modules.
      *
      * @var AbstractModule[]
      */
     private static array $modules = [];
 
     /**
-     * Array of initialized modules.
+     * Array tracking initialized modules.
      *
      * @var bool[]
      */
     private static array $loadedModules = [];
 
     /**
-     * Loads modules from the specified directory based on the configuration file.
+     * Loads modules from the provided YAML configuration file.
      *
-     * @param string $modulesPath Path to the directory containing modules.
+     * Reads the config, finds module classes, and registers enabled modules.
+     *
      * @param string $configPath Path to the YAML configuration file (modules.yml).
      *
-     * @throws \Exception If the configuration file or module directories/classes are missing.
+     * @throws \Exception If the configuration file or module classes are missing.
      *
      * @example
+     * // Load modules from configuration
      * ModuleManager::loadModules(__DIR__ . '/config/modules.yml');
      */
     public static function loadModules(string $configPath): void
@@ -76,12 +83,17 @@ class ModuleManager
         }
     }
 
-
     /**
-     * Automatically finds a module class ending with 'Modules\{ModuleName}\Module'.
+     * Dynamically searches for a module class in the declared classes.
      *
-     * @param string $moduleId
-     * @return string|null
+     * Looks for a class matching the pattern 'Modules\{ModuleName}\Module'.
+     *
+     * @param string $moduleId Module identifier from the configuration.
+     * @return string|null Fully qualified class name or null if not found.
+     *
+     * @example
+     * $className = ModuleManager::findModuleClass('UserModule');
+     * echo $className; // Output: MiniCore\Modules\UserModule\Module
      */
     private static function findModuleClass(string $moduleId): ?string
     {
@@ -97,12 +109,12 @@ class ModuleManager
     /**
      * Returns all registered modules.
      *
-     * @return AbstractModule[] List of registered modules.
+     * @return AbstractModule[] List of all loaded modules.
      *
      * @example
      * $modules = ModuleManager::getModules();
-     * foreach ($modules as $module) {
-     *     echo $module->getName() . PHP_EOL;
+     * foreach ($modules as $id => $module) {
+     *     echo "$id: " . $module->getName() . PHP_EOL;
      * }
      */
     public static function getModules(): array
@@ -111,14 +123,14 @@ class ModuleManager
     }
 
     /**
-     * Returns all initialized (booted) modules.
+     * Returns all initialized modules.
      *
-     * @return bool[] List of initialized modules.
+     * @return bool[] Array where keys are module IDs and values indicate initialization status.
      *
      * @example
-     * $initializedModules = ModuleManager::getLoadedModules();
-     * foreach ($initializedModules as $moduleId => $status) {
-     *     echo "$moduleId is initialized." . PHP_EOL;
+     * $initialized = ModuleManager::getLoadedModules();
+     * foreach ($initialized as $id => $status) {
+     *     echo "$id is " . ($status ? 'initialized' : 'not initialized') . PHP_EOL;
      * }
      */
     public static function getLoadedModules(): array
@@ -127,9 +139,9 @@ class ModuleManager
     }
 
     /**
-     * Retrieves a specific module by its ID.
+     * Retrieves a specific module by its identifier.
      *
-     * @param string $moduleId The unique identifier of the module.
+     * @param string $moduleId The module's unique identifier.
      * @return AbstractModule|null The module instance or null if not found.
      *
      * @example
@@ -144,7 +156,7 @@ class ModuleManager
     }
 
     /**
-     * Initializes all loaded modules by calling their `boot` method.
+     * Initializes all loaded modules by invoking their `boot()` method.
      * Ensures that each module is only initialized once.
      *
      * @example
