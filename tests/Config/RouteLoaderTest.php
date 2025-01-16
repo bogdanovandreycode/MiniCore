@@ -19,6 +19,10 @@ class RouteLoaderTest extends TestCase
     {
         $this->tempConfigPath = __DIR__ . '/Data/test_routes.yml';
 
+        if (!is_dir(__DIR__ . '/Data')) {
+            mkdir(__DIR__ . '/Data');
+        }
+
         $yamlData = [
             [
                 'method' => 'GET',

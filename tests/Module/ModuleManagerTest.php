@@ -8,6 +8,7 @@ use MiniCore\Module\ModuleManager;
 use MiniCore\Module\AbstractModule;
 use MiniCore\Tests\Module\Modules\TestModule\Module;
 
+use function PHPUnit\Framework\directoryExists;
 
 class ModuleManagerTest extends TestCase
 {
@@ -19,6 +20,10 @@ class ModuleManagerTest extends TestCase
     protected function setUp(): void
     {
         $this->configPath = __DIR__ . '/Data/TestModulesConfig.yml';
+
+        if (!is_dir(__DIR__ . '/Data')) {
+            mkdir(__DIR__ . '/Data');
+        }
 
         // Создание YAML конфигурации для тестового модуля
         $yamlData = [
