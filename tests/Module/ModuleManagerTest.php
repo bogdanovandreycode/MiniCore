@@ -8,8 +8,6 @@ use MiniCore\Module\ModuleManager;
 use MiniCore\Module\AbstractModule;
 use MiniCore\Tests\Module\Modules\TestModule\Module;
 
-use function PHPUnit\Framework\directoryExists;
-
 class ModuleManagerTest extends TestCase
 {
     private string $configPath;

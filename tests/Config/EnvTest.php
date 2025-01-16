@@ -14,6 +14,10 @@ class EnvTest extends TestCase
      */
     protected function setUp(): void
     {
+        if (!is_dir(__DIR__ . '/Data')) {
+            mkdir(__DIR__ . '/Data');
+        }
+
         $this->envPath = __DIR__ . '/Data/';
     }
 

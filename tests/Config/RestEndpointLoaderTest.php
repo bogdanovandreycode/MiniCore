@@ -11,6 +11,7 @@ use MiniCore\Tests\Config\Stub\TestEndpoint;
 class RestEndpointLoaderTest extends TestCase
 {
     private string $tempConfigPath;
+    private string $envPath;
 
     /**
      * Создание временного YAML файла перед тестами
@@ -18,6 +19,23 @@ class RestEndpointLoaderTest extends TestCase
     protected function setUp(): void
     {
         $this->tempConfigPath = __DIR__ . '/Data/test_endpoints.yml';
+
+        if (!is_dir(__DIR__ . '/Data')) {
+            mkdir(__DIR__ . '/Data');
+        }
+
+        $this->envPath = __DIR__ . '/Data/.env.test';
+
+        // Проверка существования .env.test и его создание при необходимости
+        if (!file_exists($this->envPath)) {
+            $envContent = <<<ENV
+DB_HOST=127.0.0.1
+DB_USER=test_user
+APP_DEBUG=true
+ENV;
+
+            file_put_contents($this->envPath, $envContent);
+        }
 
         $yamlData = [
             'endpoints' => [
