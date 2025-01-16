@@ -1,6 +1,6 @@
 <?php
 
-namespace MiniCore\Fields;
+namespace MiniCore\Form\Fields;
 
 use MiniCore\Form\FieldInterface;
 use MiniCore\Form\Enums\ShapeType;

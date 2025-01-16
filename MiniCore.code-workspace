@@ -6,6 +6,7 @@
 	],
 	"settings": {
 		"phpunit.phpunit": "./vendor/bin/phpunit",
-		"phpunit.command": "${php} ${phpargs} ./vendor/bin/phpunit --bootstrap ./vendor/autoload.php -c ./phpunit.xml ${phpunitargs}"
+		"phpunit.command": "${php} ${phpargs} ./vendor/bin/phpunit --bootstrap ./vendor/autoload.php -c ./phpunit.xml ${phpunitargs}",
+		"phpunit.enableAutomaticRefresh": true
 	}
 }

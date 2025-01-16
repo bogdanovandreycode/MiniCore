@@ -1,2 +1,4 @@
-endpoints:
-    - { method: GET, route: /api/test, handler: stdClass }
+-
+    method: GET
+    path: /api/example
+    handler: stdClass

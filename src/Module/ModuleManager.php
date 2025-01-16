@@ -58,12 +58,12 @@ class ModuleManager
         }
 
         $config = Yaml::parseFile($configPath)['modules'] ?? [];
+
         foreach ($config as $moduleId => $moduleConfig) {
             if (!isset($moduleConfig['enabled']) || !$moduleConfig['enabled']) {
-                continue; // Пропустить отключённые модули
+                continue;
             }
 
-            // 🔥 Убираем проверку директории
             $className = self::findModuleClass($moduleId);
 
             if (!$className || !class_exists($className)) {
@@ -85,10 +85,7 @@ class ModuleManager
      */
     private static function findModuleClass(string $moduleId): ?string
     {
-        file_put_contents('test.txt', json_encode(get_declared_classes()));
-
         foreach (get_declared_classes() as $className) {
-
             if (preg_match('/Modules\\\\' . preg_quote($moduleId, '/') . '\\\\Module$/', $className)) {
                 return $className;
             }

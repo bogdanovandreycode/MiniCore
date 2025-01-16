@@ -31,6 +31,8 @@ class ModuleManagerTest extends TestCase
 
         // Генерация конфигурационного файла
         file_put_contents($this->configPath, Yaml::dump($yamlData));
+        // Заглука для постоянного добавления класса в declared classes
+        $stubInstace = new Module();
     }
 
     /**
