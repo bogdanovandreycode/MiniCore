@@ -19,7 +19,7 @@
             "email": "bogdanov.andrey.code@gmail.com"
         }
     ],
-    "minimum-stability": "alpha",
+    "minimum-stability": "beta",
     "prefer-stable": true,
     "require": {
         "vlucas/phpdotenv": "^5.6",
