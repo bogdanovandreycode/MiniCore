@@ -8,25 +8,37 @@ use MiniCore\Form\Fields\TextField;
 use MiniCore\Form\Fields\SelectField;
 
 /**
- * Class FormBuilderTest
+ * Unit tests for the FormBuilder class.
  *
- * Unit tests for the FormBuilder class with real field classes.
+ * This test suite verifies the correct behavior of the FormBuilder class,
+ * ensuring that forms are built and rendered properly with various types of fields and configurations.
  */
 class FormBuilderTest extends TestCase
 {
     /**
-     * Проверка инициализации формы с правильными action и method.
+     * Helper method to load expected HTML from a file.
+     *
+     * @param string $filename Name of the HTML file in the Data directory.
+     * @return string Contents of the HTML file.
+     */
+    private function loadExpectedHtml(string $filename): string
+    {
+        return file_get_contents(__DIR__ . "/StaticData/" . $filename);
+    }
+
+    /**
+     * Tests form initialization with correct action and method.
      */
     public function testFormInitialization(): void
     {
         $form = new FormBuilder('/submit', 'post');
-        $expectedHtml = '<form action="/submit" method="POST" ></form>';
+        $expectedHtml = $this->loadExpectedHtml('form_initialization.html');
 
-        $this->assertEquals($expectedHtml, $form->render(), 'Форма была инициализирована некорректно.');
+        $this->assertEquals($expectedHtml, $form->render(), 'Form was not initialized correctly.');
     }
 
     /**
-     * Проверка добавления текстового поля в форму.
+     * Tests adding a text field to the form.
      */
     public function testAddTextField(): void
     {
@@ -34,13 +46,13 @@ class FormBuilderTest extends TestCase
         $form = new FormBuilder('/submit', 'POST');
         $form->addField($textField);
 
-        $expectedHtml = '<form action="/submit" method="POST" ><input type="text" name="username" value="JohnDoe" class="form-control"/></form>';
+        $expectedHtml = $this->loadExpectedHtml('add_text_field.html');
 
-        $this->assertEquals($expectedHtml, $form->render(), 'Текстовое поле было добавлено или отрендерено некорректно.');
+        $this->assertEquals($expectedHtml, $form->render(), 'Text field was not added or rendered correctly.');
     }
 
     /**
-     * Проверка добавления выпадающего списка в форму.
+     * Tests adding a select field to the form.
      */
     public function testAddSelectField(): void
     {
@@ -53,15 +65,13 @@ class FormBuilderTest extends TestCase
         $form = new FormBuilder('/submit', 'POST');
         $form->addField($selectField);
 
-        $expectedHtml = <<<HTML
-<form action="/submit" method="POST" ><select name="gender" class="form-select"><option value="male" selected>Male</option><option value="female" >Female</option><option value="other" >Other</option></select></form>
-HTML;
+        $expectedHtml = $this->loadExpectedHtml('add_select_field.html');
 
-        $this->assertEquals($expectedHtml, $form->render(), 'Выпадающий список был добавлен некорректно.');
+        $this->assertEquals($expectedHtml, $form->render(), 'Select field was not added correctly.');
     }
 
     /**
-     * Проверка добавления группы полей (fieldset).
+     * Tests adding a fieldset group to the form.
      */
     public function testAddGroup(): void
     {
@@ -71,54 +81,52 @@ HTML;
         $form = new FormBuilder('/submit', 'POST');
         $form->addGroup('User Info', [$firstNameField, $lastNameField]);
 
-        $expectedHtml = <<<HTML
-<form action="/submit" method="POST" ><fieldset><legend>User Info</legend><input type="text" name="first_name" value="" placeholder="First Name"/><input type="text" name="last_name" value="" placeholder="Last Name"/></fieldset></form>
-HTML;
+        $expectedHtml = $this->loadExpectedHtml('add_group.html');
 
-        $this->assertEquals($expectedHtml, $form->render(), 'Группа полей была добавлена некорректно.');
+        $this->assertEquals($expectedHtml, $form->render(), 'Field group was not added correctly.');
     }
 
     /**
-     * Проверка добавления кнопки отправки формы.
+     * Tests adding a submit button to the form.
      */
     public function testAddSubmitButton(): void
     {
         $form = new FormBuilder('/submit', 'POST');
         $form->addSubmitButton('Send', ['class' => 'btn btn-primary']);
 
-        $expectedHtml = '<form action="/submit" method="POST" ><button type="submit" class="btn btn-primary">Send</button></form>';
+        $expectedHtml = $this->loadExpectedHtml('add_submit_button.html');
 
-        $this->assertEquals($expectedHtml, $form->render(), 'Кнопка отправки была добавлена некорректно.');
+        $this->assertEquals($expectedHtml, $form->render(), 'Submit button was not added correctly.');
     }
 
     /**
-     * Проверка добавления пользовательских атрибутов к форме.
+     * Tests applying custom attributes to the form.
      */
     public function testSetAttribute(): void
     {
         $form = new FormBuilder('/submit', 'POST');
         $form->setAttribute('class', 'custom-form')->setAttribute('id', 'form-id');
 
-        $expectedHtml = '<form action="/submit" method="POST" class="custom-form" id="form-id"></form>';
+        $expectedHtml = $this->loadExpectedHtml('set_attribute.html');
 
-        $this->assertEquals($expectedHtml, $form->render(), 'Атрибуты формы были добавлены некорректно.');
+        $this->assertEquals($expectedHtml, $form->render(), 'Form attributes were not added correctly.');
     }
 
     /**
-     * Проверка добавления произвольного HTML к форме.
+     * Tests adding raw HTML content to the form.
      */
     public function testAddRawHtml(): void
     {
         $form = new FormBuilder('/submit', 'POST');
         $form->addField('<p>Custom HTML block</p>');
 
-        $expectedHtml = '<form action="/submit" method="POST" ><p>Custom HTML block</p></form>';
+        $expectedHtml = $this->loadExpectedHtml('add_raw_html.html');
 
-        $this->assertEquals($expectedHtml, $form->render(), 'Произвольный HTML был добавлен некорректно.');
+        $this->assertEquals($expectedHtml, $form->render(), 'Raw HTML was not added correctly.');
     }
 
     /**
-     * Проверка добавления нескольких элементов в форму.
+     * Tests adding multiple fields to the form.
      */
     public function testAddMultipleFields(): void
     {
@@ -130,22 +138,19 @@ HTML;
             ->addField($passwordField)
             ->addSubmitButton('Login');
 
-        $expectedHtml = <<<HTML
-<form action="/login" method="POST" ><input type="text" name="email" value="" placeholder="Enter your email"/><input type="text" name="password" value="" type="password" placeholder="Enter your password"/><button type="submit" >Login</button></form>
-HTML;
+        $expectedHtml = $this->loadExpectedHtml('add_multiple_fields.html');
 
-        $this->assertEquals($expectedHtml, $form->render(), 'Несколько полей были добавлены некорректно.');
+        $this->assertEquals($expectedHtml, $form->render(), 'Multiple fields were not added correctly.');
     }
 
     /**
-     * Проверка, что метод по умолчанию — POST.
+     * Tests that the default method is POST.
      */
     public function testDefaultMethodIsPost(): void
     {
         $form = new FormBuilder('/submit');
+        $expectedHtml = $this->loadExpectedHtml('default_method_post.html');
 
-        $expectedHtml = '<form action="/submit" method="POST" ></form>';
-
-        $this->assertEquals($expectedHtml, $form->render(), 'Метод формы по умолчанию должен быть POST.');
+        $this->assertEquals($expectedHtml, $form->render(), 'Default form method should be POST.');
     }
 }

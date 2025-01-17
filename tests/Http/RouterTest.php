@@ -7,11 +7,26 @@ use MiniCore\Http\Router;
 use MiniCore\Http\Request;
 use MiniCore\API\EndpointInterface;
 
+/**
+ * Unit tests for the Router class.
+ *
+ * This test suite verifies the correct functionality of the Router class,
+ * ensuring that routes are properly registered, handled, and normalized.
+ *
+ * Covered functionality:
+ * - Registering routes with HTTP methods and paths.
+ * - Handling requests with registered routes.
+ * - Handling requests with unregistered routes.
+ * - Handling requests with unsupported HTTP methods.
+ * - Normalizing route paths.
+ */
 class RouterTest extends TestCase
 {
+    /**
+     * Clears registered routes before each test.
+     */
     protected function setUp(): void
     {
-        // Очищаем маршруты перед каждым тестом
         $reflection = new \ReflectionClass(Router::class);
         $routesProperty = $reflection->getProperty('routes');
         $routesProperty->setAccessible(true);
@@ -19,7 +34,7 @@ class RouterTest extends TestCase
     }
 
     /**
-     * Тест регистрации маршрута
+     * Tests registering a new route.
      */
     public function testRegisterRoute()
     {
@@ -28,13 +43,13 @@ class RouterTest extends TestCase
 
         $routes = Router::getRoutes();
 
-        $this->assertArrayHasKey('GET', $routes);
-        $this->assertArrayHasKey('/test', $routes['GET']);
-        $this->assertSame($endpointMock, $routes['GET']['/test']);
+        $this->assertArrayHasKey('GET', $routes, 'Route method GET should be registered.');
+        $this->assertArrayHasKey('/test', $routes['GET'], 'Route /test should be registered.');
+        $this->assertSame($endpointMock, $routes['GET']['/test'], 'Registered endpoint should match.');
     }
 
     /**
-     * Тест обработки запроса с существующим маршрутом
+     * Tests handling a request with a registered route.
      */
     public function testHandleRequestWithRegisteredRoute()
     {
@@ -53,11 +68,11 @@ class RouterTest extends TestCase
 
         $response = Router::handle($requestMock);
 
-        $this->assertEquals('Handled Response', $response);
+        $this->assertEquals('Handled Response', $response, 'Response should match the handler output.');
     }
 
     /**
-     * Тест обработки запроса с несуществующим маршрутом
+     * Tests handling a request with an unregistered route.
      */
     public function testHandleRequestWithUnregisteredRoute()
     {
@@ -65,11 +80,6 @@ class RouterTest extends TestCase
         $this->expectExceptionMessage('Route not found');
         $this->expectExceptionCode(404);
 
-        // Регистрируем маршрут с методом GET, но другим путем
-        $endpointMock = $this->createMock(EndpointInterface::class);
-        Router::register('GET', '/existing-route', $endpointMock);
-
-        // Проверяем запрос на несуществующий маршрут
         $requestMock = $this->createMock(Request::class);
         $requestMock->method('getMethod')->willReturn('GET');
         $requestMock->method('getPath')->willReturn('/not-registered');
@@ -78,7 +88,7 @@ class RouterTest extends TestCase
     }
 
     /**
-     * Тест обработки запроса с неразрешённым методом
+     * Tests handling a request with an unsupported HTTP method.
      */
     public function testHandleRequestWithUnsupportedMethod()
     {
@@ -94,7 +104,7 @@ class RouterTest extends TestCase
     }
 
     /**
-     * Тест нормализации маршрута
+     * Tests route path normalization.
      */
     public function testRouteNormalization()
     {
@@ -102,10 +112,9 @@ class RouterTest extends TestCase
         $method = $reflection->getMethod('normalizePath');
         $method->setAccessible(true);
 
-        $this->assertEquals('/api/user', $method->invoke(null, '/api/user/'));
-        $this->assertEquals('/api/user', $method->invoke(null, 'api/user'));
-        $this->assertEquals('/api/user', $method->invoke(null, '\\api\\user'));
-        $this->assertEquals('/api/user', $method->invoke(null, '\\api\\user\\'));
-        $this->assertEquals('/api/user', $method->invoke(null, '//api//user//'));
+        $this->assertEquals('/api/user', $method->invoke(null, '/api/user/'), 'Trailing slash should be removed.');
+        $this->assertEquals('/api/user', $method->invoke(null, 'api/user'), 'Missing leading slash should be added.');
+        $this->assertEquals('/api/user', $method->invoke(null, '\\api\\user'), 'Backslashes should be normalized.');
+        $this->assertEquals('/api/user', $method->invoke(null, '//api//user//'), 'Multiple slashes should be collapsed.');
     }
 }

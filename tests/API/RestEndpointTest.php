@@ -7,21 +7,33 @@ use MiniCore\Http\Request;
 use MiniCore\API\RestEndpoint;
 
 /**
- * Тест RestEndpoint
+ * Unit tests for the RestEndpoint class.
+ *
+ * This test suite verifies the correct handling of query and body parameters
+ * in the RestEndpoint implementation, including validation of required fields
+ * and proper exception handling when required parameters are missing.
+ *
+ * Covered functionality:
+ * - Retrieval of query parameters with and without required fields
+ * - Retrieval of body parameters with and without required fields
+ * - Exception handling for missing required parameters
  */
 class RestEndpointTest extends TestCase
 {
     /**
-     * @var RestEndpoint
+     * @var RestEndpoint Mocked instance of the RestEndpoint for testing purposes.
      */
     private RestEndpoint $endpoint;
 
     /**
-     * Создание заглушки для RestEndpoint
+     * Sets up a mock RestEndpoint instance for testing.
+     *
+     * An anonymous class is used to override abstract methods and simulate
+     * endpoint behavior.
      */
     protected function setUp(): void
     {
-        // Анонимный класс для замены устаревшего getMockForAbstractClass
+        // Anonymous class to replace the deprecated getMockForAbstractClass
         $this->endpoint = new class extends RestEndpoint {
             public function handle(array $params): mixed
             {
@@ -41,7 +53,7 @@ class RestEndpointTest extends TestCase
     }
 
     /**
-     * Тест получения query параметров без обязательных полей
+     * Tests retrieving query parameters without required fields.
      */
     public function testGetQueryParamsWithoutRequiredArgs()
     {
@@ -53,7 +65,7 @@ class RestEndpointTest extends TestCase
     }
 
     /**
-     * Тест получения query параметров с обязательными полями
+     * Tests retrieving query parameters with required fields.
      */
     public function testGetQueryParamsWithRequiredArgs()
     {
@@ -68,7 +80,7 @@ class RestEndpointTest extends TestCase
     }
 
     /**
-     * Тест исключения при отсутствии обязательного query параметра
+     * Tests that an exception is thrown when a required query parameter is missing.
      */
     public function testGetQueryParamsMissingRequiredArg()
     {
@@ -84,7 +96,7 @@ class RestEndpointTest extends TestCase
     }
 
     /**
-     * Тест получения body параметров без обязательных полей
+     * Tests retrieving body parameters without required fields.
      */
     public function testGetBodyParamsWithoutRequiredArgs()
     {
@@ -96,7 +108,7 @@ class RestEndpointTest extends TestCase
     }
 
     /**
-     * Тест получения body параметров с обязательными полями
+     * Tests retrieving body parameters with required fields.
      */
     public function testGetBodyParamsWithRequiredArgs()
     {
@@ -111,7 +123,7 @@ class RestEndpointTest extends TestCase
     }
 
     /**
-     * Тест исключения при отсутствии обязательного body параметра
+     * Tests that an exception is thrown when a required body parameter is missing.
      */
     public function testGetBodyParamsMissingRequiredArg()
     {
@@ -127,7 +139,11 @@ class RestEndpointTest extends TestCase
     }
 
     /**
-     * Вспомогательный метод для вызова защищённых методов
+     * Helper method to invoke protected methods using reflection.
+     *
+     * @param string $methodName Name of the method to invoke.
+     * @param array $parameters Parameters to pass to the method.
+     * @return mixed Result of the invoked method.
      */
     private function invokeMethod(string $methodName, array $parameters)
     {

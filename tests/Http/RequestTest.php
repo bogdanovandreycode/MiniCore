@@ -5,10 +5,23 @@ namespace MiniCore\Tests\Http;
 use PHPUnit\Framework\TestCase;
 use MiniCore\Http\Request;
 
+/**
+ * Unit tests for the Request class.
+ *
+ * This test suite verifies the core functionality of the Request class,
+ * ensuring that HTTP requests are properly constructed, normalized, and accessible.
+ *
+ * Covered functionality:
+ * - Proper initialization of the Request object with method, path, query, body, and headers.
+ * - Accessing query and body parameters via `getParam()` and `getParams()`.
+ * - Handling and retrieving headers.
+ * - Normalizing request paths.
+ * - Creating a Request object from global server variables.
+ */
 class RequestTest extends TestCase
 {
     /**
-     * Тест инициализации объекта Request
+     * Tests the correct initialization of the Request object.
      */
     public function testRequestInitialization()
     {
@@ -28,19 +41,19 @@ class RequestTest extends TestCase
     }
 
     /**
-     * Тест получения query и body параметров через getParam()
+     * Tests retrieving query and body parameters using getParam().
      */
     public function testGetParam()
     {
         $request = new Request('GET', '/search', ['q' => 'php'], ['page' => 2]);
 
-        $this->assertEquals('php', $request->getParam('q'));         // Из query
-        $this->assertEquals(2, $request->getParam('page'));          // Из body
-        $this->assertEquals('default', $request->getParam('none', 'default')); // Отсутствующий параметр
+        $this->assertEquals('php', $request->getParam('q'));
+        $this->assertEquals(2, $request->getParam('page'));
+        $this->assertEquals('default', $request->getParam('none', 'default'));
     }
 
     /**
-     * Тест объединения параметров через getParams()
+     * Tests merging query and body parameters using getParams().
      */
     public function testGetParams()
     {
@@ -49,17 +62,11 @@ class RequestTest extends TestCase
     }
 
     /**
-     * Тест работы с заголовками
+     * Tests header retrieval and case insensitivity.
      */
     public function testGetHeader()
     {
-        $request = new Request(
-            'GET',
-            '/info',
-            [],
-            [],
-            ['authorization' => 'Bearer token']
-        );
+        $request = new Request('GET', '/info', [], [], ['authorization' => 'Bearer token']);
 
         $this->assertEquals('Bearer token', $request->getHeader('Authorization'));
         $this->assertNull($request->getHeader('Non-Existent'));
@@ -67,7 +74,7 @@ class RequestTest extends TestCase
     }
 
     /**
-     * Тест нормализации пути
+     * Tests path normalization to ensure consistent formatting.
      */
     public function testNormalizePath()
     {
@@ -75,7 +82,6 @@ class RequestTest extends TestCase
         $method = $reflection->getMethod('normalizePath');
         $method->setAccessible(true);
 
-        // Создаём объект Request
         $request = new Request('GET', '/');
 
         $this->assertEquals('/api/user', $method->invokeArgs($request, ['/api/user/']));
@@ -84,7 +90,7 @@ class RequestTest extends TestCase
     }
 
     /**
-     * Тест создания объекта из суперглобальных переменных
+     * Tests creating a Request object from global server variables.
      */
     public function testFromGlobals()
     {
@@ -104,7 +110,7 @@ class RequestTest extends TestCase
     }
 
     /**
-     * Очистка суперглобальных переменных после тестов
+     * Cleans up superglobal variables after each test.
      */
     protected function tearDown(): void
     {

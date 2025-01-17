@@ -7,7 +7,16 @@ use MiniCore\View\ViewLoader;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * Тесты для ViewLoader
+ * Unit tests for the ViewLoader class.
+ *
+ * This test suite verifies the correct behavior of the ViewLoader class,
+ * ensuring that view templates and layouts are properly loaded, rendered, and handled.
+ *
+ * Covered functionality:
+ * - Loading view configuration from a YAML file.
+ * - Rendering templates with and without layouts.
+ * - Handling missing configuration files and templates.
+ * - Error handling when templates are not defined.
  */
 class ViewLoaderTest extends TestCase
 {
@@ -15,29 +24,24 @@ class ViewLoaderTest extends TestCase
     private string $tempViewsPath;
 
     /**
-     * Создание временных файлов перед тестами
+     * Creates temporary configuration and view files before each test.
      */
     protected function setUp(): void
     {
-        // Временные пути
         $this->tempConfigPath = __DIR__ . '/Data/test_views.yml';
         $this->tempViewsPath = __DIR__ . '/Data/Views';
 
-        // Создание директории для шаблонов
         if (!is_dir(__DIR__ . '/Data')) {
             mkdir(__DIR__ . '/Data', 0777, true);
         }
 
-        // Создание директории для шаблонов
         if (!is_dir($this->tempViewsPath)) {
             mkdir($this->tempViewsPath, 0777, true);
         }
 
-        // Создание шаблона
         file_put_contents($this->tempViewsPath . '/template.php', '<h1><?= $title ?></h1>');
         file_put_contents($this->tempViewsPath . '/layout.php', '<div><?= $content ?></div>');
 
-        // YAML конфигурация
         $yamlData = [
             'views' => [
                 'home.index' => [
@@ -54,7 +58,7 @@ class ViewLoaderTest extends TestCase
     }
 
     /**
-     * Удаление временных файлов после тестов
+     * Deletes temporary files after each test.
      */
     protected function tearDown(): void
     {
@@ -65,9 +69,9 @@ class ViewLoaderTest extends TestCase
     }
 
     /**
-     * Тест загрузки конфигурации представлений
+     * Tests loading view configurations from YAML.
      */
-    public function testLoadConfig()
+    public function testLoadConfig(): void
     {
         ViewLoader::loadConfig($this->tempConfigPath, $this->tempViewsPath);
 
@@ -76,36 +80,36 @@ class ViewLoaderTest extends TestCase
         $property->setAccessible(true);
         $views = $property->getValue();
 
-        $this->assertArrayHasKey('home.index', $views);
-        $this->assertArrayHasKey('home.withLayout', $views);
+        $this->assertArrayHasKey('home.index', $views, 'View home.index should be loaded.');
+        $this->assertArrayHasKey('home.withLayout', $views, 'View home.withLayout should be loaded.');
     }
 
     /**
-     * Тест рендера представления без лэйаута
+     * Tests rendering a template without a layout.
      */
-    public function testRenderTemplateWithoutLayout()
+    public function testRenderTemplateWithoutLayout(): void
     {
         ViewLoader::loadConfig($this->tempConfigPath, $this->tempViewsPath);
         $result = ViewLoader::render('home.index', ['title' => 'Hello, World!']);
 
-        $this->assertEquals('<h1>Hello, World!</h1>', trim($result));
+        $this->assertEquals('<h1>Hello, World!</h1>', trim($result), 'Template should render without layout.');
     }
 
     /**
-     * Тест рендера представления с лэйаутом
+     * Tests rendering a template with a layout.
      */
-    public function testRenderTemplateWithLayout()
+    public function testRenderTemplateWithLayout(): void
     {
         ViewLoader::loadConfig($this->tempConfigPath, $this->tempViewsPath);
         $result = ViewLoader::render('home.withLayout', ['title' => 'Hello, Layout!']);
 
-        $this->assertEquals('<div><h1>Hello, Layout!</h1></div>', trim($result));
+        $this->assertEquals('<div><h1>Hello, Layout!</h1></div>', trim($result), 'Template should render with layout.');
     }
 
     /**
-     * Тест ошибки при отсутствии конфигурационного файла
+     * Tests error handling when the configuration file is missing.
      */
-    public function testLoadNonExistentConfig()
+    public function testLoadNonExistentConfig(): void
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Views configuration file not found');
@@ -114,11 +118,10 @@ class ViewLoaderTest extends TestCase
     }
 
     /**
-     * Тест ошибки при отсутствии шаблона
+     * Tests error handling when the template file is missing.
      */
-    public function testRenderNonExistentTemplate()
+    public function testRenderNonExistentTemplate(): void
     {
-        // Создание конфигурации с несуществующим шаблоном
         $invalidConfigPath = __DIR__ . '/Data/invalid_views.yml';
 
         $yamlData = [
@@ -131,25 +134,21 @@ class ViewLoaderTest extends TestCase
 
         file_put_contents($invalidConfigPath, Yaml::dump($yamlData));
 
-        // Загрузка конфигурации
         ViewLoader::loadConfig($invalidConfigPath, $this->tempViewsPath);
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage("Template 'nonexistent.php' not found");
 
-        // Рендеринг шаблона с несуществующим файлом
         ViewLoader::render('broken.view');
 
         unlink($invalidConfigPath);
     }
 
-
     /**
-     * Тест ошибки при отсутствии шаблона в конфигурации
+     * Tests error handling when the template is missing in the configuration.
      */
-    public function testRenderViewWithoutTemplate()
+    public function testRenderViewWithoutTemplate(): void
     {
-        // Конфигурация без template
         $invalidConfigPath = __DIR__ . '/Data/invalid_views.yml';
         $yamlData = [
             'views' => [

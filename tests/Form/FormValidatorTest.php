@@ -6,14 +6,24 @@ use PHPUnit\Framework\TestCase;
 use MiniCore\Form\FormValidator;
 
 /**
- * Class FormValidatorTest
- *
  * Unit tests for the FormValidator class.
+ *
+ * This test suite verifies the core functionality of the FormValidator class,
+ * ensuring that form data is validated correctly according to specified rules.
+ *
+ * Covered functionality:
+ * - Successful validation of correct data.
+ * - Handling validation errors for incorrect data.
+ * - Checking for errors on specific fields.
+ * - Retrieving detailed error messages.
+ * - Applying multiple validation rules to a single field.
+ * - Validating data without any rules.
+ * - Detecting missing fields in the submitted data.
  */
 class FormValidatorTest extends TestCase
 {
     /**
-     * Проверка успешной валидации без ошибок.
+     * Tests successful validation without errors.
      */
     public function testValidationSuccess(): void
     {
@@ -27,12 +37,12 @@ class FormValidatorTest extends TestCase
             'email' => 'john@example.com'
         ];
 
-        $this->assertTrue($validator->validate($data), 'Валидация должна пройти успешно при корректных данных.');
-        $this->assertEmpty($validator->getErrors(), 'Ошибок быть не должно.');
+        $this->assertTrue($validator->validate($data), 'Validation should pass with correct data.');
+        $this->assertEmpty($validator->getErrors(), 'There should be no validation errors.');
     }
 
     /**
-     * Проверка валидации с ошибками.
+     * Tests validation failure with incorrect data.
      */
     public function testValidationFailure(): void
     {
@@ -46,13 +56,13 @@ class FormValidatorTest extends TestCase
             'email' => 'invalid-email'
         ];
 
-        $this->assertFalse($validator->validate($data), 'Валидация должна завершиться ошибкой.');
-        $this->assertArrayHasKey('username', $validator->getErrors(), 'Ошибка должна быть для поля username.');
-        $this->assertArrayHasKey('email', $validator->getErrors(), 'Ошибка должна быть для поля email.');
+        $this->assertFalse($validator->validate($data), 'Validation should fail with incorrect data.');
+        $this->assertArrayHasKey('username', $validator->getErrors(), 'Error should exist for username field.');
+        $this->assertArrayHasKey('email', $validator->getErrors(), 'Error should exist for email field.');
     }
 
     /**
-     * Проверка наличия ошибок у конкретного поля.
+     * Tests checking if specific fields have validation errors.
      */
     public function testHasErrors(): void
     {
@@ -64,12 +74,12 @@ class FormValidatorTest extends TestCase
 
         $validator->validate($data);
 
-        $this->assertTrue($validator->hasErrors('password'), 'Поле password должно содержать ошибку.');
-        $this->assertFalse($validator->hasErrors('username'), 'Поле username не должно содержать ошибок.');
+        $this->assertTrue($validator->hasErrors('password'), 'Password field should have a validation error.');
+        $this->assertFalse($validator->hasErrors('username'), 'Username field should not have a validation error.');
     }
 
     /**
-     * Проверка получения сообщений об ошибках для конкретного поля.
+     * Tests retrieving error messages for specific fields.
      */
     public function testGetFieldErrors(): void
     {
@@ -84,12 +94,12 @@ class FormValidatorTest extends TestCase
 
         $errors = $validator->getFieldErrors('age');
 
-        $this->assertCount(1, $errors, 'Должна быть одна ошибка для поля age.');
-        $this->assertEquals('Age must be 18 or older', $errors[0], 'Ошибка должна соответствовать правилу.');
+        $this->assertCount(1, $errors, 'There should be one error for the age field.');
+        $this->assertEquals('Age must be 18 or older', $errors[0], 'Error message should match the rule.');
     }
 
     /**
-     * Проверка работы нескольких правил для одного поля.
+     * Tests applying multiple rules to a single field.
      */
     public function testMultipleRulesForField(): void
     {
@@ -105,14 +115,13 @@ class FormValidatorTest extends TestCase
 
         $errors = $validator->getFieldErrors('password');
 
-        $this->assertCount(2, $errors, 'Должно быть две ошибки для поля password.');
-        $this->assertContains('Password must contain an uppercase letter', $errors, 'Ошибка про заглавную букву должна быть.');
-        $this->assertContains('Password must contain a number', $errors, 'Ошибка про цифру должна быть.');
+        $this->assertCount(2, $errors, 'Password field should have two validation errors.');
+        $this->assertContains('Password must contain an uppercase letter', $errors, 'Error about uppercase letter should be present.');
+        $this->assertContains('Password must contain a number', $errors, 'Error about number should be present.');
     }
 
-
     /**
-     * Проверка валидации без добавленных правил.
+     * Tests validation without any defined rules.
      */
     public function testValidationWithoutRules(): void
     {
@@ -120,12 +129,12 @@ class FormValidatorTest extends TestCase
 
         $data = ['any_field' => 'any_value'];
 
-        $this->assertTrue($validator->validate($data), 'Валидация должна пройти успешно, если нет правил.');
-        $this->assertEmpty($validator->getErrors(), 'Ошибок быть не должно.');
+        $this->assertTrue($validator->validate($data), 'Validation should pass if no rules are defined.');
+        $this->assertEmpty($validator->getErrors(), 'There should be no validation errors.');
     }
 
     /**
-     * Проверка валидации отсутствующего поля в данных.
+     * Tests validation when a required field is missing.
      */
     public function testMissingFieldInData(): void
     {
@@ -133,11 +142,11 @@ class FormValidatorTest extends TestCase
 
         $validator->addRule('email', fn($value) => !empty($value), 'Email is required');
 
-        $data = []; // Поле email отсутствует
+        $data = [];
 
         $validator->validate($data);
 
-        $this->assertTrue($validator->hasErrors('email'), 'Ошибка должна быть для отсутствующего поля email.');
-        $this->assertEquals(['Email is required'], $validator->getFieldErrors('email'), 'Сообщение об ошибке должно быть корректным.');
+        $this->assertTrue($validator->hasErrors('email'), 'Error should exist for missing email field.');
+        $this->assertEquals(['Email is required'], $validator->getFieldErrors('email'), 'Error message should be correct.');
     }
 }

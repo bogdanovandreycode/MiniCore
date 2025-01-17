@@ -8,13 +8,34 @@ use Symfony\Component\Yaml\Yaml;
 use MiniCore\Config\RestEndpointLoader;
 use MiniCore\Tests\Config\Stub\TestEndpoint;
 
+/**
+ * Unit tests for the RestEndpointLoader class.
+ *
+ * This test suite ensures the proper loading and validation of REST endpoints from YAML configuration files.
+ *
+ * Covered functionality:
+ * - Loading valid endpoints from YAML files.
+ * - Handling missing configuration files.
+ * - Validating endpoint configuration keys.
+ * - Checking for existing handler classes.
+ * - Verifying handler implementation of the required interface.
+ */
 class RestEndpointLoaderTest extends TestCase
 {
+    /**
+     * @var string Path to the temporary YAML configuration file.
+     */
     private string $tempConfigPath;
+
+    /**
+     * @var string Path to the temporary .env file.
+     */
     private string $envPath;
 
     /**
-     * Создание временного YAML файла перед тестами
+     * Sets up the environment before each test.
+     *
+     * Creates a temporary YAML file and a `.env` file required for testing.
      */
     protected function setUp(): void
     {
@@ -26,14 +47,15 @@ class RestEndpointLoaderTest extends TestCase
 
         $this->envPath = __DIR__ . '/Data/.env.test';
 
-        // Проверка существования .env.test и его создание при необходимости
+        // Create .env.test file if it doesn't exist
         if (!file_exists($this->envPath)) {
-            $envContent = <<<ENV
-DB_HOST=127.0.0.1
-DB_USER=test_user
-APP_DEBUG=true
-ENV;
+            $envData = [
+                'DB_HOST' => '127.0.0.1',
+                'DB_USER' => 'test_user',
+                'APP_DEBUG' => 'true'
+            ];
 
+            $envContent = implode("\n", array_map(fn($key, $value) => "$key=$value", array_keys($envData), $envData));
             file_put_contents($this->envPath, $envContent);
         }
 
@@ -51,7 +73,7 @@ ENV;
     }
 
     /**
-     * Удаление временного файла после тестов
+     * Cleans up temporary files after each test.
      */
     protected function tearDown(): void
     {
@@ -61,7 +83,7 @@ ENV;
     }
 
     /**
-     * Тест успешной загрузки эндпоинта из YAML
+     * Tests successful loading of a valid endpoint from a YAML file.
      */
     public function testLoadValidEndpoint()
     {
@@ -75,7 +97,7 @@ ENV;
     }
 
     /**
-     * Тест ошибки при отсутствии файла
+     * Tests exception handling when the configuration file is missing.
      */
     public function testLoadNonExistentFile()
     {
@@ -86,7 +108,7 @@ ENV;
     }
 
     /**
-     * Тест ошибки при отсутствии ключей в конфигурации
+     * Tests exception handling for invalid endpoint configuration (missing method).
      */
     public function testInvalidEndpointConfiguration()
     {
@@ -95,7 +117,7 @@ ENV;
         $yamlData = [
             'endpoints' => [
                 [
-                    'route' => '/api/test'  // Метод отсутствует
+                    'route' => '/api/test' // Missing 'method' key
                 ]
             ]
         ];
@@ -111,7 +133,7 @@ ENV;
     }
 
     /**
-     * Тест ошибки при отсутствии обработчика
+     * Tests exception handling when the handler class does not exist.
      */
     public function testHandlerClassNotFound()
     {
@@ -135,7 +157,7 @@ ENV;
     }
 
     /**
-     * Тест ошибки, если обработчик не реализует EndpointInterface
+     * Tests exception handling when the handler does not implement the required interface.
      */
     public function testHandlerDoesNotImplementInterface()
     {

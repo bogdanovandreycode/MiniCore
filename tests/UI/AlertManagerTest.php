@@ -7,14 +7,21 @@ use MiniCore\UI\AlertManager;
 use MiniCore\UI\AlertType;
 
 /**
- * Class AlertManagerTest
+ * Unit tests for the AlertManager class.
  *
- * Tests for the AlertManager class.
+ * This test suite verifies the correct behavior of the AlertManager class,
+ * ensuring that alerts are added, managed, and rendered properly.
+ *
+ * Covered functionality:
+ * - Adding single and multiple alerts with various types.
+ * - Rendering alerts into HTML format.
+ * - Clearing alerts from the storage.
+ * - Handling the rendering of empty alerts.
  */
 class AlertManagerTest extends TestCase
 {
     /**
-     * Reset alerts before each test.
+     * Resets the alert list before each test to ensure a clean state.
      */
     protected function setUp(): void
     {
@@ -22,7 +29,7 @@ class AlertManagerTest extends TestCase
     }
 
     /**
-     * Test adding a single alert.
+     * Tests adding a single alert and verifying its storage.
      */
     public function testAddSingleAlert(): void
     {
@@ -31,12 +38,12 @@ class AlertManagerTest extends TestCase
         $alerts = AlertManager::getAlerts();
 
         $this->assertCount(1, $alerts, 'Expected one alert to be added.');
-        $this->assertEquals(AlertType::SUCCESS, $alerts[0]['type']);
-        $this->assertEquals('Operation was successful.', $alerts[0]['message']);
+        $this->assertEquals(AlertType::SUCCESS, $alerts[0]['type'], 'Alert type should be SUCCESS.');
+        $this->assertEquals('Operation was successful.', $alerts[0]['message'], 'Alert message should match.');
     }
 
     /**
-     * Test adding multiple alerts.
+     * Tests adding multiple alerts and verifying their order and content.
      */
     public function testAddMultipleAlerts(): void
     {
@@ -59,7 +66,7 @@ class AlertManagerTest extends TestCase
     }
 
     /**
-     * Test rendering of alerts as HTML.
+     * Tests rendering of alerts into HTML format.
      */
     public function testRenderAlerts(): void
     {
@@ -75,7 +82,7 @@ class AlertManagerTest extends TestCase
     }
 
     /**
-     * Test clearing of alerts.
+     * Tests clearing all alerts from the manager.
      */
     public function testClearAlerts(): void
     {
@@ -88,7 +95,7 @@ class AlertManagerTest extends TestCase
     }
 
     /**
-     * Test rendering with no alerts (should return empty string).
+     * Tests rendering with no alerts, which should return an empty string.
      */
     public function testRenderEmptyAlerts(): void
     {

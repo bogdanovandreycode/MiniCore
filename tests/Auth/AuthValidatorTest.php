@@ -5,24 +5,38 @@ namespace MiniCore\Tests\Auth;
 use PHPUnit\Framework\TestCase;
 use MiniCore\Auth\AuthValidator;
 
+/**
+ * Unit tests for the AuthValidator class.
+ *
+ * This test suite verifies the core authentication validation logic, including:
+ * - Credential validation with correct and incorrect data.
+ * - Password strength validation.
+ * - Username format and length validation.
+ */
 class AuthValidatorTest extends TestCase
 {
+    /**
+     * @var AuthValidator Instance of AuthValidator for testing.
+     */
     private AuthValidator $validator;
 
+    /**
+     * Initializes the AuthValidator instance before each test.
+     */
     protected function setUp(): void
     {
         $this->validator = new AuthValidator();
     }
 
     /**
-     * Тест проверки валидных учетных данных
+     * Tests successful validation of correct user credentials.
      */
     public function testValidateCredentialsSuccess()
     {
         $username = 'admin';
         $password = 'SecurePass123!';
 
-        // Симуляция получения пользователя из базы данных
+        // Simulates fetching a user from the database.
         $getUserByUsername = function ($name) use ($username, $password) {
             if ($name === $username) {
                 return [
@@ -38,7 +52,7 @@ class AuthValidatorTest extends TestCase
     }
 
     /**
-     * Тест проверки неверного пароля
+     * Tests validation failure when an incorrect password is provided.
      */
     public function testValidateCredentialsWrongPassword()
     {
@@ -58,7 +72,7 @@ class AuthValidatorTest extends TestCase
     }
 
     /**
-     * Тест проверки несуществующего пользователя
+     * Tests validation failure when the user does not exist.
      */
     public function testValidateCredentialsUserNotFound()
     {
@@ -69,7 +83,7 @@ class AuthValidatorTest extends TestCase
     }
 
     /**
-     * Тест валидного сложного пароля
+     * Tests that a strong password passes the strength validation.
      */
     public function testValidatePasswordStrengthSuccess()
     {
@@ -79,7 +93,7 @@ class AuthValidatorTest extends TestCase
     }
 
     /**
-     * Тест простого пароля (без спецсимволов)
+     * Tests that a weak password without special characters fails validation.
      */
     public function testValidatePasswordStrengthWeakPassword()
     {
@@ -89,7 +103,7 @@ class AuthValidatorTest extends TestCase
     }
 
     /**
-     * Тест сложного пароля, не содержащего цифры
+     * Tests that a password without digits fails the strength validation.
      */
     public function testValidatePasswordStrengthNoDigits()
     {
@@ -99,7 +113,7 @@ class AuthValidatorTest extends TestCase
     }
 
     /**
-     * Тест валидного имени пользователя
+     * Tests that a properly formatted username passes validation.
      */
     public function testValidateUsernameSuccess()
     {
@@ -109,7 +123,7 @@ class AuthValidatorTest extends TestCase
     }
 
     /**
-     * Тест слишком короткого имени пользователя
+     * Tests that a username that is too short fails validation.
      */
     public function testValidateUsernameTooShort()
     {
@@ -119,7 +133,7 @@ class AuthValidatorTest extends TestCase
     }
 
     /**
-     * Тест слишком длинного имени пользователя
+     * Tests that a username that is too long fails validation.
      */
     public function testValidateUsernameTooLong()
     {
@@ -129,7 +143,7 @@ class AuthValidatorTest extends TestCase
     }
 
     /**
-     * Тест имени пользователя с недопустимыми символами
+     * Tests that a username with invalid characters fails validation.
      */
     public function testValidateUsernameInvalidCharacters()
     {

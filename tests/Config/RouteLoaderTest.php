@@ -8,12 +8,30 @@ use MiniCore\Config\RouteLoader;
 use Symfony\Component\Yaml\Yaml;
 use MiniCore\Tests\Config\Stub\TestRouteHandler;
 
+/**
+ * Unit tests for the RouteLoader class.
+ *
+ * This test suite verifies the correct loading and validation of route configurations
+ * from YAML files into the application's routing system.
+ *
+ * Covered functionality:
+ * - Successful loading of valid routes.
+ * - Handling missing configuration files.
+ * - Validation of route configurations.
+ * - Checking for existing handler classes.
+ * - Verifying that handlers implement the required interface.
+ */
 class RouteLoaderTest extends TestCase
 {
+    /**
+     * @var string Path to the temporary YAML configuration file.
+     */
     private string $tempConfigPath;
 
     /**
-     * Создание временного YAML файла перед тестами
+     * Sets up the environment before each test.
+     *
+     * Creates a temporary YAML configuration file for testing route loading.
      */
     protected function setUp(): void
     {
@@ -35,7 +53,7 @@ class RouteLoaderTest extends TestCase
     }
 
     /**
-     * Удаление временного файла после тестов
+     * Cleans up the temporary YAML file after each test.
      */
     protected function tearDown(): void
     {
@@ -45,7 +63,7 @@ class RouteLoaderTest extends TestCase
     }
 
     /**
-     * Тест успешной загрузки маршрута из YAML
+     * Tests successful loading of a valid route from a YAML file.
      */
     public function testLoadValidRoute()
     {
@@ -59,7 +77,7 @@ class RouteLoaderTest extends TestCase
     }
 
     /**
-     * Тест ошибки при отсутствии файла
+     * Tests exception handling when the configuration file does not exist.
      */
     public function testLoadNonExistentFile()
     {
@@ -70,7 +88,7 @@ class RouteLoaderTest extends TestCase
     }
 
     /**
-     * Тест ошибки при некорректной конфигурации маршрута
+     * Tests exception handling for invalid route configuration (missing method).
      */
     public function testInvalidRouteConfiguration()
     {
@@ -78,7 +96,7 @@ class RouteLoaderTest extends TestCase
 
         $yamlData = [
             [
-                'path' => '/api/example'  // Отсутствует метод
+                'path' => '/api/example' // Missing 'method' key
             ]
         ];
 
@@ -93,7 +111,7 @@ class RouteLoaderTest extends TestCase
     }
 
     /**
-     * Тест ошибки при отсутствии обработчика
+     * Tests exception handling when the handler class does not exist.
      */
     public function testHandlerClassNotFound()
     {
@@ -118,7 +136,7 @@ class RouteLoaderTest extends TestCase
     }
 
     /**
-     * Тест ошибки, если обработчик не реализует EndpointInterface
+     * Tests exception handling when the handler does not implement the required interface.
      */
     public function testHandlerDoesNotImplementInterface()
     {

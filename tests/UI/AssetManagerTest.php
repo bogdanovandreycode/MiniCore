@@ -6,14 +6,23 @@ use PHPUnit\Framework\TestCase;
 use MiniCore\UI\AssetManager;
 
 /**
- * Class AssetManagerTest
+ * Unit tests for the AssetManager class.
  *
- * Tests for the AssetManager class.
+ * This test suite verifies the core functionality of the AssetManager class,
+ * ensuring that styles and scripts are correctly managed, rendered, and cleared.
+ *
+ * Covered functionality:
+ * - Adding and rendering CSS styles.
+ * - Adding and rendering JavaScript scripts (header and footer).
+ * - Preventing duplication of styles and scripts.
+ * - Selective rendering of footer scripts.
+ * - Clearing all registered assets.
+ * - Rendering with no registered assets.
  */
 class AssetManagerTest extends TestCase
 {
     /**
-     * Очистка всех стилей и скриптов перед каждым тестом.
+     * Clears all styles and scripts before each test to ensure a clean state.
      */
     protected function setUp(): void
     {
@@ -21,7 +30,7 @@ class AssetManagerTest extends TestCase
     }
 
     /**
-     * Тест добавления и рендеринга стиля.
+     * Tests adding and rendering a CSS style.
      */
     public function testAddStyle(): void
     {
@@ -29,11 +38,11 @@ class AssetManagerTest extends TestCase
 
         $expectedHtml = '<link rel="stylesheet" href="/assets/css/style.css">' . PHP_EOL;
 
-        $this->assertEquals($expectedHtml, AssetManager::renderStyles(), 'CSS стиль не был корректно добавлен или отрендерен.');
+        $this->assertEquals($expectedHtml, AssetManager::renderStyles(), 'CSS style was not added or rendered correctly.');
     }
 
     /**
-     * Тест предотвращения дублирования стилей.
+     * Tests preventing duplication of CSS styles.
      */
     public function testAddDuplicateStyle(): void
     {
@@ -42,11 +51,11 @@ class AssetManagerTest extends TestCase
 
         $expectedHtml = '<link rel="stylesheet" href="/assets/css/style.css">' . PHP_EOL;
 
-        $this->assertEquals($expectedHtml, AssetManager::renderStyles(), 'Дублирование стилей не было предотвращено.');
+        $this->assertEquals($expectedHtml, AssetManager::renderStyles(), 'Duplicate styles were not prevented.');
     }
 
     /**
-     * Тест добавления и рендеринга скрипта в шапке.
+     * Tests adding and rendering a JavaScript script in the header.
      */
     public function testAddScriptToHeader(): void
     {
@@ -54,11 +63,11 @@ class AssetManagerTest extends TestCase
 
         $expectedHtml = '<script src="/assets/js/app.js"></script>' . PHP_EOL;
 
-        $this->assertEquals($expectedHtml, AssetManager::renderScripts(), 'JavaScript скрипт для шапки не был корректно добавлен или отрендерен.');
+        $this->assertEquals($expectedHtml, AssetManager::renderScripts(), 'Header JavaScript script was not added or rendered correctly.');
     }
 
     /**
-     * Тест добавления и рендеринга скрипта в подвале.
+     * Tests adding and rendering a JavaScript script in the footer.
      */
     public function testAddScriptToFooter(): void
     {
@@ -66,11 +75,11 @@ class AssetManagerTest extends TestCase
 
         $expectedHtml = '<script src="/assets/js/footer.js"></script>' . PHP_EOL;
 
-        $this->assertEquals($expectedHtml, AssetManager::renderScripts(true), 'JavaScript скрипт для подвала не был корректно добавлен или отрендерен.');
+        $this->assertEquals($expectedHtml, AssetManager::renderScripts(true), 'Footer JavaScript script was not added or rendered correctly.');
     }
 
     /**
-     * Тест предотвращения дублирования скриптов.
+     * Tests preventing duplication of JavaScript scripts.
      */
     public function testAddDuplicateScript(): void
     {
@@ -79,11 +88,11 @@ class AssetManagerTest extends TestCase
 
         $expectedHtml = '<script src="/assets/js/app.js"></script>' . PHP_EOL;
 
-        $this->assertEquals($expectedHtml, AssetManager::renderScripts(), 'Дублирование скриптов не было предотвращено.');
+        $this->assertEquals($expectedHtml, AssetManager::renderScripts(), 'Duplicate scripts were not prevented.');
     }
 
     /**
-     * Тест рендера только скриптов для подвала.
+     * Tests rendering only footer scripts.
      */
     public function testRenderOnlyFooterScripts(): void
     {
@@ -92,11 +101,11 @@ class AssetManagerTest extends TestCase
 
         $expectedFooterHtml = '<script src="/assets/js/footer.js"></script>' . PHP_EOL;
 
-        $this->assertEquals($expectedFooterHtml, AssetManager::renderScripts(true), 'Скрипты для подвала не были корректно отрендерены.');
+        $this->assertEquals($expectedFooterHtml, AssetManager::renderScripts(true), 'Footer scripts were not rendered correctly.');
     }
 
     /**
-     * Тест очистки всех стилей и скриптов.
+     * Tests clearing all registered styles and scripts.
      */
     public function testClearAssets(): void
     {
@@ -105,16 +114,16 @@ class AssetManagerTest extends TestCase
 
         AssetManager::clear();
 
-        $this->assertEmpty(AssetManager::renderStyles(), 'Стили не были очищены.');
-        $this->assertEmpty(AssetManager::renderScripts(), 'Скрипты не были очищены.');
+        $this->assertEmpty(AssetManager::renderStyles(), 'Styles were not cleared.');
+        $this->assertEmpty(AssetManager::renderScripts(), 'Scripts were not cleared.');
     }
 
     /**
-     * Тест рендера без зарегистрированных активов.
+     * Tests rendering when no assets are registered (should return empty strings).
      */
     public function testRenderEmptyAssets(): void
     {
-        $this->assertEquals('', AssetManager::renderStyles(), 'Рендер пустых стилей должен возвращать пустую строку.');
-        $this->assertEquals('', AssetManager::renderScripts(), 'Рендер пустых скриптов должен возвращать пустую строку.');
+        $this->assertEquals('', AssetManager::renderStyles(), 'Rendering empty styles should return an empty string.');
+        $this->assertEquals('', AssetManager::renderScripts(), 'Rendering empty scripts should return an empty string.');
     }
 }

@@ -8,12 +8,24 @@ use MiniCore\Module\ModuleManager;
 use MiniCore\Module\AbstractModule;
 use MiniCore\Tests\Module\Modules\TestModule\Module;
 
+/**
+ * Unit tests for the ModuleManager class.
+ *
+ * This test suite verifies the core functionality of the ModuleManager class,
+ * ensuring proper loading, initialization, and management of modules.
+ *
+ * Covered functionality:
+ * - Loading modules from YAML configuration.
+ * - Initializing loaded modules.
+ * - Retrieving modules by ID.
+ * - Handling missing configuration files.
+ */
 class ModuleManagerTest extends TestCase
 {
     private string $configPath;
 
     /**
-     * Подготовка конфигурации перед тестами.
+     * Prepares the test configuration before each test.
      */
     protected function setUp(): void
     {
@@ -23,7 +35,7 @@ class ModuleManagerTest extends TestCase
             mkdir(__DIR__ . '/Data');
         }
 
-        // Создание YAML конфигурации для тестового модуля
+        // Creating YAML configuration for the test module
         $yamlData = [
             'modules' => [
                 'TestModule' => [
@@ -32,14 +44,14 @@ class ModuleManagerTest extends TestCase
             ]
         ];
 
-        // Генерация конфигурационного файла
+        // Generating the configuration file
         file_put_contents($this->configPath, Yaml::dump($yamlData));
-        // Заглука для постоянного добавления класса в declared classes
-        $stubInstace = new Module();
+        // Stub instance to ensure the module class is loaded
+        $stubInstance = new Module();
     }
 
     /**
-     * Тест успешной загрузки модуля.
+     * Tests successful loading of modules.
      */
     public function testLoadModules()
     {
@@ -47,12 +59,12 @@ class ModuleManagerTest extends TestCase
 
         $modules = ModuleManager::getModules();
 
-        $this->assertArrayHasKey('TestModule', $modules);
-        $this->assertInstanceOf(Module::class, $modules['TestModule']);
+        $this->assertArrayHasKey('TestModule', $modules, 'TestModule should be loaded.');
+        $this->assertInstanceOf(Module::class, $modules['TestModule'], 'Loaded module should be an instance of Module.');
     }
 
     /**
-     * Тест инициализации модуля.
+     * Tests successful initialization of modules.
      */
     public function testInitializeModules()
     {
@@ -62,12 +74,12 @@ class ModuleManagerTest extends TestCase
         /** @var Module $module */
         $module = ModuleManager::getModule('TestModule');
 
-        $this->assertTrue($module->booted, 'Модуль не был инициализирован.');
-        $this->assertArrayHasKey('TestModule', ModuleManager::getLoadedModules());
+        $this->assertTrue($module->booted, 'Module should be initialized (booted).');
+        $this->assertArrayHasKey('TestModule', ModuleManager::getLoadedModules(), 'TestModule should be in the loaded modules list.');
     }
 
     /**
-     * Тест получения модуля по ID.
+     * Tests retrieving a module by its ID.
      */
     public function testGetModule()
     {
@@ -75,12 +87,12 @@ class ModuleManagerTest extends TestCase
 
         $module = ModuleManager::getModule('TestModule');
 
-        $this->assertInstanceOf(AbstractModule::class, $module);
-        $this->assertEquals('TestModule', $module->getId());
+        $this->assertInstanceOf(AbstractModule::class, $module, 'Retrieved module should be an instance of AbstractModule.');
+        $this->assertEquals('TestModule', $module->getId(), 'Module ID should match the expected value.');
     }
 
     /**
-     * Тест ошибки при отсутствии конфигурационного файла.
+     * Tests error handling when the configuration file is missing.
      */
     public function testLoadModulesWithMissingConfig()
     {

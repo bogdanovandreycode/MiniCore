@@ -5,12 +5,30 @@ namespace MiniCore\Tests\Config;
 use PHPUnit\Framework\TestCase;
 use MiniCore\Config\Env;
 
+/**
+ * Unit tests for the Env class.
+ *
+ * This test suite ensures the correct functionality of environment configuration management,
+ * including loading `.env` files, retrieving and setting environment variables,
+ * and handling errors when the `.env` file is missing.
+ *
+ * Covered functionality:
+ * - Loading environment variables from a file
+ * - Fetching environment variables with or without default values
+ * - Setting new environment variables
+ * - Exception handling for missing environment files
+ */
 class EnvTest extends TestCase
 {
+    /**
+     * @var string Path to the test environment directory.
+     */
     private string $envPath;
 
     /**
-     * Подготовка тестов
+     * Sets up the test environment before each test.
+     *
+     * Creates the necessary directory for storing `.env` test files.
      */
     protected function setUp(): void
     {
@@ -22,7 +40,9 @@ class EnvTest extends TestCase
     }
 
     /**
-     * Тест успешной загрузки .env файла
+     * Tests successful loading of a `.env` file.
+     *
+     * Verifies that environment variables are correctly loaded from the `.env.test` file.
      */
     public function testLoadEnvFile()
     {
@@ -34,7 +54,9 @@ class EnvTest extends TestCase
     }
 
     /**
-     * Тест получения переменной с дефолтным значением
+     * Tests retrieving an environment variable with a default value.
+     *
+     * Verifies that a default value is returned when the requested key does not exist.
      */
     public function testGetEnvVariableWithDefault()
     {
@@ -42,7 +64,9 @@ class EnvTest extends TestCase
     }
 
     /**
-     * Тест установки переменной в окружение
+     * Tests setting a new environment variable.
+     *
+     * Ensures that a variable can be added to the environment and retrieved successfully.
      */
     public function testSetEnvVariable()
     {
@@ -53,7 +77,9 @@ class EnvTest extends TestCase
     }
 
     /**
-     * Тест ошибки при отсутствии .env файла
+     * Tests exception handling when the `.env` file does not exist.
+     *
+     * Verifies that a RuntimeException is thrown if the specified `.env` file is missing.
      */
     public function testLoadNonExistentEnvFile()
     {
@@ -64,7 +90,9 @@ class EnvTest extends TestCase
     }
 
     /**
-     * Очистка переменных окружения после тестов
+     * Cleans up the environment variables after each test.
+     *
+     * Ensures that no environment variables persist between tests.
      */
     protected function tearDown(): void
     {

@@ -5,10 +5,23 @@ namespace MiniCore\Tests\Event;
 use PHPUnit\Framework\TestCase;
 use MiniCore\Event\EventDispatcher;
 
+/**
+ * Unit tests for the EventDispatcher class.
+ *
+ * This test suite verifies the core event handling mechanism,
+ * including registering listeners, dispatching events,
+ * and retrieving registered listeners.
+ *
+ * Covered functionality:
+ * - Adding event listeners.
+ * - Dispatching events to single or multiple listeners.
+ * - Handling events without registered listeners.
+ * - Retrieving all registered listeners.
+ */
 class EventDispatcherTest extends TestCase
 {
     /**
-     * Очищаем слушателей перед каждым тестом.
+     * Clears all registered listeners before each test.
      */
     protected function setUp(): void
     {
@@ -19,7 +32,7 @@ class EventDispatcherTest extends TestCase
     }
 
     /**
-     * Тест регистрации слушателя.
+     * Tests registering an event listener.
      */
     public function testAddListener()
     {
@@ -34,7 +47,7 @@ class EventDispatcherTest extends TestCase
     }
 
     /**
-     * Тест диспатча события с одним слушателем.
+     * Tests dispatching an event to a single listener.
      */
     public function testDispatchEventToListener()
     {
@@ -48,11 +61,11 @@ class EventDispatcherTest extends TestCase
 
         EventDispatcher::dispatch('user.created', ['username' => 'john_doe']);
 
-        $this->assertTrue($triggered, 'Слушатель не был вызван.');
+        $this->assertTrue($triggered, 'Listener was not triggered.');
     }
 
     /**
-     * Тест диспатча события с несколькими слушателями.
+     * Tests dispatching an event to multiple listeners.
      */
     public function testDispatchEventToMultipleListeners()
     {
@@ -74,11 +87,11 @@ class EventDispatcherTest extends TestCase
     }
 
     /**
-     * Тест диспатча события без слушателей.
+     * Tests dispatching an event with no listeners.
      */
     public function testDispatchEventWithNoListeners()
     {
-        // Ожидаем, что не произойдет ошибок и слушателей нет
+        // Expect no errors when dispatching an event with no listeners
         EventDispatcher::dispatch('nonexistent.event');
 
         $listeners = EventDispatcher::getListeners();
@@ -87,7 +100,7 @@ class EventDispatcherTest extends TestCase
     }
 
     /**
-     * Тест получения всех слушателей.
+     * Tests retrieving all registered listeners.
      */
     public function testGetListeners()
     {
