@@ -77,8 +77,8 @@ class RouterTest extends TestCase
     public function testHandleRequestWithUnregisteredRoute()
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Route not found');
-        $this->expectExceptionCode(404);
+        $this->expectExceptionMessage('Method not allowed');
+        $this->expectExceptionCode(405);
 
         $requestMock = $this->createMock(Request::class);
         $requestMock->method('getMethod')->willReturn('GET');

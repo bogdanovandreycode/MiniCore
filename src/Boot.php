@@ -125,7 +125,7 @@ class Boot
      */
     private static function initializeModules(): void
     {
-        ModuleManager::loadModules(self::$configDir . '/modules.yml');
+        ModuleManager::loadModules(self::$configDir . '/modules.yml', self::$moduleDir);
         ModuleManager::initializeModules();
 
         RouteLoader::loadFromModules();

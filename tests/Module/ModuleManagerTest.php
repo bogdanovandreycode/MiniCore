@@ -46,8 +46,6 @@ class ModuleManagerTest extends TestCase
 
         // Generating the configuration file
         file_put_contents($this->configPath, Yaml::dump($yamlData));
-        // Stub instance to ensure the module class is loaded
-        $stubInstance = new Module();
     }
 
     /**
@@ -55,7 +53,7 @@ class ModuleManagerTest extends TestCase
      */
     public function testLoadModules()
     {
-        ModuleManager::loadModules($this->configPath);
+        ModuleManager::loadModules($this->configPath, __DIR__ . '/Modules');
 
         $modules = ModuleManager::getModules();
 
@@ -68,7 +66,7 @@ class ModuleManagerTest extends TestCase
      */
     public function testInitializeModules()
     {
-        ModuleManager::loadModules($this->configPath);
+        ModuleManager::loadModules($this->configPath, __DIR__ . '/Modules');
         ModuleManager::initializeModules();
 
         /** @var Module $module */
@@ -83,7 +81,7 @@ class ModuleManagerTest extends TestCase
      */
     public function testGetModule()
     {
-        ModuleManager::loadModules($this->configPath);
+        ModuleManager::loadModules($this->configPath, __DIR__ . '/Modules');
 
         $module = ModuleManager::getModule('TestModule');
 
@@ -99,6 +97,6 @@ class ModuleManagerTest extends TestCase
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Modules configuration file not found');
 
-        ModuleManager::loadModules(__DIR__ . '/invalid_config.yml');
+        ModuleManager::loadModules(__DIR__ . '/invalid_config.yml', __DIR__ . '/Modules');
     }
 }

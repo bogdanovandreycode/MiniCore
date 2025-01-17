@@ -46,19 +46,31 @@ class ModuleManager
     private static array $loadedModules = [];
 
     /**
-     * Loads modules from the provided YAML configuration file.
+     * Loads and initializes modules based on the provided YAML configuration file.
      *
-     * Reads the config, finds module classes, and registers enabled modules.
+     * This method reads the YAML configuration, locates and loads the corresponding `Module.php` files
+     * for all enabled modules, and registers them for further use in the system.
      *
-     * @param string $configPath Path to the YAML configuration file (modules.yml).
+     * Only modules marked as `enabled: true` in the configuration will be loaded.
+     * The module class must follow the namespace pattern: `Modules\{ModuleName}\Module`.
      *
-     * @throws \Exception If the configuration file or module classes are missing.
+     * @param string $configPath Path to the YAML configuration file (e.g., `modules.yml`).
+     * @param string $modulesDir Path to the directory where module folders are located.
+     *
+     * @throws \Exception If the configuration file or module class file is missing.
      *
      * @example
-     * // Load modules from configuration
-     * ModuleManager::loadModules(__DIR__ . '/config/modules.yml');
+     * // Example of loading modules from a YAML file and initializing them:
+     * ModuleManager::loadModules(__DIR__ . '/config/modules.yml', __DIR__ . '/Modules');
+     * ModuleManager::initializeModules();
+     *
+     * // Example of accessing a loaded module:
+     * $userModule = ModuleManager::getModule('UserModule');
+     * if ($userModule) {
+     *     echo $userModule->getName(); // Output: User Module
+     * }
      */
-    public static function loadModules(string $configPath): void
+    public static function loadModules(string $configPath, string $modulesDir): void
     {
         if (!file_exists($configPath)) {
             throw new \Exception("Modules configuration file not found: $configPath");
@@ -66,9 +78,12 @@ class ModuleManager
 
         $config = Yaml::parseFile($configPath)['modules'] ?? [];
 
+        // Load only enabled modules
+        self::loadModuleFiles($config, $modulesDir);
+
         foreach ($config as $moduleId => $moduleConfig) {
             if (!isset($moduleConfig['enabled']) || !$moduleConfig['enabled']) {
-                continue;
+                continue; // Skip disabled modules
             }
 
             $className = self::findModuleClass($moduleId);
@@ -80,6 +95,39 @@ class ModuleManager
             /** @var AbstractModule $module */
             $module = new $className();
             self::$modules[$moduleId] = $module;
+        }
+    }
+
+    /**
+     * Loads `Module.php` files only for enabled modules from the configuration.
+     *
+     * For each enabled module, the method looks for the file at the path: `{modulesDir}/{ModuleName}/Module.php`.
+     * If the file is found, it is included using `require_once`, making the module class available for instantiation.
+     *
+     * @param array $modulesConfig Array of modules from the YAML configuration file.
+     * @param string $modulesDir Directory where the modules are stored.
+     *
+     * @throws \Exception If the module file is missing.
+     *
+     * @example
+     * // Assuming 'UserModule' is enabled in the YAML config, this will load:
+     * // /Modules/UserModule/Module.php
+     * self::loadModuleFiles($modulesConfig, __DIR__ . '/Modules');
+     */
+    private static function loadModuleFiles(array $modulesConfig, string $modulesDir): void
+    {
+        foreach ($modulesConfig as $moduleId => $moduleConfig) {
+            if (!isset($moduleConfig['enabled']) || !$moduleConfig['enabled']) {
+                continue; // Skip disabled modules
+            }
+
+            $moduleFile = rtrim($modulesDir, '/') . "/{$moduleId}/Module.php";
+
+            if (file_exists($moduleFile)) {
+                require_once $moduleFile;  // Makes the module class available
+            } else {
+                throw new \Exception("Module file not found for '$moduleId' at $moduleFile");
+            }
         }
     }
 
