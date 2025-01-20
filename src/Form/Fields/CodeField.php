@@ -7,32 +7,35 @@ use MiniCore\Form\FieldInterface;
 /**
  * Class CodeField
  *
- * Represents a multi-input field typically used for entering verification codes, 
- * such as OTPs (One-Time Passwords) or security codes.
+ * Represents a Bootstrap-styled multi-input field used for entering verification codes, 
+ * such as SMS confirmation codes or security tokens.
  * 
- * This field renders several single-character input fields, where each field 
- * accepts one character of the entire code.
+ * This field renders a series of single-character input fields, styled with Bootstrap, 
+ * where each field accepts one character of the entire code.
  *
  * @package MiniCore\Form\Fields
  *
  * @example
- * // 4-character alphanumeric code field with custom styling
+ * // 6-digit numeric code input for SMS verification
  * $codeField = new CodeField(
- *     name: 'auth_code',
- *     length: 4,
- *     allowOnlyDigits: false,
- *     attributes: ['class' => 'auth-code-input', 'placeholder' => '*']
+ *     name: 'sms_code',
+ *     length: 6,
+ *     allowOnlyDigits: true,
+ *     attributes: ['placeholder' => '0']
  * );
  * echo $codeField->render();
  *
  * // Output:
- * // <div class="code-field">
- * //   <input type="text" name="auth_code[0]" value="" maxlength="1" class="auth-code-input" placeholder="*">
- * //   <input type="text" name="auth_code[1]" value="" maxlength="1" class="auth-code-input" placeholder="*">
- * //   <input type="text" name="auth_code[2]" value="" maxlength="1" class="auth-code-input" placeholder="*">
- * //   <input type="text" name="auth_code[3]" value="" maxlength="1" class="auth-code-input" placeholder="*">
+ * // <div class="d-flex gap-2">
+ * //   <input type="text" name="sms_code[0]" value="" maxlength="1" class="form-control text-center" placeholder="0">
+ * //   <input type="text" name="sms_code[1]" value="" maxlength="1" class="form-control text-center" placeholder="0">
+ * //   <input type="text" name="sms_code[2]" value="" maxlength="1" class="form-control text-center" placeholder="0">
+ * //   <input type="text" name="sms_code[3]" value="" maxlength="1" class="form-control text-center" placeholder="0">
+ * //   <input type="text" name="sms_code[4]" value="" maxlength="1" class="form-control text-center" placeholder="0">
+ * //   <input type="text" name="sms_code[5]" value="" maxlength="1" class="form-control text-center" placeholder="0">
  * // </div>
  */
+
 class CodeField implements FieldInterface
 {
     /**
@@ -53,27 +56,53 @@ class CodeField implements FieldInterface
     ) {}
 
     /**
-     * Render the code field as a set of input fields.
+     * Render the code field as a set of Bootstrap-styled input fields.
+     *
+     * This method generates a group of single-character input fields using Bootstrap classes. 
+     * The inputs are displayed inline with consistent spacing and centered text for easy code entry.
      *
      * @return string The rendered code field HTML.
      */
     public function render(): string
     {
-        $attributes = $this->buildAttributes();
+        $attributes = $this->attributes;
+
+        if (!isset($attributes['class']) || !str_contains($attributes['class'], 'form-control')) {
+            $attributes['class'] = trim(($attributes['class'] ?? '') . ' form-control text-center');
+        }
+
+        $attributesString = $this->buildAttributesFromArray($attributes);
         $inputsHtml = '';
 
         for ($i = 0; $i < $this->length; $i++) {
             $inputValue = $this->value[$i] ?? '';
             $inputsHtml .= sprintf(
-                '<input type="text" name="%s[%d]" value="%s" maxlength="1" class="code-input" %s>',
+                '<input type="text" name="%s[%d]" value="%s" maxlength="1" %s>',
                 htmlspecialchars($this->name),
                 $i,
                 htmlspecialchars($inputValue),
-                $attributes
+                $attributesString
             );
         }
 
-        return sprintf('<div class="code-field">%s</div>', $inputsHtml);
+        return sprintf('<div class="d-flex gap-2">%s</div>', $inputsHtml);
+    }
+
+    /**
+     * Convert attributes array to an HTML string.
+     *
+     * @param array $attributes HTML attributes as key-value pairs.
+     * @return string The formatted HTML attributes.
+     */
+    private function buildAttributesFromArray(array $attributes): string
+    {
+        $result = '';
+
+        foreach ($attributes as $key => $value) {
+            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
+        }
+
+        return trim($result);
     }
 
     /**

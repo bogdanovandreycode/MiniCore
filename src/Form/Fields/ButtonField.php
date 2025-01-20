@@ -13,21 +13,18 @@ use MiniCore\Form\FieldInterface;
  * @package MiniCore\Form\Fields
  *
  * @example
- * // Simple submit button
  * $submitButton = new ButtonField('submit', 'Send');
  * echo $submitButton->render();
- * // Output: <button name="submit" value="">Send</button>
+ * 
+ * // Output:
+ * <button name="submit" value="" class="btn btn-primary">Send</button>
  *
  * @example
- * // Button with custom attributes
- * $button = new ButtonField(
- *     'save',
- *     'Save Changes',
- *     'save_action',
- *     ['class' => 'btn btn-success', 'id' => 'save-btn']
- * );
+ * $button = new ButtonField('save', 'Save', 'save_action', ['class' => 'btn btn-success']);
  * echo $button->render();
- * // Output: <button name="save" value="save_action" class="btn btn-success" id="save-btn">Save Changes</button>
+ * 
+ * // Output:
+ * <button name="save" value="save_action" class="btn btn-success">Save</button>
  */
 class ButtonField implements FieldInterface
 {
@@ -47,21 +44,49 @@ class ButtonField implements FieldInterface
     ) {}
 
     /**
-     * Render the button field as an HTML string.
+     * Render the button field as a Bootstrap-styled HTML button.
+     *
+     * This method generates an HTML `<button>` element with Bootstrap classes. 
+     * If no custom class is provided, it defaults to `btn btn-primary`. 
+     * This ensures consistent styling across forms.
      *
      * @return string The rendered HTML of the button.
+     *
      */
     public function render(): string
     {
-        $attributes = $this->buildAttributes();
+        $attributes = $this->attributes;
+
+        if (!isset($attributes['class']) || !str_contains($attributes['class'], 'btn')) {
+            $attributes['class'] = trim(($attributes['class'] ?? '') . ' btn btn-primary');
+        }
+
+        $attributesString = $this->buildAttributesFromArray($attributes);
 
         return sprintf(
             '<button name="%s" value="%s" %s>%s</button>',
             htmlspecialchars($this->name),
             htmlspecialchars((string) $this->value),
-            $attributes,
+            $attributesString,
             htmlspecialchars($this->label)
         );
+    }
+
+    /**
+     * Convert attributes array to an HTML string.
+     *
+     * @param array $attributes HTML attributes as key-value pairs.
+     * @return string The formatted HTML attributes.
+     */
+    private function buildAttributesFromArray(array $attributes): string
+    {
+        $result = '';
+
+        foreach ($attributes as $key => $value) {
+            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
+        }
+
+        return trim($result);
     }
 
     /**

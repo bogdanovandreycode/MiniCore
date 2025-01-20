@@ -7,22 +7,22 @@ use MiniCore\Form\FieldInterface;
 /**
  * Class PasswordField
  *
- * Represents a secure password input field in a form.
+ * Represents a Bootstrap-styled password input field in a form.
  * This field hides user input by masking characters for security.
  * Additional HTML attributes can be passed for customization (e.g., placeholder, CSS classes).
  *
  * @package MiniCore\Form\Fields
  *
  * @example
- * // Password field with placeholder and custom CSS class
+ * // Password field with placeholder and Bootstrap class
  * $passwordField = new PasswordField(
  *     name: 'admin_password',
- *     attributes: ['placeholder' => 'Enter your password', 'class' => 'password-input']
+ *     attributes: ['placeholder' => 'Enter your password', 'class' => 'form-control']
  * );
  * echo $passwordField->render();
  *
  * // Output:
- * // <input type="password" name="admin_password" value="" placeholder="Enter your password" class="password-input"/>
+ * // <input type="password" name="admin_password" value="" placeholder="Enter your password" class="form-control"/>
  */
 class PasswordField implements FieldInterface
 {
@@ -49,7 +49,7 @@ class PasswordField implements FieldInterface
         $attributes = $this->buildAttributes();
 
         return sprintf(
-            '<input type="password" name="%s" value="%s" %s/>',
+            '<input type="password" name="%s" value="%s" class="form-control" %s/>',
             htmlspecialchars($this->name),
             htmlspecialchars((string)$this->value),
             $attributes

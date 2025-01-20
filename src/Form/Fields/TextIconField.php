@@ -7,7 +7,7 @@ use MiniCore\Form\FieldInterface;
 /**
  * Class TextIconField
  *
- * Represents a text input field with an integrated icon.
+ * Represents a Bootstrap-styled text input field with an integrated icon.
  * This field allows adding icons (e.g., Font Awesome, Material Icons) inside a text input for visual enhancement.
  *
  * @package MiniCore\Form\Fields
@@ -20,15 +20,15 @@ use MiniCore\Form\FieldInterface;
  *     iconClass: 'fa fa-search',
  *     attributes: [
  *         'placeholder' => 'Search...',
- *         'class' => 'search-input'
+ *         'class' => 'form-control'
  *     ]
  * );
  * echo $searchField->render();
  *
  * // Output:
- * // <div class="text-icon-field">
- * //     <i class="fa fa-search"></i>
- * //     <input type="text" name="search" value="" placeholder="Search..." class="search-input"/>
+ * // <div class="input-group">
+ * //     <span class="input-group-text"><i class="fa fa-search"></i></span>
+ * //     <input type="text" name="search" value="" placeholder="Search..." class="form-control"/>
  * // </div>
  */
 class TextIconField implements FieldInterface
@@ -58,9 +58,9 @@ class TextIconField implements FieldInterface
         $attributes = $this->buildAttributes();
 
         return sprintf(
-            '<div class="text-icon-field">
-                <i class="%s"></i>
-                <input type="text" name="%s" value="%s" %s/>
+            '<div class="input-group">
+                <span class="input-group-text"><i class="%s"></i></span>
+                <input type="text" name="%s" value="%s" class="form-control" %s/>
             </div>',
             htmlspecialchars($this->iconClass),
             htmlspecialchars($this->name),

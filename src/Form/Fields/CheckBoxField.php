@@ -13,15 +13,14 @@ use MiniCore\Form\FieldInterface;
  * @package MiniCore\Form\Fields
  *
  * @example
- * // Checkbox with the checked state enabled
  * $checkbox = new CheckBoxField(name: 'subscribe', value: '1', checked: true);
  * echo $checkbox->render();
- *
+ * 
  * // Output:
- * // <label class="switch">
- * //     <input type="checkbox" name="subscribe" value="1" checked>
- * //     <span class="slider"></span>
- * // </label>
+ * <div class="form-check form-switch">
+ *     <input type="checkbox" name="subscribe" value="1" class="form-check-input" checked>
+ *     <label class="form-check-label">Subscribe</label>
+ * </div>
  *
  */
 class CheckBoxField implements FieldInterface
@@ -42,25 +41,55 @@ class CheckBoxField implements FieldInterface
     ) {}
 
     /**
-     * Render the checkbox field as a custom HTML toggle switch.
+     * Render the checkbox field as a Bootstrap-styled toggle switch.
      *
-     * @return string The rendered custom checkbox HTML.
+     * This method generates a checkbox field using Bootstrap's `form-switch` class 
+     * to render it as a toggle switch. If no custom classes are provided, it applies 
+     * the necessary Bootstrap classes for consistent styling.
+     *
+     * @return string The rendered HTML for the checkbox field.
+     *
      */
     public function render(): string
     {
-        $attributes = $this->buildAttributes();
+        $attributes = $this->attributes;
+
+        if (!isset($attributes['class']) || !str_contains($attributes['class'], 'form-check-input')) {
+            $attributes['class'] = trim(($attributes['class'] ?? '') . ' form-check-input');
+        }
+
+        $attributesString = $this->buildAttributesFromArray($attributes);
         $checked = $this->checked ? 'checked' : '';
 
         return sprintf(
-            '<label class="switch">
-                <input type="checkbox" name="%s" value="%s" %s %s>
-                <span class="slider"></span>
-            </label>',
+            '<div class="form-check form-switch">
+            <input type="checkbox" name="%s" value="%s" %s %s>
+            <label class="form-check-label" for="%s">%s</label>
+        </div>',
             htmlspecialchars($this->name),
             htmlspecialchars((string)$this->value),
-            $attributes,
-            $checked
+            $attributesString,
+            $checked,
+            htmlspecialchars($this->name),
+            ucfirst(htmlspecialchars($this->name))
         );
+    }
+
+    /**
+     * Convert attributes array to an HTML string.
+     *
+     * @param array $attributes HTML attributes as key-value pairs.
+     * @return string The formatted HTML attributes.
+     */
+    private function buildAttributesFromArray(array $attributes): string
+    {
+        $result = '';
+
+        foreach ($attributes as $key => $value) {
+            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
+        }
+
+        return trim($result);
     }
 
     /**

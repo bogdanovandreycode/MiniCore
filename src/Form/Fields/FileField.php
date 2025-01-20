@@ -7,7 +7,7 @@ use MiniCore\Form\FieldInterface;
 /**
  * Class FileField
  *
- * Represents a customizable file upload field with progress bar and status messages.
+ * Represents a Bootstrap-styled file upload field with progress bar and status messages.
  * This field allows users to upload files and provides feedback on upload success or failure.
  *
  * @package MiniCore\Form\Fields
@@ -16,20 +16,24 @@ use MiniCore\Form\FieldInterface;
  * // File upload with accepted file types and custom messages
  * $fileField = new FileField(
  *     name: 'profile_picture',
- *     attributes: ['accept' => 'image/*', 'multiple' => 'multiple'],
+ *     attributes: ['accept' => 'image/*', 'multiple' => 'multiple', 'class' => 'form-control'],
  *     successMessage: 'File uploaded successfully!',
  *     errorMessage: 'File upload failed. Please try again.'
  * );
  * echo $fileField->render();
  *
  * // Output:
- * // <div class="file-field">
- * //     <input type="file" name="profile_picture" accept="image/*" multiple>
- * //     <div class="file-info"><span class="file-name">No file chosen</span></div>
- * //     <div class="progress-bar"><div class="progress"></div></div>
- * //     <div class="upload-status">
- * //         <span class="success-message">File uploaded successfully!</span>
- * //         <span class="error-message">File upload failed. Please try again.</span>
+ * // <div class="mb-3">
+ * //     <input type="file" name="profile_picture" class="form-control" accept="image/*" multiple>
+ * //     <div class="form-text">
+ * //         <span class="file-name">No file chosen</span>
+ * //     </div>
+ * //     <div class="progress">
+ * //         <div class="progress-bar" role="progressbar" style="width: 0;"></div>
+ * //     </div>
+ * //     <div class="mt-2">
+ * //         <span class="text-success">File uploaded successfully!</span>
+ * //         <span class="text-danger">File upload failed. Please try again.</span>
  * //     </div>
  * // </div>
  */
@@ -62,17 +66,17 @@ class FileField implements FieldInterface
         $attributes = $this->buildAttributes();
 
         return sprintf(
-            '<div class="file-field">
-                <input type="file" name="%s" %s>
-                <div class="file-info">
+            '<div class="mb-3">
+                <input type="file" name="%s" class="form-control" %s>
+                <div class="form-text">
                     <span class="file-name">No file chosen</span>
                 </div>
-                <div class="progress-bar">
-                    <div class="progress"></div>
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: 0;"></div>
                 </div>
-                <div class="upload-status">
-                    <span class="success-message">%s</span>
-                    <span class="error-message">%s</span>
+                <div class="mt-2">
+                    <span class="text-success">%s</span>
+                    <span class="text-danger">%s</span>
                 </div>
             </div>',
             htmlspecialchars($this->name),

@@ -7,7 +7,7 @@ use MiniCore\Form\FieldInterface;
 /**
  * Class MultiSelectField
  *
- * Represents a customizable multi-select input field using checkboxes.
+ * Represents a Bootstrap-styled multi-select input field using checkboxes.
  * This field allows users to select multiple options from a given list.
  *
  * @package MiniCore\Form\Fields
@@ -22,24 +22,24 @@ use MiniCore\Form\FieldInterface;
  *         'gaming' => 'Gaming'
  *     ],
  *     selected: ['gaming'],
- *     attributes: ['class' => 'custom-multi-select', 'data-type' => 'hobby']
+ *     attributes: ['class' => 'row g-3', 'data-type' => 'hobby']
  * );
  * echo $multiSelect->render();
  *
  * // Output:
- * // <div class="multi-select-field custom-multi-select" data-type="hobby">
- * //     <label class="multi-select-option">
- * //         <input type="checkbox" name="hobbies[]" value="reading">
- * //         <span class="option-label">Reading</span>
- * //     </label>
- * //     <label class="multi-select-option">
- * //         <input type="checkbox" name="hobbies[]" value="traveling">
- * //         <span class="option-label">Traveling</span>
- * //     </label>
- * //     <label class="multi-select-option">
- * //         <input type="checkbox" name="hobbies[]" value="gaming" checked>
- * //         <span class="option-label">Gaming</span>
- * //     </label>
+ * // <div class="row g-3" data-type="hobby">
+ * //     <div class="form-check">
+ * //         <input type="checkbox" name="hobbies[]" value="reading" class="form-check-input">
+ * //         <label class="form-check-label">Reading</label>
+ * //     </div>
+ * //     <div class="form-check">
+ * //         <input type="checkbox" name="hobbies[]" value="traveling" class="form-check-input">
+ * //         <label class="form-check-label">Traveling</label>
+ * //     </div>
+ * //     <div class="form-check">
+ * //         <input type="checkbox" name="hobbies[]" value="gaming" class="form-check-input" checked>
+ * //         <label class="form-check-label">Gaming</label>
+ * //     </div>
  * // </div>
  */
 class MultiSelectField implements FieldInterface
@@ -72,10 +72,10 @@ class MultiSelectField implements FieldInterface
         foreach ($this->options as $value => $label) {
             $checked = in_array($value, $this->selected, true) ? 'checked' : '';
             $optionsHtml .= sprintf(
-                '<label class="multi-select-option">
-                    <input type="checkbox" name="%s[]" value="%s" %s>
-                    <span class="option-label">%s</span>
-                </label>',
+                '<div class="form-check">
+                    <input type="checkbox" name="%s[]" value="%s" class="form-check-input" %s>
+                    <label class="form-check-label">%s</label>
+                </div>',
                 htmlspecialchars($this->name),
                 htmlspecialchars((string)$value),
                 $checked,
@@ -84,7 +84,7 @@ class MultiSelectField implements FieldInterface
         }
 
         return sprintf(
-            '<div class="multi-select-field" %s>%s</div>',
+            '<div class="row g-3" %s>%s</div>',
             $attributes,
             $optionsHtml
         );

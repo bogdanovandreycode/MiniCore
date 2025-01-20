@@ -7,7 +7,7 @@ use MiniCore\Form\FieldInterface;
 /**
  * Class SelectField
  *
- * Represents a dropdown select field in a form.
+ * Represents a Bootstrap-styled dropdown select field in a form.
  * Allows the user to choose one option from a list of predefined options.
  * Additional HTML attributes can be applied for customization (e.g., CSS classes, styles).
  *
@@ -23,14 +23,14 @@ use MiniCore\Form\FieldInterface;
  *         'other' => 'Other'
  *     ],
  *     attributes: [
- *         'class' => 'form-control',
+ *         'class' => 'form-select',
  *         'required' => 'required'
  *     ]
  * );
  * echo $selectField->render();
  *
  * // Output:
- * // <select name="gender" class="form-control" required>
+ * // <select name="gender" class="form-select" required>
  * //     <option value="male">Male</option>
  * //     <option value="female">Female</option>
  * //     <option value="other">Other</option>
@@ -74,7 +74,7 @@ class SelectField implements FieldInterface
         }
 
         return sprintf(
-            '<select name="%s" %s>%s</select>',
+            '<select name="%s" class="form-select" %s>%s</select>',
             htmlspecialchars($this->name),
             $attributes,
             $optionsHtml

@@ -14,30 +14,15 @@ use MiniCore\Form\FieldInterface;
  * @package MiniCore\Form\Fields
  *
  * @example
- * // Creating and rendering a CAPTCHA field
  * $captcha = new Captcha();
- * $captcha->generate(); // Generates a random math question
+ * $captcha->generate();
  * echo $captcha->render();
  * 
  * // Output:
- * // <div class="captcha-field">
- * //     <label class="captcha-question">14 + 6 = ?</label>
- * //     <input type="text" name="captcha" value="" class="captcha-input">
- * // </div>
- *
- * @example
- * // Validating user input
- * $captcha = new Captcha();
- * $captcha->generate();
- * 
- * // Simulate user input
- * $userInput = 20;
- * 
- * if ($captcha->validate($userInput)) {
- *     echo "CAPTCHA passed!";
- * } else {
- *     echo "Incorrect answer. Please try again.";
- * }
+ * <div class="mb-3">
+ *     <label class="form-label">14 + 6 = ?</label>
+ *     <input type="text" name="captcha" value="" class="form-control">
+ * </div>
  */
 class Captcha implements FieldInterface
 {
@@ -76,24 +61,51 @@ class Captcha implements FieldInterface
     }
 
     /**
-     * Render the CAPTCHA field as a custom HTML block.
+     * Render the CAPTCHA field with Bootstrap styling.
+     *
+     * This method generates the CAPTCHA input field using Bootstrap classes.
+     * The math question is displayed as a label (`form-label`), and the input field 
+     * uses the `form-control` class for consistent styling.
      *
      * @return string The rendered HTML for the CAPTCHA field.
      */
     public function render(): string
     {
-        $attributes = $this->buildAttributes();
+        $attributes = $this->attributes;
+
+        if (!isset($attributes['class']) || !str_contains($attributes['class'], 'form-control')) {
+            $attributes['class'] = trim(($attributes['class'] ?? '') . ' form-control');
+        }
+
+        $attributesString = $this->buildAttributesFromArray($attributes);
 
         return sprintf(
-            '<div class="captcha-field">
-                <label class="captcha-question">%s</label>
-                <input type="text" name="%s" value="%s" class="captcha-input" %s>
-            </div>',
+            '<div class="mb-3">
+            <label class="form-label">%s</label>
+            <input type="text" name="%s" value="%s" %s>
+        </div>',
             htmlspecialchars($this->question),
             htmlspecialchars($this->name),
             htmlspecialchars($this->userInput),
-            $attributes
+            $attributesString
         );
+    }
+
+    /**
+     * Convert attributes array to an HTML string.
+     *
+     * @param array $attributes HTML attributes as key-value pairs.
+     * @return string The formatted HTML attributes.
+     */
+    private function buildAttributesFromArray(array $attributes): string
+    {
+        $result = '';
+
+        foreach ($attributes as $key => $value) {
+            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
+        }
+
+        return trim($result);
     }
 
     /**

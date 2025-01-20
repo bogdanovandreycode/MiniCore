@@ -7,7 +7,7 @@ use MiniCore\Form\FieldInterface;
 /**
  * Class EmailField
  *
- * Represents an HTML email input field with customizable attributes.
+ * Represents a Bootstrap-styled email input field with customizable attributes.
  * This field ensures that the user inputs a valid email format.
  *
  * @package MiniCore\Form\Fields
@@ -17,12 +17,12 @@ use MiniCore\Form\FieldInterface;
  * $emailField = new EmailField(
  *     name: 'contact_email',
  *     value: 'user@example.com',
- *     attributes: ['placeholder' => 'Enter your email', 'required' => 'required']
+ *     attributes: ['placeholder' => 'Enter your email', 'class' => 'form-control', 'required' => 'required']
  * );
  * echo $emailField->render();
  *
  * // Output:
- * // <input type="email" name="contact_email" value="user@example.com" placeholder="Enter your email" required />
+ * // <input type="email" name="contact_email" value="user@example.com" placeholder="Enter your email" class="form-control" required />
  */
 class EmailField implements FieldInterface
 {
@@ -49,7 +49,7 @@ class EmailField implements FieldInterface
         $attributes = $this->buildAttributes();
 
         return sprintf(
-            '<input type="email" name="%s" value="%s" %s/>',
+            '<input type="email" name="%s" value="%s" class="form-control" %s/>',
             htmlspecialchars($this->name),
             htmlspecialchars((string)$this->value),
             $attributes

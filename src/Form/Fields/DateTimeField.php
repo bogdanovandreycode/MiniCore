@@ -7,23 +7,23 @@ use MiniCore\Form\FieldInterface;
 /**
  * Class DateTimeField
  *
- * Represents a customizable date and time input field for forms.
+ * Represents a Bootstrap-styled date and time input field for forms.
  * This field includes a date picker and separate inputs for hours, minutes, and optionally seconds.
  *
  * @package MiniCore\Form\Fields
  *
  * @example
- * //DateTime field without seconds
+ * // DateTime field without seconds
  * $dateTimeField = new DateTimeField(name: 'appointment_datetime');
  * echo $dateTimeField->render();
  *
  * // Output:
- * // <div class="datetime-field">
- * //   <div class="date-field">
- * //       <input type="text" name="appointment_datetime[date]" value="" placeholder="Select a date" class="date-input">
- * //       <div class="date-icon"><i class="fa fa-calendar"></i></div>
+ * // <div class="mb-3">
+ * //   <div class="input-group">
+ * //       <input type="text" name="appointment_datetime[date]" value="" placeholder="Select a date" class="form-control">
+ * //       <span class="input-group-text"><i class="fa fa-calendar"></i></span>
  * //   </div>
- * //   <div class="time-field">
+ * //   <div class="d-flex gap-2">
  * //       [Hour input] [Minute input]
  * //   </div>
  * // </div>
@@ -62,9 +62,9 @@ class DateTimeField implements FieldInterface
 
         // Rendering date field
         $dateField = sprintf(
-            '<div class="date-field">
-                <input type="text" name="%s[date]" value="%s" placeholder="%s" class="date-input">
-                <div class="date-icon"><i class="fa fa-calendar"></i></div>
+            '<div class="input-group mb-2">
+                <input type="text" name="%s[date]" value="%s" placeholder="%s" class="form-control">
+                <span class="input-group-text"><i class="fa fa-calendar"></i></span>
             </div>',
             htmlspecialchars($this->name),
             htmlspecialchars((string)$this->dateValue),
@@ -77,14 +77,14 @@ class DateTimeField implements FieldInterface
         $secondField = $this->includeSeconds ? $this->renderTimeInput('seconds', 'Seconds', 59) : '';
 
         $timeField = sprintf(
-            '<div class="time-field">%s %s %s</div>',
+            '<div class="d-flex gap-2">%s %s %s</div>',
             $hourField,
             $minuteField,
             $secondField
         );
 
         return sprintf(
-            '<div class="datetime-field" %s>%s %s</div>',
+            '<div class="mb-3" %s>%s %s</div>',
             $attributes,
             $dateField,
             $timeField
@@ -101,11 +101,11 @@ class DateTimeField implements FieldInterface
 
         return sprintf(
             '<div class="time-input">
-                <label>%s</label>
-                <div class="time-spinner">
-                    <button type="button" class="increment" data-type="%s">▲</button>
-                    <input type="number" name="%s" value="%d" min="0" max="%d" class="time-%s">
-                    <button type="button" class="decrement" data-type="%s">▼</button>
+                <label class="form-label">%s</label>
+                <div class="input-group">
+                    <button type="button" class="btn btn-outline-secondary increment" data-type="%s">▲</button>
+                    <input type="number" name="%s" value="%d" min="0" max="%d" class="form-control text-center time-%s">
+                    <button type="button" class="btn btn-outline-secondary decrement" data-type="%s">▼</button>
                 </div>
             </div>',
             htmlspecialchars($label),

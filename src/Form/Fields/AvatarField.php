@@ -11,6 +11,18 @@ use MiniCore\Form\Enums\ShapeType;
  * A custom form field designed for uploading and displaying avatar images.
  * It provides a clickable preview of the avatar and allows uploading a new image.
  *
+ * @example
+ * $avatarField = new AvatarField('profile_picture');
+ * echo $avatarField->render();
+ * 
+ * // Output:
+ * <div class="mb-3">
+ *     <label class="form-label">
+ *         <input type="file" name="profile_picture" accept="image/*" hidden>
+ *         <img src="assets/default-avatar.png" alt="Avatar" class="img-fluid rounded-circle">
+ *     </label>
+ * </div>
+ * 
  * @package MiniCore\Fields
  */
 class AvatarField implements FieldInterface
@@ -33,41 +45,34 @@ class AvatarField implements FieldInterface
     ) {}
 
     /**
-     * Render the avatar upload field with a clickable preview.
+     * Render the avatar upload field with Bootstrap styling.
      *
-     * Generates the HTML structure for the avatar upload field,
-     * which includes a preview image and a hidden file input.
+     * This method generates the HTML structure for an avatar upload field 
+     * using Bootstrap classes. It includes a preview image styled as either 
+     * a circle (`rounded-circle`) or a square (`img-thumbnail`) and a hidden 
+     * file input for uploading a new avatar image. The preview is clickable 
+     * and triggers the file upload dialog.
      *
-     * @return string The rendered custom avatar field HTML.
+     * @return string The rendered HTML for the avatar upload field.
      *
-     * @example
-     * $avatarField = new AvatarField('profile_picture');
-     * echo $avatarField->render();
-     * 
-     * // Output:
-     * <div class="avatar-field circle">
-     *     <label>
-     *         <input type="file" name="profile_picture" accept="image/*" hidden>
-     *         <img src="assets/default-avatar.png" alt="Avatar" class="avatar-preview">
-     *     </label>
-     * </div>
      */
     public function render(): string
     {
         $attributes = $this->buildAttributes();
         $avatarUrl = $this->value ?: $this->placeholder;
+        $shapeClass = $this->shape === ShapeType::Circle ? 'rounded-circle' : 'img-thumbnail';
 
         return sprintf(
-            '<div class="avatar-field %s" %s>
-                <label>
-                    <input type="file" name="%s" accept="image/*" hidden>
-                    <img src="%s" alt="Avatar" class="avatar-preview">
-                </label>
-            </div>',
-            htmlspecialchars($this->shape->value),
+            '<div class="mb-3" %s>
+            <label class="form-label">
+                <input type="file" name="%s" accept="image/*" hidden>
+                <img src="%s" alt="Avatar" class="img-fluid %s">
+            </label>
+        </div>',
             $attributes,
             htmlspecialchars($this->name),
-            htmlspecialchars($avatarUrl)
+            htmlspecialchars($avatarUrl),
+            $shapeClass
         );
     }
 

@@ -7,7 +7,7 @@ use MiniCore\Form\FieldInterface;
 /**
  * Class TextAreaField
  *
- * Represents a customizable HTML `<textarea>` field for forms.
+ * Represents a Bootstrap-styled HTML `<textarea>` field for forms.
  * This field allows users to input multi-line text. It supports additional HTML attributes
  * for customization such as setting placeholder text, rows, columns, and CSS classes.
  *
@@ -55,7 +55,7 @@ class TextAreaField implements FieldInterface
         $attributes = $this->buildAttributes();
 
         return sprintf(
-            '<textarea name="%s" %s>%s</textarea>',
+            '<textarea name="%s" class="form-control" %s>%s</textarea>',
             htmlspecialchars($this->name),
             $attributes,
             htmlspecialchars((string)$this->value)

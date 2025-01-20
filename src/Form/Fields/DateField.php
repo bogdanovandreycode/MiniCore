@@ -7,8 +7,9 @@ use MiniCore\Form\FieldInterface;
 /**
  * Class DateField
  *
- * Represents a customizable date input field for forms.
- * This field generates an HTML input for date selection with a user-friendly interface.
+ * Represents a Bootstrap-styled date input field for forms.
+ * This field generates an HTML `<input type="date">` with Bootstrap styling 
+ * and an optional calendar icon for a more user-friendly interface.
  *
  * @package MiniCore\Form\Fields
  *
@@ -18,9 +19,9 @@ use MiniCore\Form\FieldInterface;
  * echo $dateField->render();
  *
  * // Output:
- * // <div class="date-field">
- * //     <input type="text" name="birth_date" value="" placeholder="Select a date" class="date-input">
- * //     <div class="date-icon"><i class="fa fa-calendar"></i></div>
+ * // <div class="input-group mb-3">
+ * //     <input type="date" name="birth_date" value="" placeholder="Select a date" class="form-control">
+ * //     <span class="input-group-text"><i class="fa fa-calendar"></i></span>
  * // </div>
  *
  * @example
@@ -34,9 +35,9 @@ use MiniCore\Form\FieldInterface;
  * echo $dateField->render();
  *
  * // Output:
- * // <div class="date-field">
- * //     <input type="text" name="event_date" value="2024-12-31" placeholder="Pick a date" class="custom-date" id="event-date">
- * //     <div class="date-icon"><i class="fa fa-calendar"></i></div>
+ * // <div class="input-group mb-3">
+ * //     <input type="date" name="event_date" value="2024-12-31" placeholder="Pick a date" class="form-control custom-date" id="event-date">
+ * //     <span class="input-group-text"><i class="fa fa-calendar"></i></span>
  * // </div>
  */
 class DateField implements FieldInterface
@@ -57,24 +58,47 @@ class DateField implements FieldInterface
     ) {}
 
     /**
-     * Render the date field as a custom HTML string with a user-friendly interface.
+     * Render the date field with Bootstrap styling.
      *
-     * @return string The rendered custom date input HTML.
+     * @return string The rendered HTML for the date input field.
      */
     public function render(): string
     {
-        $attributes = $this->buildAttributes();
+        $attributes = $this->attributes;
+
+        if (!isset($attributes['class']) || !str_contains($attributes['class'], 'form-control')) {
+            $attributes['class'] = trim(($attributes['class'] ?? '') . ' form-control');
+        }
+
+        $attributesString = $this->buildAttributesFromArray($attributes);
 
         return sprintf(
-            '<div class="date-field">
-                <input type="text" name="%s" value="%s" placeholder="%s" class="date-input" %s>
-                <div class="date-icon"><i class="fa fa-calendar"></i></div>
+            '<div class="input-group mb-3">
+                <input type="date" name="%s" value="%s" placeholder="%s" %s>
+                <span class="input-group-text"><i class="fa fa-calendar"></i></span>
             </div>',
             htmlspecialchars($this->name),
             htmlspecialchars((string)$this->value),
             htmlspecialchars($this->placeholder),
-            $attributes
+            $attributesString
         );
+    }
+
+    /**
+     * Convert attributes array to an HTML string.
+     *
+     * @param array $attributes HTML attributes as key-value pairs.
+     * @return string The formatted HTML attributes.
+     */
+    private function buildAttributesFromArray(array $attributes): string
+    {
+        $result = '';
+
+        foreach ($attributes as $key => $value) {
+            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
+        }
+
+        return trim($result);
     }
 
     /**

@@ -7,7 +7,7 @@ use MiniCore\Form\FieldInterface;
 /**
  * Class TimeField
  *
- * Represents a customizable time input field with separate inputs for hours, minutes, and optional seconds.
+ * Represents a Bootstrap-styled time input field with separate inputs for hours, minutes, and optional seconds.
  * Includes increment and decrement buttons for user-friendly time selection.
  *
  * @package MiniCore\Form\Fields
@@ -23,21 +23,21 @@ use MiniCore\Form\FieldInterface;
  * echo $timeField->render();
  *
  * // Output:
- * // <div class="time-field">
- * //     <div class="time-input">
- * //         <label>Hours</label>
- * //         <div class="time-spinner">
- * //             <button type="button" class="increment" data-type="hours">▲</button>
- * //             <input type="number" name="start_time[hours]" value="9" min="0" max="23" class="time-hours">
- * //             <button type="button" class="decrement" data-type="hours">▼</button>
+ * // <div class="d-flex gap-3">
+ * //     <div class="mb-3">
+ * //         <label class="form-label">Hours</label>
+ * //         <div class="input-group">
+ * //             <button type="button" class="btn btn-outline-secondary" data-type="hours">▲</button>
+ * //             <input type="number" name="start_time[hours]" value="9" min="0" max="23" class="form-control text-center">
+ * //             <button type="button" class="btn btn-outline-secondary" data-type="hours">▼</button>
  * //         </div>
  * //     </div>
- * //     <div class="time-input">
- * //         <label>Minutes</label>
- * //         <div class="time-spinner">
- * //             <button type="button" class="increment" data-type="minutes">▲</button>
- * //             <input type="number" name="start_time[minutes]" value="30" min="0" max="59" class="time-minutes">
- * //             <button type="button" class="decrement" data-type="minutes">▼</button>
+ * //     <div class="mb-3">
+ * //         <label class="form-label">Minutes</label>
+ * //         <div class="input-group">
+ * //             <button type="button" class="btn btn-outline-secondary" data-type="minutes">▲</button>
+ * //             <input type="number" name="start_time[minutes]" value="30" min="0" max="59" class="form-control text-center">
+ * //             <button type="button" class="btn btn-outline-secondary" data-type="minutes">▼</button>
  * //         </div>
  * //     </div>
  * // </div>
@@ -74,7 +74,7 @@ class TimeField implements FieldInterface
         $secondField = $this->includeSeconds ? $this->renderInput('seconds', 'Seconds', 59) : '';
 
         return sprintf(
-            '<div class="time-field" %s>%s %s %s</div>',
+            '<div class="d-flex gap-3" %s>%s %s %s</div>',
             $attributes,
             $hourField,
             $minuteField,
@@ -91,12 +91,12 @@ class TimeField implements FieldInterface
         $name = "{$this->name}[{$type}]";
 
         return sprintf(
-            '<div class="time-input">
-                <label>%s</label>
-                <div class="time-spinner">
-                    <button type="button" class="increment" data-type="%s">▲</button>
-                    <input type="number" name="%s" value="%d" min="0" max="%d" class="time-%s">
-                    <button type="button" class="decrement" data-type="%s">▼</button>
+            '<div class="mb-3">
+                <label class="form-label">%s</label>
+                <div class="input-group">
+                    <button type="button" class="btn btn-outline-secondary" data-type="%s">▲</button>
+                    <input type="number" name="%s" value="%d" min="0" max="%d" class="form-control text-center">
+                    <button type="button" class="btn btn-outline-secondary" data-type="%s">▼</button>
                 </div>
             </div>',
             htmlspecialchars($label),
@@ -104,7 +104,6 @@ class TimeField implements FieldInterface
             htmlspecialchars($name),
             $value,
             $maxValue,
-            $type,
             $type
         );
     }

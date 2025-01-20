@@ -7,7 +7,7 @@ use MiniCore\Form\FieldInterface;
 /**
  * Class TextField
  *
- * Represents a standard HTML `<input type="text">` field.
+ * Represents a Bootstrap-styled HTML `<input type="text">` field.
  * This class allows the creation of customizable text input fields for forms with
  * support for additional attributes like placeholder, maxlength, CSS classes, etc.
  *
@@ -20,14 +20,14 @@ use MiniCore\Form\FieldInterface;
  *     value: '',
  *     attributes: [
  *         'placeholder' => 'Search...',
- *         'class' => 'search-box',
+ *         'class' => 'form-control',
  *         'maxlength' => '50'
  *     ]
  * );
  * echo $textField->render();
  *
  * // Output:
- * // <input type="text" name="search" value="" placeholder="Search..." class="search-box" maxlength="50"/>
+ * // <input type="text" name="search" value="" placeholder="Search..." class="form-control" maxlength="50"/>
  */
 class TextField implements FieldInterface
 {
@@ -54,7 +54,7 @@ class TextField implements FieldInterface
         $attributes = $this->buildAttributes();
 
         return sprintf(
-            '<input type="text" name="%s" value="%s" %s/>',
+            '<input type="text" name="%s" value="%s" class="form-control" %s/>',
             htmlspecialchars($this->name),
             htmlspecialchars((string)$this->value),
             $attributes
