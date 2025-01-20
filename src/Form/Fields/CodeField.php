@@ -65,13 +65,11 @@ class CodeField implements FieldInterface
      */
     public function render(): string
     {
-        $attributes = $this->attributes;
-
-        if (!isset($attributes['class']) || !str_contains($attributes['class'], 'form-control')) {
-            $attributes['class'] = trim(($attributes['class'] ?? '') . ' form-control text-center');
+        if (!isset($this->attributes['class']) || !str_contains($this->attributes['class'], 'form-control')) {
+            $this->attributes['class'] = trim(($this->attributes['class'] ?? '') . ' form-control text-center');
         }
 
-        $attributesString = $this->buildAttributesFromArray($attributes);
+        $attributesString = $this->buildAttributes();
         $inputsHtml = '';
 
         for ($i = 0; $i < $this->length; $i++) {
@@ -86,23 +84,6 @@ class CodeField implements FieldInterface
         }
 
         return sprintf('<div class="d-flex gap-2">%s</div>', $inputsHtml);
-    }
-
-    /**
-     * Convert attributes array to an HTML string.
-     *
-     * @param array $attributes HTML attributes as key-value pairs.
-     * @return string The formatted HTML attributes.
-     */
-    private function buildAttributesFromArray(array $attributes): string
-    {
-        $result = '';
-
-        foreach ($attributes as $key => $value) {
-            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
-        }
-
-        return trim($result);
     }
 
     /**

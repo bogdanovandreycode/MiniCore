@@ -52,13 +52,11 @@ class CheckBoxField implements FieldInterface
      */
     public function render(): string
     {
-        $attributes = $this->attributes;
-
-        if (!isset($attributes['class']) || !str_contains($attributes['class'], 'form-check-input')) {
-            $attributes['class'] = trim(($attributes['class'] ?? '') . ' form-check-input');
+        if (!isset($this->attributesattributes['class']) || !str_contains($this->attributes['class'], 'form-check-input')) {
+            $this->attributes['class'] = trim(($this->attributes['class'] ?? '') . ' form-check-input');
         }
 
-        $attributesString = $this->buildAttributesFromArray($attributes);
+        $attributesString = $this->buildAttributes();
         $checked = $this->checked ? 'checked' : '';
 
         return sprintf(
@@ -73,23 +71,6 @@ class CheckBoxField implements FieldInterface
             htmlspecialchars($this->name),
             ucfirst(htmlspecialchars($this->name))
         );
-    }
-
-    /**
-     * Convert attributes array to an HTML string.
-     *
-     * @param array $attributes HTML attributes as key-value pairs.
-     * @return string The formatted HTML attributes.
-     */
-    private function buildAttributesFromArray(array $attributes): string
-    {
-        $result = '';
-
-        foreach ($attributes as $key => $value) {
-            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
-        }
-
-        return trim($result);
     }
 
     /**

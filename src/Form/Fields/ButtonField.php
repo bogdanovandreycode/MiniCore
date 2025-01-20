@@ -55,13 +55,11 @@ class ButtonField implements FieldInterface
      */
     public function render(): string
     {
-        $attributes = $this->attributes;
-
-        if (!isset($attributes['class']) || !str_contains($attributes['class'], 'btn')) {
-            $attributes['class'] = trim(($attributes['class'] ?? '') . ' btn btn-primary');
+        if (!isset($this->attributes['class']) || !str_contains($this->attributes['class'], 'btn')) {
+            $this->attributes['class'] = trim(($this->attributes['class'] ?? '') . ' btn btn-primary');
         }
 
-        $attributesString = $this->buildAttributesFromArray($attributes);
+        $attributesString = $this->buildAttributes();
 
         return sprintf(
             '<button name="%s" value="%s" %s>%s</button>',
@@ -70,23 +68,6 @@ class ButtonField implements FieldInterface
             $attributesString,
             htmlspecialchars($this->label)
         );
-    }
-
-    /**
-     * Convert attributes array to an HTML string.
-     *
-     * @param array $attributes HTML attributes as key-value pairs.
-     * @return string The formatted HTML attributes.
-     */
-    private function buildAttributesFromArray(array $attributes): string
-    {
-        $result = '';
-
-        foreach ($attributes as $key => $value) {
-            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
-        }
-
-        return trim($result);
     }
 
     /**

@@ -71,13 +71,11 @@ class Captcha implements FieldInterface
      */
     public function render(): string
     {
-        $attributes = $this->attributes;
-
-        if (!isset($attributes['class']) || !str_contains($attributes['class'], 'form-control')) {
-            $attributes['class'] = trim(($attributes['class'] ?? '') . ' form-control');
+        if (!isset($this->attributesattributes['class']) || !str_contains($this->attributes['class'], 'form-control')) {
+            $this->attributes['class'] = trim(($this->attributes['class'] ?? '') . ' form-control');
         }
 
-        $attributesString = $this->buildAttributesFromArray($attributes);
+        $attributesString = $this->buildAttributes();
 
         return sprintf(
             '<div class="mb-3">
@@ -89,23 +87,6 @@ class Captcha implements FieldInterface
             htmlspecialchars($this->userInput),
             $attributesString
         );
-    }
-
-    /**
-     * Convert attributes array to an HTML string.
-     *
-     * @param array $attributes HTML attributes as key-value pairs.
-     * @return string The formatted HTML attributes.
-     */
-    private function buildAttributesFromArray(array $attributes): string
-    {
-        $result = '';
-
-        foreach ($attributes as $key => $value) {
-            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
-        }
-
-        return trim($result);
     }
 
     /**
