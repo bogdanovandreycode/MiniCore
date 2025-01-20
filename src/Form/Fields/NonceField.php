@@ -2,6 +2,7 @@
 
 namespace MiniCore\Form\Fields;
 
+use MiniCore\Form\Field;
 use MiniCore\Form\FieldInterface;
 
 /**
@@ -27,11 +28,9 @@ use MiniCore\Form\FieldInterface;
  *
  * if ($isValid) {
  *     echo "Nonce is valid. Processing form data...";
- * } else {
- *     echo "Invalid or expired nonce.";
  * }
  */
-class NonceField implements FieldInterface
+class NonceField extends Field implements FieldInterface
 {
     /**
      * NonceField constructor.
@@ -45,14 +44,22 @@ class NonceField implements FieldInterface
      * @param array  $attributes   Additional HTML attributes for the nonce input.
      */
     public function __construct(
-        public string $name = '_nonce',
+        string $name = '_nonce',
+        string $label = '',
+        array $attributes = [],
         public string $action = 'default_action',
         public string $nonce = '',
         public int $expiration = 3600,
         public string $userInput = '',
         public string $errorMessage = 'Invalid or expired nonce.',
-        public array $attributes = [],
-    ) {}
+    ) {
+        parent::__construct(
+            $name,
+            $label,
+            $userInput,
+            $attributes
+        );
+    }
 
     /**
      * Generate a nonce value based on the action and current time.
@@ -124,16 +131,6 @@ class NonceField implements FieldInterface
     }
 
     /**
-     * Get the name of the nonce field.
-     *
-     * @return string The name attribute of the field.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
      * Get the user-provided nonce value.
      *
      * @return mixed The user's input value.
@@ -141,32 +138,6 @@ class NonceField implements FieldInterface
     public function getValue(): mixed
     {
         return $this->userInput;
-    }
-
-    /**
-     * Get additional HTML attributes for the nonce field.
-     *
-     * @return array The attributes as key-value pairs.
-     */
-    public function getAttributes(): array
-    {
-        return $this->attributes;
-    }
-
-    /**
-     * Build the attributes as an HTML string.
-     *
-     * @return string The HTML attributes.
-     */
-    public function buildAttributes(): string
-    {
-        $result = '';
-
-        foreach ($this->attributes as $key => $value) {
-            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
-        }
-
-        return trim($result);
     }
 
     /**

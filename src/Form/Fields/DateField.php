@@ -2,6 +2,7 @@
 
 namespace MiniCore\Form\Fields;
 
+use MiniCore\Form\Field;
 use MiniCore\Form\FieldInterface;
 
 /**
@@ -12,17 +13,6 @@ use MiniCore\Form\FieldInterface;
  * and an optional calendar icon for a more user-friendly interface.
  *
  * @package MiniCore\Form\Fields
- *
- * @example
- * // Basic date input field
- * $dateField = new DateField(name: 'birth_date');
- * echo $dateField->render();
- *
- * // Output:
- * // <div class="input-group mb-3">
- * //     <input type="date" name="birth_date" value="" placeholder="Select a date" class="form-control">
- * //     <span class="input-group-text"><i class="fa fa-calendar"></i></span>
- * // </div>
  *
  * @example
  * // Date input field with default value and custom attributes
@@ -40,7 +30,7 @@ use MiniCore\Form\FieldInterface;
  * //     <span class="input-group-text"><i class="fa fa-calendar"></i></span>
  * // </div>
  */
-class DateField implements FieldInterface
+class DateField extends Field implements FieldInterface
 {
     /**
      * DateField constructor.
@@ -51,11 +41,19 @@ class DateField implements FieldInterface
      * @param string $placeholder Placeholder text for the input field.
      */
     public function __construct(
-        public string $name = '',
-        public mixed $value = null,
-        public array $attributes = [],
+        string $name = '',
+        string $label = '',
+        mixed $value = null,
+        array $attributes = [],
         public string $placeholder = 'Select a date',
-    ) {}
+    ) {
+        parent::__construct(
+            $name,
+            $label,
+            $value,
+            $attributes
+        );
+    }
 
     /**
      * Render the date field with Bootstrap styling.
@@ -80,51 +78,5 @@ class DateField implements FieldInterface
             htmlspecialchars($this->placeholder),
             $attributesString
         );
-    }
-
-    /**
-     * Get the name of the date field.
-     *
-     * @return string The name attribute of the field.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Get the value of the date field.
-     *
-     * @return mixed The current value of the date input.
-     */
-    public function getValue(): mixed
-    {
-        return $this->value;
-    }
-
-    /**
-     * Get the additional attributes of the date field.
-     *
-     * @return array The HTML attributes as key-value pairs.
-     */
-    public function getAttributes(): array
-    {
-        return $this->attributes;
-    }
-
-    /**
-     * Build the attributes as an HTML string.
-     *
-     * @return string The compiled HTML attributes.
-     */
-    public function buildAttributes(): string
-    {
-        $result = '';
-
-        foreach ($this->attributes as $key => $value) {
-            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
-        }
-
-        return trim($result);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace MiniCore\Form\Fields;
 
+use MiniCore\Form\Field;
 use MiniCore\Form\FieldInterface;
 
 /**
@@ -24,7 +25,7 @@ use MiniCore\Form\FieldInterface;
  *     <input type="text" name="captcha" value="" class="form-control">
  * </div>
  */
-class Captcha implements FieldInterface
+class Captcha extends Field implements FieldInterface
 {
     /**
      * Captcha constructor.
@@ -37,13 +38,21 @@ class Captcha implements FieldInterface
      * @param array  $attributes   Additional HTML attributes for the input field.
      */
     public function __construct(
-        public string $name = 'captcha',
+        string $name = 'captcha',
+        string $label = '',
+        array $attributes = [],
         public string $question = '',
         public int $answer = 0,
         public string $userInput = '',
         public string $errorMessage = 'Incorrect captcha answer.',
-        public array $attributes = [],
-    ) {}
+    ) {
+        parent::__construct(
+            $name,
+            $label,
+            $userInput,
+            $attributes
+        );
+    }
 
     /**
      * Generate a new math-based CAPTCHA question.
@@ -101,16 +110,6 @@ class Captcha implements FieldInterface
     }
 
     /**
-     * Get the name of the CAPTCHA field.
-     *
-     * @return string The name attribute.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
      * Get the user's input for the CAPTCHA field.
      *
      * @return mixed The user's input value.
@@ -118,31 +117,5 @@ class Captcha implements FieldInterface
     public function getValue(): mixed
     {
         return $this->userInput;
-    }
-
-    /**
-     * Get the additional HTML attributes for the CAPTCHA input field.
-     *
-     * @return array The attributes as key-value pairs.
-     */
-    public function getAttributes(): array
-    {
-        return $this->attributes;
-    }
-
-    /**
-     * Build the HTML attributes into a string for rendering.
-     *
-     * @return string The formatted HTML attributes.
-     */
-    public function buildAttributes(): string
-    {
-        $result = '';
-
-        foreach ($this->attributes as $key => $value) {
-            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
-        }
-
-        return trim($result);
     }
 }

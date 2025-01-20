@@ -2,6 +2,7 @@
 
 namespace MiniCore\Form\Fields;
 
+use MiniCore\Form\Field;
 use MiniCore\Form\FieldInterface;
 
 /**
@@ -30,7 +31,7 @@ use MiniCore\Form\FieldInterface;
  * // Output:
  * // <textarea name="bio" placeholder="Tell us about yourself..." rows="5" cols="40" class="form-control"></textarea>
  */
-class TextAreaField implements FieldInterface
+class TextAreaField extends Field implements FieldInterface
 {
     /**
      * TextAreaField constructor.
@@ -40,10 +41,18 @@ class TextAreaField implements FieldInterface
      * @param array  $attributes Additional HTML attributes for customization (e.g., rows, cols, class).
      */
     public function __construct(
-        public string $name = '',
-        public mixed $value = '',
-        public array $attributes = [],
-    ) {}
+        string $name = '',
+        string $label = '',
+        mixed $value = '',
+        array $attributes = [],
+    ) {
+        parent::__construct(
+            $name,
+            $label,
+            $value,
+            $attributes
+        );
+    }
 
     /**
      * Render the textarea field as an HTML string.
@@ -60,51 +69,5 @@ class TextAreaField implements FieldInterface
             $attributes,
             htmlspecialchars((string)$this->value)
         );
-    }
-
-    /**
-     * Get the name of the textarea field.
-     *
-     * @return string The name attribute.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Get the value of the textarea field.
-     *
-     * @return mixed The content inside the textarea.
-     */
-    public function getValue(): mixed
-    {
-        return $this->value;
-    }
-
-    /**
-     * Get the additional attributes of the textarea field.
-     *
-     * @return array The key-value pairs of HTML attributes.
-     */
-    public function getAttributes(): array
-    {
-        return $this->attributes;
-    }
-
-    /**
-     * Build the attributes as an HTML string.
-     *
-     * @return string The formatted HTML attributes for rendering.
-     */
-    public function buildAttributes(): string
-    {
-        $result = '';
-
-        foreach ($this->attributes as $key => $value) {
-            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
-        }
-
-        return trim($result);
     }
 }

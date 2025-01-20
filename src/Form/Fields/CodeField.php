@@ -2,6 +2,7 @@
 
 namespace MiniCore\Form\Fields;
 
+use MiniCore\Form\Field;
 use MiniCore\Form\FieldInterface;
 
 /**
@@ -36,7 +37,7 @@ use MiniCore\Form\FieldInterface;
  * // </div>
  */
 
-class CodeField implements FieldInterface
+class CodeField extends Field implements FieldInterface
 {
     /**
      * CodeField constructor.
@@ -48,12 +49,20 @@ class CodeField implements FieldInterface
      * @param array  $attributes     Additional HTML attributes for each input field.
      */
     public function __construct(
-        public string $name = 'code',
+        string $name = 'code',
+        string $label = 'Code',
+        array $value = [],
+        array $attributes = [],
         public int $length = 6,
         public bool $allowOnlyDigits = true,
-        public array $value = [],
-        public array $attributes = [],
-    ) {}
+    ) {
+        parent::__construct(
+            $name,
+            $label,
+            $value,
+            $attributes
+        );
+    }
 
     /**
      * Render the code field as a set of Bootstrap-styled input fields.
@@ -84,51 +93,5 @@ class CodeField implements FieldInterface
         }
 
         return sprintf('<div class="d-flex gap-2">%s</div>', $inputsHtml);
-    }
-
-    /**
-     * Get the name of the code field.
-     *
-     * @return string The name attribute of the input field.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Get the value of the code field.
-     *
-     * @return mixed The values of the input fields as an array.
-     */
-    public function getValue(): mixed
-    {
-        return $this->value;
-    }
-
-    /**
-     * Get the additional attributes of the code field.
-     *
-     * @return array The HTML attributes as key-value pairs.
-     */
-    public function getAttributes(): array
-    {
-        return $this->attributes;
-    }
-
-    /**
-     * Build the attributes as an HTML string.
-     *
-     * @return string The compiled HTML attributes.
-     */
-    public function buildAttributes(): string
-    {
-        $result = '';
-
-        foreach ($this->attributes as $key => $value) {
-            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
-        }
-
-        return trim($result);
     }
 }

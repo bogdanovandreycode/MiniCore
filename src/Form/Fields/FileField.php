@@ -2,6 +2,7 @@
 
 namespace MiniCore\Form\Fields;
 
+use MiniCore\Form\Field;
 use MiniCore\Form\FieldInterface;
 
 /**
@@ -37,7 +38,7 @@ use MiniCore\Form\FieldInterface;
  * //     </div>
  * // </div>
  */
-class FileField implements FieldInterface
+class FileField extends Field implements FieldInterface
 {
     /**
      * FileField constructor.
@@ -50,11 +51,19 @@ class FileField implements FieldInterface
      */
     public function __construct(
         public string $name = '',
-        public mixed $value = null,
-        public array $attributes = [],
+        string $label = '',
+        mixed $value = null,
+        array $attributes = [],
         public string $successMessage = 'Upload successful!',
         public string $errorMessage = 'Upload failed.',
-    ) {}
+    ) {
+        parent::__construct(
+            $name,
+            $label,
+            $value,
+            $attributes
+        );
+    }
 
     /**
      * Render the file input field as a custom HTML string with progress bar.
@@ -67,7 +76,7 @@ class FileField implements FieldInterface
 
         return sprintf(
             '<div class="mb-3">
-                <input type="file" name="%s" class="form-control" %s>
+                <input type="file" name="%s" %s>
                 <div class="form-text">
                     <span class="file-name">No file chosen</span>
                 </div>
@@ -84,51 +93,5 @@ class FileField implements FieldInterface
             htmlspecialchars($this->successMessage),
             htmlspecialchars($this->errorMessage)
         );
-    }
-
-    /**
-     * Get the name of the file input field.
-     *
-     * @return string The name attribute.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Get the value of the file input field.
-     *
-     * @return mixed The value of the input field.
-     */
-    public function getValue(): mixed
-    {
-        return $this->value;
-    }
-
-    /**
-     * Get the additional attributes of the file input field.
-     *
-     * @return array The key-value pairs of attributes.
-     */
-    public function getAttributes(): array
-    {
-        return $this->attributes;
-    }
-
-    /**
-     * Build the attributes as an HTML string.
-     *
-     * @return string The formatted HTML attributes.
-     */
-    public function buildAttributes(): string
-    {
-        $result = '';
-
-        foreach ($this->attributes as $key => $value) {
-            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
-        }
-
-        return trim($result);
     }
 }

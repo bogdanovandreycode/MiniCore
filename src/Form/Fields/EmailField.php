@@ -2,6 +2,7 @@
 
 namespace MiniCore\Form\Fields;
 
+use MiniCore\Form\Field;
 use MiniCore\Form\FieldInterface;
 
 /**
@@ -24,7 +25,7 @@ use MiniCore\Form\FieldInterface;
  * // Output:
  * // <input type="email" name="contact_email" value="user@example.com" placeholder="Enter your email" class="form-control" required />
  */
-class EmailField implements FieldInterface
+class EmailField extends Field implements FieldInterface
 {
     /**
      * EmailField constructor.
@@ -34,10 +35,18 @@ class EmailField implements FieldInterface
      * @param array  $attributes Additional HTML attributes for the input field.
      */
     public function __construct(
-        public string $name = '',
-        public mixed $value = '',
-        public array $attributes = [],
-    ) {}
+        string $name = '',
+        string $label = '',
+        mixed $value = '',
+        array $attributes = [],
+    ) {
+        parent::__construct(
+            $name,
+            $label,
+            $value,
+            $attributes
+        );
+    }
 
     /**
      * Render the email field as an HTML string.
@@ -49,56 +58,10 @@ class EmailField implements FieldInterface
         $attributes = $this->buildAttributes();
 
         return sprintf(
-            '<input type="email" name="%s" value="%s" class="form-control" %s/>',
+            '<input type="email" name="%s" value="%s" %s/>',
             htmlspecialchars($this->name),
             htmlspecialchars((string)$this->value),
             $attributes
         );
-    }
-
-    /**
-     * Get the name of the email field.
-     *
-     * @return string The name attribute.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Get the value of the email field.
-     *
-     * @return mixed The value of the input field.
-     */
-    public function getValue(): mixed
-    {
-        return $this->value;
-    }
-
-    /**
-     * Get the additional attributes of the email field.
-     *
-     * @return array The key-value pairs of attributes.
-     */
-    public function getAttributes(): array
-    {
-        return $this->attributes;
-    }
-
-    /**
-     * Build the attributes as an HTML string.
-     *
-     * @return string The formatted HTML attributes.
-     */
-    public function buildAttributes(): string
-    {
-        $result = '';
-
-        foreach ($this->attributes as $key => $value) {
-            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
-        }
-
-        return trim($result);
     }
 }

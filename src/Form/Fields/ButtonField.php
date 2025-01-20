@@ -2,6 +2,7 @@
 
 namespace MiniCore\Form\Fields;
 
+use MiniCore\Form\Field;
 use MiniCore\Form\FieldInterface;
 
 /**
@@ -13,20 +14,13 @@ use MiniCore\Form\FieldInterface;
  * @package MiniCore\Form\Fields
  *
  * @example
- * $submitButton = new ButtonField('submit', 'Send');
- * echo $submitButton->render();
- * 
- * // Output:
- * <button name="submit" value="" class="btn btn-primary">Send</button>
- *
- * @example
  * $button = new ButtonField('save', 'Save', 'save_action', ['class' => 'btn btn-success']);
  * echo $button->render();
  * 
  * // Output:
  * <button name="save" value="save_action" class="btn btn-success">Save</button>
  */
-class ButtonField implements FieldInterface
+class ButtonField extends Field implements FieldInterface
 {
     /**
      * ButtonField constructor.
@@ -37,11 +31,18 @@ class ButtonField implements FieldInterface
      * @param array  $attributes Additional HTML attributes for the button (e.g., class, id, style).
      */
     public function __construct(
-        public string $name = '',
-        public string $label = 'Submit',
-        public mixed $value = null,
-        public array $attributes = []
-    ) {}
+        string $name = '',
+        string $label = 'Submit',
+        mixed $value = null,
+        array $attributes = []
+    ) {
+        parent::__construct(
+            $name,
+            $label,
+            $value,
+            $attributes
+        );
+    }
 
     /**
      * Render the button field as a Bootstrap-styled HTML button.
@@ -68,61 +69,5 @@ class ButtonField implements FieldInterface
             $attributesString,
             htmlspecialchars($this->label)
         );
-    }
-
-    /**
-     * Get the name attribute of the button.
-     *
-     * @return string The name attribute.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Get the label (text) of the button.
-     *
-     * @return string The button text.
-     */
-    public function getLabel(): string
-    {
-        return $this->label;
-    }
-
-    /**
-     * Get the value of the button.
-     *
-     * @return mixed The button value.
-     */
-    public function getValue(): mixed
-    {
-        return $this->value;
-    }
-
-    /**
-     * Get the additional attributes of the button.
-     *
-     * @return array The key-value pairs of attributes.
-     */
-    public function getAttributes(): array
-    {
-        return $this->attributes;
-    }
-
-    /**
-     * Build the attributes as an HTML string.
-     *
-     * @return string The HTML-ready string of attributes.
-     */
-    public function buildAttributes(): string
-    {
-        $result = '';
-
-        foreach ($this->attributes as $key => $value) {
-            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
-        }
-
-        return trim($result);
     }
 }

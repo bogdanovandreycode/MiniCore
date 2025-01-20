@@ -2,6 +2,7 @@
 
 namespace MiniCore\Form\Fields;
 
+use MiniCore\Form\Field;
 use MiniCore\Form\FieldInterface;
 
 /**
@@ -28,7 +29,7 @@ use MiniCore\Form\FieldInterface;
  * //   </div>
  * // </div>
  */
-class DateTimeField implements FieldInterface
+class DateTimeField extends Field implements FieldInterface
 {
     /**
      * DateTimeField constructor.
@@ -42,14 +43,22 @@ class DateTimeField implements FieldInterface
      * @param string $placeholderDate  Placeholder text for the date input.
      */
     public function __construct(
-        private string $name = 'datetime',
+        string $name = 'datetime',
+        string $label = 'Date and Time',
+        array $attributes = [],
         public mixed $dateValue = null,
         public mixed $timeValue = ['hours' => 0, 'minutes' => 0, 'seconds' => 0],
         public bool $includeSeconds = false,
         public int $interval = 1,
-        public array $attributes = [],
         public string $placeholderDate = 'Select a date',
-    ) {}
+    ) {
+        parent::__construct(
+            $name,
+            $label,
+            $dateValue,
+            $attributes
+        );
+    }
 
     /**
      * Render the DateTimeField as a custom HTML string.
@@ -68,7 +77,7 @@ class DateTimeField implements FieldInterface
             </div>',
             htmlspecialchars($this->name),
             htmlspecialchars((string)$this->dateValue),
-            htmlspecialchars($this->placeholderDate)
+            htmlspecialchars($this->placeholderDate),
         );
 
         // Rendering time fields
@@ -119,16 +128,6 @@ class DateTimeField implements FieldInterface
     }
 
     /**
-     * Get the name of the datetime field.
-     *
-     * @return string The name attribute.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
      * Get the value of the datetime field.
      *
      * @return array The combined date and time value.
@@ -139,31 +138,5 @@ class DateTimeField implements FieldInterface
             'date' => $this->dateValue,
             'time' => $this->timeValue,
         ];
-    }
-
-    /**
-     * Get additional attributes of the datetime field.
-     *
-     * @return array The HTML attributes as key-value pairs.
-     */
-    public function getAttributes(): array
-    {
-        return $this->attributes;
-    }
-
-    /**
-     * Build the attributes as an HTML string.
-     *
-     * @return string The compiled HTML attributes.
-     */
-    public function buildAttributes(): string
-    {
-        $result = '';
-
-        foreach ($this->attributes as $key => $value) {
-            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
-        }
-
-        return trim($result);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace MiniCore\Form\Fields;
 
+use MiniCore\Form\Field;
 use MiniCore\Form\FieldInterface;
 
 /**
@@ -42,7 +43,7 @@ use MiniCore\Form\FieldInterface;
  * //     </div>
  * // </div>
  */
-class TimeField implements FieldInterface
+class TimeField extends Field implements FieldInterface
 {
     /**
      * TimeField constructor.
@@ -54,12 +55,20 @@ class TimeField implements FieldInterface
      * @param array $attributes Additional HTML attributes for the field.
      */
     public function __construct(
-        public string $name = 'time',
+        string $name = 'time',
+        string $label = '',
+        array $value = ['hours' => 0, 'minutes' => 0, 'seconds' => 0],
+        array $attributes = [],
         public int $interval = 1,
         public bool $includeSeconds = false,
-        public array $value = ['hours' => 0, 'minutes' => 0, 'seconds' => 0],
-        public array $attributes = [],
-    ) {}
+    ) {
+        parent::__construct(
+            $name,
+            $label,
+            $value,
+            $attributes
+        );
+    }
 
     /**
      * Render the time field as a custom HTML string with hour, minute, and optional second inputs.
@@ -106,45 +115,5 @@ class TimeField implements FieldInterface
             $maxValue,
             $type
         );
-    }
-
-    /**
-     * Get the name of the time field.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Get the value of the time field.
-     */
-    public function getValue(): mixed
-    {
-        return $this->value;
-    }
-
-    /**
-     * Get the additional attributes of the time field.
-     */
-    public function getAttributes(): array
-    {
-        return $this->attributes;
-    }
-
-    /**
-     * Build the attributes as an HTML string.
-     *
-     * @return string The HTML attributes.
-     */
-    public function buildAttributes(): string
-    {
-        $result = '';
-
-        foreach ($this->attributes as $key => $value) {
-            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
-        }
-
-        return trim($result);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace MiniCore\Form\Fields;
 
+use MiniCore\Form\Field;
 use MiniCore\Form\FieldInterface;
 
 /**
@@ -36,7 +37,7 @@ use MiniCore\Form\FieldInterface;
  * //     <option value="other">Other</option>
  * // </select>
  */
-class SelectField implements FieldInterface
+class SelectField extends Field implements FieldInterface
 {
     /**
      * SelectField constructor.
@@ -47,11 +48,19 @@ class SelectField implements FieldInterface
      * @param array  $attributes Additional HTML attributes (e.g., class, style).
      */
     public function __construct(
-        public string $name = '',
-        public mixed $value = '',
+        string $name = '',
+        string $label = '',
+        mixed $value = '',
+        array $attributes = [],
         public array $options = [],
-        public array $attributes = [],
-    ) {}
+    ) {
+        parent::__construct(
+            $name,
+            $label,
+            $value,
+            $attributes
+        );
+    }
 
     /**
      * Render the select field as an HTML string.
@@ -61,10 +70,11 @@ class SelectField implements FieldInterface
     public function render(): string
     {
         $attributes = $this->buildAttributes();
-
         $optionsHtml = '';
+
         foreach ($this->options as $key => $label) {
             $selected = ($key == $this->value) ? 'selected' : '';
+
             $optionsHtml .= sprintf(
                 '<option value="%s" %s>%s</option>',
                 htmlspecialchars($key),
@@ -74,56 +84,10 @@ class SelectField implements FieldInterface
         }
 
         return sprintf(
-            '<select name="%s" class="form-select" %s>%s</select>',
+            '<select name="%s" %s>%s</select>',
             htmlspecialchars($this->name),
             $attributes,
             $optionsHtml
         );
-    }
-
-    /**
-     * Get the name of the select field.
-     *
-     * @return string The name attribute.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Get the value of the select field.
-     *
-     * @return mixed The selected option value.
-     */
-    public function getValue(): mixed
-    {
-        return $this->value;
-    }
-
-    /**
-     * Get the additional attributes of the select field.
-     *
-     * @return array The HTML attributes as key-value pairs.
-     */
-    public function getAttributes(): array
-    {
-        return $this->attributes;
-    }
-
-    /**
-     * Build the additional attributes as an HTML string.
-     *
-     * @return string The compiled HTML attributes.
-     */
-    public function buildAttributes(): string
-    {
-        $result = '';
-
-        foreach ($this->attributes as $key => $value) {
-            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
-        }
-
-        return trim($result);
     }
 }

@@ -5,39 +5,18 @@ namespace MiniCore\Form;
 abstract class Field
 {
     /**
-     * Field name.
-     *
-     * @var string
-     */
-    protected string $name;
-
-    /**
-     * Field value.
-     *
-     * @var mixed
-     */
-    protected mixed $value;
-
-    /**
-     * Additional field attributes.
-     *
-     * @var array
-     */
-    protected array $attributes;
-
-    /**
      * Field constructor.
      *
      * @param string $name The field name.
      * @param mixed $value The field value.
      * @param array $attributes Additional field attributes.
      */
-    public function __construct(string $name, mixed $value = null, array $attributes = [])
-    {
-        $this->name = $name;
-        $this->value = $value;
-        $this->attributes = $attributes;
-    }
+    public function __construct(
+        protected string $name,
+        protected string $label,
+        protected mixed $value,
+        protected array $attributes,
+    ) {}
 
     /**
      * Get the name of the field.
@@ -47,6 +26,16 @@ abstract class Field
     public function getName(): string
     {
         return $this->name;
+    }
+
+    /**
+     * Get the label of the field.
+     *
+     * @return string The field label.
+     */
+    public function getLabel(): string
+    {
+        return $this->label;
     }
 
     /**
@@ -67,6 +56,26 @@ abstract class Field
     public function getAttributes(): array
     {
         return $this->attributes;
+    }
+
+    /**
+     * Convert additional attributes into an HTML string.
+     *
+     * @return string The formatted HTML attributes.
+     *
+     * @example
+     * // If attributes are ['class' => 'custom-class', 'id' => 'block1']
+     * $field->buildAttributes(); // Output: 'class="custom-class" id="block1"'
+     */
+    public function buildAttributes(): string
+    {
+        $result = '';
+
+        foreach ($this->attributes as $key => $value) {
+            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
+        }
+
+        return trim($result);
     }
 
     /**

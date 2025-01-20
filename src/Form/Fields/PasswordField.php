@@ -2,6 +2,7 @@
 
 namespace MiniCore\Form\Fields;
 
+use MiniCore\Form\Field;
 use MiniCore\Form\FieldInterface;
 
 /**
@@ -24,7 +25,7 @@ use MiniCore\Form\FieldInterface;
  * // Output:
  * // <input type="password" name="admin_password" value="" placeholder="Enter your password" class="form-control"/>
  */
-class PasswordField implements FieldInterface
+class PasswordField extends Field implements FieldInterface
 {
     /**
      * PasswordField constructor.
@@ -34,10 +35,18 @@ class PasswordField implements FieldInterface
      * @param array  $attributes Additional HTML attributes (e.g., placeholder, class, id).
      */
     public function __construct(
-        public string $name = '',
-        public mixed $value = '',
-        public array $attributes = [],
-    ) {}
+        string $name = '',
+        string $label = '',
+        mixed $value = '',
+        array $attributes = [],
+    ) {
+        parent::__construct(
+            $name,
+            $label,
+            $value,
+            $attributes
+        );
+    }
 
     /**
      * Render the password field as an HTML string.
@@ -49,56 +58,10 @@ class PasswordField implements FieldInterface
         $attributes = $this->buildAttributes();
 
         return sprintf(
-            '<input type="password" name="%s" value="%s" class="form-control" %s/>',
+            '<input type="password" name="%s" value="%s" %s/>',
             htmlspecialchars($this->name),
             htmlspecialchars((string)$this->value),
             $attributes
         );
-    }
-
-    /**
-     * Get the name of the password field.
-     *
-     * @return string The name attribute.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Get the value of the password field.
-     *
-     * @return mixed The value attribute.
-     */
-    public function getValue(): mixed
-    {
-        return $this->value;
-    }
-
-    /**
-     * Get the additional attributes of the password field.
-     *
-     * @return array The HTML attributes as key-value pairs.
-     */
-    public function getAttributes(): array
-    {
-        return $this->attributes;
-    }
-
-    /**
-     * Build the additional attributes into an HTML string.
-     *
-     * @return string The compiled HTML attributes.
-     */
-    public function buildAttributes(): string
-    {
-        $result = '';
-
-        foreach ($this->attributes as $key => $value) {
-            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
-        }
-
-        return trim($result);
     }
 }

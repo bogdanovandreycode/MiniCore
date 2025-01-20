@@ -2,6 +2,7 @@
 
 namespace MiniCore\Form\Fields;
 
+use MiniCore\Form\Field;
 use MiniCore\Form\FieldInterface;
 
 /**
@@ -31,7 +32,7 @@ use MiniCore\Form\FieldInterface;
  * //     <input type="text" name="search" value="" placeholder="Search..." class="form-control"/>
  * // </div>
  */
-class TextIconField implements FieldInterface
+class TextIconField extends Field implements FieldInterface
 {
     /**
      * TextIconField constructor.
@@ -42,11 +43,19 @@ class TextIconField implements FieldInterface
      * @param array  $attributes Additional HTML attributes for customization (e.g., placeholder, class).
      */
     public function __construct(
-        public string $name = '',
-        public mixed $value = '',
+        string $name = '',
+        string $label = '',
+        mixed $value = '',
+        array $attributes = [],
         public string $iconClass = '',
-        public array $attributes = [],
-    ) {}
+    ) {
+        parent::__construct(
+            $name,
+            $label,
+            $value,
+            $attributes
+        );
+    }
 
     /**
      * Render the text field with an icon as an HTML string.
@@ -60,58 +69,12 @@ class TextIconField implements FieldInterface
         return sprintf(
             '<div class="input-group">
                 <span class="input-group-text"><i class="%s"></i></span>
-                <input type="text" name="%s" value="%s" class="form-control" %s/>
+                <input type="text" name="%s" value="%s" %s/>
             </div>',
             htmlspecialchars($this->iconClass),
             htmlspecialchars($this->name),
             htmlspecialchars((string)$this->value),
             $attributes
         );
-    }
-
-    /**
-     * Get the name of the text field.
-     *
-     * @return string The name attribute.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Get the value of the text field.
-     *
-     * @return mixed The value attribute.
-     */
-    public function getValue(): mixed
-    {
-        return $this->value;
-    }
-
-    /**
-     * Get the additional attributes of the text field.
-     *
-     * @return array The HTML attributes as key-value pairs.
-     */
-    public function getAttributes(): array
-    {
-        return $this->attributes;
-    }
-
-    /**
-     * Build the attributes as an HTML string.
-     *
-     * @return string The HTML attributes.
-     */
-    public function buildAttributes(): string
-    {
-        $result = '';
-
-        foreach ($this->attributes as $key => $value) {
-            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
-        }
-
-        return trim($result);
     }
 }

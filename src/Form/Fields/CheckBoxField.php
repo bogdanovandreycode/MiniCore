@@ -2,6 +2,7 @@
 
 namespace MiniCore\Form\Fields;
 
+use MiniCore\Form\Field;
 use MiniCore\Form\FieldInterface;
 
 /**
@@ -23,7 +24,7 @@ use MiniCore\Form\FieldInterface;
  * </div>
  *
  */
-class CheckBoxField implements FieldInterface
+class CheckBoxField extends Field implements FieldInterface
 {
     /**
      * CheckBoxField constructor.
@@ -34,11 +35,19 @@ class CheckBoxField implements FieldInterface
      * @param array  $attributes Additional HTML attributes for the checkbox input.
      */
     public function __construct(
-        public string $name = '',
-        public mixed $value = '',
+        string $name = '',
+        string $label = '',
+        mixed $value = '',
+        array $attributes = [],
         public bool $checked = false,
-        public array $attributes = [],
-    ) {}
+    ) {
+        parent::__construct(
+            $name,
+            $label,
+            $value,
+            $attributes
+        );
+    }
 
     /**
      * Render the checkbox field as a Bootstrap-styled toggle switch.
@@ -71,51 +80,5 @@ class CheckBoxField implements FieldInterface
             htmlspecialchars($this->name),
             ucfirst(htmlspecialchars($this->name))
         );
-    }
-
-    /**
-     * Get the name of the checkbox field.
-     *
-     * @return string The name attribute.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Get the value of the checkbox field.
-     *
-     * @return mixed The value attribute.
-     */
-    public function getValue(): mixed
-    {
-        return $this->value;
-    }
-
-    /**
-     * Get the additional attributes of the checkbox field.
-     *
-     * @return array The HTML attributes as key-value pairs.
-     */
-    public function getAttributes(): array
-    {
-        return $this->attributes;
-    }
-
-    /**
-     * Build the additional attributes into a formatted HTML string.
-     *
-     * @return string The compiled HTML attributes.
-     */
-    public function buildAttributes(): string
-    {
-        $result = '';
-
-        foreach ($this->attributes as $key => $value) {
-            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
-        }
-
-        return trim($result);
     }
 }

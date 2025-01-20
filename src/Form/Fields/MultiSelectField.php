@@ -2,6 +2,7 @@
 
 namespace MiniCore\Form\Fields;
 
+use MiniCore\Form\Field;
 use MiniCore\Form\FieldInterface;
 
 /**
@@ -42,7 +43,7 @@ use MiniCore\Form\FieldInterface;
  * //     </div>
  * // </div>
  */
-class MultiSelectField implements FieldInterface
+class MultiSelectField extends Field implements FieldInterface
 {
     /**
      * MultiSelectField constructor.
@@ -53,11 +54,19 @@ class MultiSelectField implements FieldInterface
      * @param array  $attributes Additional HTML attributes for the field.
      */
     public function __construct(
-        public string $name = '',
+        string $name = '',
+        string $label = '',
+        array $attributes = [],
         public array $options = [],
         public array $selected = [],
-        public array $attributes = [],
-    ) {}
+    ) {
+        parent::__construct(
+            $name,
+            $label,
+            $selected,
+            $attributes
+        );
+    }
 
     /**
      * Render the multi-select field as a custom HTML string with checkboxes.
@@ -73,7 +82,7 @@ class MultiSelectField implements FieldInterface
             $checked = in_array($value, $this->selected, true) ? 'checked' : '';
             $optionsHtml .= sprintf(
                 '<div class="form-check">
-                    <input type="checkbox" name="%s[]" value="%s" class="form-check-input" %s>
+                    <input type="checkbox" name="%s[]" value="%s" %s>
                     <label class="form-check-label">%s</label>
                 </div>',
                 htmlspecialchars($this->name),
@@ -91,16 +100,6 @@ class MultiSelectField implements FieldInterface
     }
 
     /**
-     * Get the name of the multi-select field.
-     *
-     * @return string The name attribute.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
      * Get the selected values of the multi-select field.
      *
      * @return array The selected values.
@@ -108,31 +107,5 @@ class MultiSelectField implements FieldInterface
     public function getValue(): mixed
     {
         return $this->selected;
-    }
-
-    /**
-     * Get the additional attributes of the multi-select field.
-     *
-     * @return array The HTML attributes.
-     */
-    public function getAttributes(): array
-    {
-        return $this->attributes;
-    }
-
-    /**
-     * Build the attributes as an HTML string.
-     *
-     * @return string The HTML attributes.
-     */
-    public function buildAttributes(): string
-    {
-        $result = '';
-
-        foreach ($this->attributes as $key => $value) {
-            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
-        }
-
-        return trim($result);
     }
 }

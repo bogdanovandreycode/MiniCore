@@ -2,6 +2,7 @@
 
 namespace MiniCore\Form\Fields;
 
+use MiniCore\Form\Field;
 use MiniCore\Form\FieldInterface;
 use MiniCore\Form\Enums\ShapeType;
 
@@ -25,7 +26,7 @@ use MiniCore\Form\Enums\ShapeType;
  * 
  * @package MiniCore\Fields
  */
-class AvatarField implements FieldInterface
+class AvatarField extends Field implements FieldInterface
 {
     /**
      * AvatarField constructor.
@@ -37,12 +38,20 @@ class AvatarField implements FieldInterface
      * @param ShapeType $shape Defines the shape of the avatar preview (circle or square).
      */
     public function __construct(
-        public string $name = '',
-        public mixed $value = null,
-        public array $attributes = [],
+        string $name = '',
+        string $label = '',
+        mixed $value = null,
+        array $attributes = [],
         public string $placeholder = 'assets/default-avatar.png',
         public ShapeType $shape = ShapeType::Circle
-    ) {}
+    ) {
+        parent::__construct(
+            $name,
+            $label,
+            $value,
+            $attributes
+        );
+    }
 
     /**
      * Render the avatar upload field with Bootstrap styling.
@@ -74,57 +83,5 @@ class AvatarField implements FieldInterface
             htmlspecialchars($avatarUrl),
             $shapeClass
         );
-    }
-
-    /**
-     * Get the `name` attribute of the field.
-     *
-     * @return string The field's name.
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * Get the current value of the avatar field.
-     *
-     * Typically returns the URL or path of the uploaded avatar image.
-     *
-     * @return mixed The current avatar value.
-     */
-    public function getValue(): mixed
-    {
-        return $this->value;
-    }
-
-    /**
-     * Get additional HTML attributes for the wrapper `<div>`.
-     *
-     * @return array The attributes as key-value pairs.
-     */
-    public function getAttributes(): array
-    {
-        return $this->attributes;
-    }
-
-    /**
-     * Convert additional attributes into an HTML string.
-     *
-     * @return string The formatted HTML attributes.
-     *
-     * @example
-     * // If attributes are ['class' => 'custom-avatar', 'id' => 'avatar1']
-     * $field->buildAttributes(); // Output: 'class="custom-avatar" id="avatar1"'
-     */
-    public function buildAttributes(): string
-    {
-        $result = '';
-
-        foreach ($this->attributes as $key => $value) {
-            $result .= sprintf('%s="%s" ', htmlspecialchars($key), htmlspecialchars($value));
-        }
-
-        return trim($result);
     }
 }

@@ -42,7 +42,7 @@ class FormBuilderTest extends TestCase
      */
     public function testAddTextField(): void
     {
-        $textField = new TextField('username', 'JohnDoe', ['class' => 'form-control']);
+        $textField = new TextField('username', '', 'JohnDoe', ['class' => 'form-control']);
         $form = new FormBuilder('/submit', 'POST');
         $form->addField($textField);
 
@@ -56,11 +56,20 @@ class FormBuilderTest extends TestCase
      */
     public function testAddSelectField(): void
     {
-        $selectField = new SelectField('gender', 'male', [
-            'male' => 'Male',
-            'female' => 'Female',
-            'other' => 'Other'
-        ], ['class' => 'form-select']);
+        $selectField = new SelectField(
+            'gender',
+            'Gender',
+            'male',
+            [
+                'class' => 'form-select'
+            ],
+            [
+                'male' => 'Male',
+                'female' => 'Female',
+                'other' => 'Other'
+            ],
+
+        );
 
         $form = new FormBuilder('/submit', 'POST');
         $form->addField($selectField);
@@ -75,8 +84,8 @@ class FormBuilderTest extends TestCase
      */
     public function testAddGroup(): void
     {
-        $firstNameField = new TextField('first_name', '', ['placeholder' => 'First Name']);
-        $lastNameField = new TextField('last_name', '', ['placeholder' => 'Last Name']);
+        $firstNameField = new TextField('first_name', 'First Name', '', ['placeholder' => 'First Name']);
+        $lastNameField = new TextField('last_name', 'Last Name', '', ['placeholder' => 'Last Name']);
 
         $form = new FormBuilder('/submit', 'POST');
         $form->addGroup('User Info', [$firstNameField, $lastNameField]);
@@ -130,8 +139,8 @@ class FormBuilderTest extends TestCase
      */
     public function testAddMultipleFields(): void
     {
-        $emailField = new TextField('email', '', ['placeholder' => 'Enter your email']);
-        $passwordField = new TextField('password', '', ['type' => 'password', 'placeholder' => 'Enter your password']);
+        $emailField = new TextField('email', 'Email', '', ['placeholder' => 'Enter your email']);
+        $passwordField = new TextField('password', 'Password', '', ['type' => 'password', 'placeholder' => 'Enter your password']);
 
         $form = new FormBuilder('/login', 'POST');
         $form->addField($emailField)
