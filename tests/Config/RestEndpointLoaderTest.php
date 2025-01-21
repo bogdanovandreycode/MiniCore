@@ -4,6 +4,7 @@ namespace MiniCore\Tests\Config;
 
 use MiniCore\Http\Router;
 use PHPUnit\Framework\TestCase;
+use MiniCore\Http\RestApiRouter;
 use Symfony\Component\Yaml\Yaml;
 use MiniCore\Config\RestEndpointLoader;
 use MiniCore\Tests\Config\Stub\TestEndpoint;
@@ -85,15 +86,23 @@ class RestEndpointLoaderTest extends TestCase
     /**
      * Tests successful loading of a valid endpoint from a YAML file.
      */
-    public function testLoadValidEndpoint()
+    /**
+     * Tests successful loading of a valid endpoint from a YAML file.
+     */
+    public function testLoadValidEndpoint(): void
     {
+        // Загружаем маршруты из временного файла
         RestEndpointLoader::load($this->tempConfigPath);
 
-        $routes = Router::getRoutes();
+        // Получаем зарегистрированные маршруты
+        $routes = RestApiRouter::getRoutes();
 
+        // Проверяем структуру маршрутов
         $this->assertArrayHasKey('GET', $routes);
         $this->assertArrayHasKey('/api/test', $routes['GET']);
-        $this->assertInstanceOf(TestEndpoint::class, $routes['GET']['/api/test']);
+
+        // Проверяем, что endpoint корректно зарегистрирован
+        $this->assertInstanceOf(TestEndpoint::class, $routes['GET']['/api/test']['endpoint']);
     }
 
     /**

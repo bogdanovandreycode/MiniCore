@@ -2,7 +2,7 @@
 
 namespace MiniCore\Config;
 
-use MiniCore\Http\Router;
+use MiniCore\Http\RestApiRouter;
 use Symfony\Component\Yaml\Yaml;
 use MiniCore\Module\ModuleManager;
 use MiniCore\API\EndpointInterface;
@@ -44,10 +44,22 @@ class RestEndpointLoader
             throw new \RuntimeException("Endpoints file not found: $configPath");
         }
 
-        $data = Yaml::parseFile($configPath)['endpoints'] ?? [];
+        $data = Yaml::parseFile($configPath);
 
-        foreach ($data as $endpoint) {
-            self::registerEndpoint($endpoint);
+        // Extract global middlewares if defined
+        $globalMiddlewares = [];
+        if (!empty($data['middlewares'])) {
+            foreach ($data['middlewares'] as $middlewareClass) {
+                if (!class_exists($middlewareClass)) {
+                    throw new \RuntimeException("Middleware class not found: $middlewareClass");
+                }
+                $globalMiddlewares[] = new $middlewareClass();
+            }
+        }
+
+        // Load endpoints from configuration
+        foreach ($data['endpoints'] ?? [] as $endpoint) {
+            self::registerEndpoint($endpoint, $globalMiddlewares);
         }
     }
 
@@ -81,6 +93,7 @@ class RestEndpointLoader
      * so that it can process HTTP requests.
      *
      * @param array $endpoint The endpoint configuration (method, route, handler).
+     * @param array $globalMiddlewares List of global middleware instances.
      * @return void
      *
      * @throws \RuntimeException If the endpoint configuration is invalid or the handler is missing.
@@ -90,11 +103,17 @@ class RestEndpointLoader
      * // - method: GET
      * //   route: "/api/users"
      * //   handler: "App\\Endpoints\\GetUsersEndpoint"
+     * //   middlewares:
+     * //     - "App\\Middleware\\AuthMiddleware"
      */
-    private static function registerEndpoint(array $endpoint): void
+    private static function registerEndpoint(array $endpoint, array $globalMiddlewares = []): void
     {
         if (!isset($endpoint['method'], $endpoint['route'], $endpoint['handler'])) {
             throw new \RuntimeException("Invalid endpoint configuration.");
+        }
+
+        if (empty($endpoint['method']) || empty($endpoint['route']) || empty($endpoint['handler'])) {
+            throw new \RuntimeException("Endpoint configuration contains empty values.");
         }
 
         $method = strtoupper($endpoint['method']);
@@ -111,6 +130,21 @@ class RestEndpointLoader
             throw new \RuntimeException("Handler must implement EndpointInterface: $handlerClass");
         }
 
-        Router::register($method, $route, $handler);
+        // Extract route-specific middleware
+        $routeMiddlewares = [];
+        if (!empty($endpoint['middlewares'])) {
+            foreach ($endpoint['middlewares'] as $middlewareClass) {
+                if (!class_exists($middlewareClass)) {
+                    throw new \RuntimeException("Middleware class not found: $middlewareClass");
+                }
+                $routeMiddlewares[] = new $middlewareClass();
+            }
+        }
+
+        // Combine global and route-specific middleware
+        $middlewares = array_merge($globalMiddlewares, $routeMiddlewares);
+
+        // Register the endpoint with RestApiRouter
+        RestApiRouter::register($method, $route, $handler, $middlewares);
     }
 }

@@ -41,6 +41,13 @@ use MiniCore\Http\Request;
 abstract class RestEndpoint implements EndpointInterface
 {
     /**
+     * List of middleware classes to apply to the endpoint.
+     *
+     * @var array
+     */
+    protected array $middlewares = [];
+
+    /**
      * Extract query parameters from the request.
      *
      * Retrieves query parameters (e.g., from a URL like `/api/users?role=admin`)
@@ -113,4 +120,47 @@ abstract class RestEndpoint implements EndpointInterface
 
         return $params;
     }
+
+    /**
+     * Register middleware for the endpoint.
+     *
+     * @param MiddlewareInterface $middleware Middleware instance.
+     * @return void
+     */
+    public function addMiddleware(MiddlewareInterface $middleware): void
+    {
+        $this->middlewares[] = $middleware;
+    }
+
+    /**
+     * Process the middleware chain and execute the endpoint's core logic.
+     *
+     * @param array $params Parameters for the endpoint.
+     * @return mixed The response from the endpoint.
+     */
+    public function process(array $params): mixed
+    {
+        // Create a callable for the final handler (main logic of the endpoint).
+        $handler = function (array $params) {
+            return $this->handle($params);
+        };
+
+        // Wrap the handler with middleware in reverse order.
+        foreach (array_reverse($this->middlewares) as $middleware) {
+            $handler = function (array $params) use ($middleware, $handler) {
+                return $middleware->handle($params, $handler);
+            };
+        }
+
+        // Execute the final wrapped handler.
+        return $handler($params);
+    }
+
+    /**
+     * Abstract method to handle the endpoint logic.
+     *
+     * @param array $params
+     * @return mixed
+     */
+    abstract public function handle(array $params): mixed;
 }
