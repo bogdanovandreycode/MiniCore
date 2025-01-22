@@ -68,7 +68,7 @@ class RestApiRouter
             }
 
             if (!isset(self::$routes[$method][$path])) {
-                throw new \Exception('Route not found', 404);
+                throw new \Exception('Endpoint not found', 404);
             }
 
             $route = self::$routes[$method][$path];

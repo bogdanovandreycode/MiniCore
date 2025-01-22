@@ -206,16 +206,22 @@ class Boot
     public static function handleRequest(): void
     {
         try {
-            $response = RestApiRouter::handle(self::$request);
-            (new Response(200, $response))->send();
-            return;
-        } catch (\Exception $e) {
-            if ($e->getCode() === 404) {
-                $response = Router::handle(self::$request);
-                (new Response(200, $response))->send();
+            $responseApi = RestApiRouter::handle(self::$request);
+
+            if (!isset($responseApi['error'])) {
+                (new Response(200, $responseApi))->send();
                 return;
             }
 
+            $responseRoute = Router::handle(self::$request);
+
+            if (!isset($responseRoute['error'])) {
+                (new Response(200, $responseRoute))->send();
+                return;
+            }
+
+            (new Response(404, ['error' => 'Route or endpoint not found']))->send();
+        } catch (\Exception $e) {
             (new Response($e->getCode() ?: 500, ['error' => $e->getMessage()]))->send();
             return;
         }
