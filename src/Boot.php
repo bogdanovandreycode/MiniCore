@@ -7,6 +7,7 @@ use MiniCore\Http\Router;
 use MiniCore\Http\Request;
 use MiniCore\Http\Response;
 use MiniCore\View\ViewLoader;
+use MiniCore\API\RestApiRouter;
 use MiniCore\Database\DataBase;
 use MiniCore\Config\RouteLoader;
 use MiniCore\Module\ModuleManager;
@@ -205,10 +206,18 @@ class Boot
     public static function handleRequest(): void
     {
         try {
-            $response = Router::handle(self::$request);
+            $response = RestApiRouter::handle(self::$request);
             (new Response(200, $response))->send();
+            return;
         } catch (\Exception $e) {
+            if ($e->getCode() === 404) {
+                $response = Router::handle(self::$request);
+                (new Response(200, $response))->send();
+                return;
+            }
+
             (new Response($e->getCode() ?: 500, ['error' => $e->getMessage()]))->send();
+            return;
         }
     }
 }
