@@ -153,7 +153,7 @@ class RouteLoaderTest extends TestCase
         file_put_contents($invalidHandlerPath, Yaml::dump($yamlData));
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Handler must implement EndpointInterface');
+        $this->expectExceptionMessage('Handler must implement RouteInterface');
 
         RouteLoader::load($invalidHandlerPath);
 

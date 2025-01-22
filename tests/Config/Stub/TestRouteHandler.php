@@ -2,7 +2,7 @@
 
 namespace MiniCore\Tests\Config\Stub;
 
-use MiniCore\API\EndpointInterface;
+use MiniCore\Http\RouteInterface;
 
 /**
  * Stub implementation of the EndpointInterface for testing route loading.
@@ -15,7 +15,7 @@ use MiniCore\API\EndpointInterface;
  * - Specifies allowed HTTP methods for the endpoint.
  * - Defines the API route path.
  */
-class TestRouteHandler implements EndpointInterface
+class TestRouteHandler implements RouteInterface
 {
     /**
      * Handles incoming API requests and returns a static response.

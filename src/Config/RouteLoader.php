@@ -5,7 +5,7 @@ namespace MiniCore\Config;
 use MiniCore\Http\Router;
 use Symfony\Component\Yaml\Yaml;
 use MiniCore\Module\ModuleManager;
-use MiniCore\API\EndpointInterface;
+use MiniCore\Http\RouteInterface;
 
 /**
  * Class RouteLoader
@@ -111,8 +111,8 @@ class RouteLoader
 
         $handler = new $handlerClass();
 
-        if (!$handler instanceof EndpointInterface) {
-            throw new \RuntimeException("Handler must implement EndpointInterface: $handlerClass");
+        if (!$handler instanceof RouteInterface) {
+            throw new \RuntimeException("Handler must implement RouteInterface: $handlerClass");
         }
 
         Router::register($method, $path, $handler);

@@ -2,7 +2,7 @@
 
 namespace MiniCore\Http;
 
-use MiniCore\API\EndpointInterface;
+use MiniCore\Http\RouteInterface;
 
 /**
  * Class Router
@@ -27,10 +27,10 @@ class Router
      *
      * Structure: [
      *    'GET' => [
-     *        '/api/user' => EndpointInterface
+     *        '/api/user' => RouteInterface
      *    ],
      *    'POST' => [
-     *        '/api/user' => EndpointInterface
+     *        '/api/user' => RouteInterface
      *    ]
      * ]
      */
@@ -41,14 +41,14 @@ class Router
      *
      * @param string $method HTTP method (e.g., GET, POST).
      * @param string $path The route path (e.g., /api/user).
-     * @param EndpointInterface $endpoint The endpoint that handles the route.
+     * @param RouteInterface $endpoint The endpoint that handles the route.
      *
      * @return void
      *
      * @example
      * Router::register('POST', '/api/user', new CreateUserEndpoint());
      */
-    public static function register(string $method, string $path, EndpointInterface $endpoint): void
+    public static function register(string $method, string $path, RouteInterface $endpoint): void
     {
         $normalizedMethod = strtoupper($method);
         $normalizedPath = self::normalizePath($path);

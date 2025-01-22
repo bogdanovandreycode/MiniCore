@@ -4,8 +4,8 @@ namespace Tests\Http;
 
 use ReflectionClass;
 use MiniCore\Http\Request;
+use MiniCore\API\RestApiRouter;
 use PHPUnit\Framework\TestCase;
-use MiniCore\Http\RestApiRouter;
 use MiniCore\API\EndpointInterface;
 use MiniCore\API\MiddlewareInterface;
 

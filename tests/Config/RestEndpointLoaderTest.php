@@ -2,9 +2,8 @@
 
 namespace MiniCore\Tests\Config;
 
-use MiniCore\Http\Router;
+use MiniCore\API\RestApiRouter;
 use PHPUnit\Framework\TestCase;
-use MiniCore\Http\RestApiRouter;
 use Symfony\Component\Yaml\Yaml;
 use MiniCore\Config\RestEndpointLoader;
 use MiniCore\Tests\Config\Stub\TestEndpoint;

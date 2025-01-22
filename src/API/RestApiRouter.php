@@ -1,6 +1,6 @@
 <?php
 
-namespace MiniCore\Http;
+namespace MiniCore\API;
 
 use MiniCore\Http\Request;
 use MiniCore\API\EndpointInterface;

@@ -2,7 +2,7 @@
 
 namespace MiniCore\Config;
 
-use MiniCore\Http\RestApiRouter;
+use MiniCore\API\RestApiRouter;
 use Symfony\Component\Yaml\Yaml;
 use MiniCore\Module\ModuleManager;
 use MiniCore\API\EndpointInterface;
