@@ -46,8 +46,8 @@ class RestEndpointLoader
 
         $data = Yaml::parseFile($configPath);
 
-        if (!is_array($data)) {
-            throw new \RuntimeException("Invalid configuration format in: $configPath");
+        if (empty($data) || !isset($data['endpoints']) || !is_array($data['endpoints'])) {
+            return;
         }
 
         // Extract global middlewares if defined
