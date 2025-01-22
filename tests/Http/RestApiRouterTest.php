@@ -10,8 +10,19 @@ use MiniCore\API\EndpointInterface;
 use MiniCore\Tests\Http\Stub\TestEndpoint;
 use MiniCore\Tests\Http\Stub\TestMiddleware;
 
+/**
+ * Class RestApiRouterTest
+ *
+ * Unit tests for the RestApiRouter class, verifying functionality for
+ * route registration, request handling, middleware application, and error handling.
+ */
 class RestApiRouterTest extends TestCase
 {
+    /**
+     * Reset the internal state of the RestApiRouter before each test.
+     *
+     * @return void
+     */
     protected function setUp(): void
     {
         $reflection = new ReflectionClass(RestApiRouter::class);
@@ -20,6 +31,13 @@ class RestApiRouterTest extends TestCase
         $routesProperty->setValue([]);
     }
 
+    /**
+     * Test route registration in the RestApiRouter.
+     *
+     * Verifies that the route is correctly added to the internal routes array.
+     *
+     * @return void
+     */
     public function testRegisterRoute(): void
     {
         $endpoint = new TestEndpoint();
@@ -32,6 +50,13 @@ class RestApiRouterTest extends TestCase
         $this->assertSame($endpoint, $routes['GET']['/test']['endpoint']);
     }
 
+    /**
+     * Test handling of a registered route.
+     *
+     * Ensures that the router correctly processes a request and returns the expected response.
+     *
+     * @return void
+     */
     public function testHandleRequest(): void
     {
         $endpoint = new TestEndpoint();
@@ -48,6 +73,13 @@ class RestApiRouterTest extends TestCase
         $this->assertSame(['status' => 'success'], $response);
     }
 
+    /**
+     * Test handling of a route with middleware.
+     *
+     * Ensures that middleware is applied correctly during request handling.
+     *
+     * @return void
+     */
     public function testHandleRequestWithMiddleware(): void
     {
         $middleware = new TestMiddleware();
@@ -64,7 +96,13 @@ class RestApiRouterTest extends TestCase
         $this->assertSame(['status' => 'success'], $response);
     }
 
-
+    /**
+     * Test handling of a non-existent route.
+     *
+     * Verifies that the router returns a 404 error for a route that is not registered.
+     *
+     * @return void
+     */
     public function testHandleRequestRouteNotFound(): void
     {
         $requestMock = $this->createMock(Request::class);
@@ -77,6 +115,13 @@ class RestApiRouterTest extends TestCase
         $this->assertEquals(405, http_response_code());
     }
 
+    /**
+     * Test handling of a route with an unsupported HTTP method.
+     *
+     * Verifies that the router returns a 405 error when a method is not allowed for a route.
+     *
+     * @return void
+     */
     public function testHandleRequestMethodNotAllowed(): void
     {
         $endpointMock = $this->createMock(EndpointInterface::class);
@@ -92,6 +137,14 @@ class RestApiRouterTest extends TestCase
         $this->assertEquals(405, http_response_code());
     }
 
+    /**
+     * Test registration of a route with invalid middleware.
+     *
+     * Ensures that an exception is thrown if the middleware does not implement MiddlewareInterface.
+     *
+     * @return void
+     * @throws \RuntimeException When middleware is invalid.
+     */
     public function testRegisterWithInvalidMiddleware(): void
     {
         $this->expectException(\RuntimeException::class);
