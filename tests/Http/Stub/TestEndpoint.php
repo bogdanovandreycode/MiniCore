@@ -1,6 +1,6 @@
 <?php
 
-namespace MiniCore\Tests\Config\Stub;
+namespace MiniCore\Tests\Http\Stub;
 
 use MiniCore\API\EndpointInterface;
 use MiniCore\API\RestEndpoint;

@@ -38,7 +38,7 @@ use MiniCore\Http\Request;
  *     }
  * }
  */
-abstract class RestEndpoint implements EndpointInterface
+abstract class RestEndpoint
 {
     /**
      * List of middleware classes to apply to the endpoint.

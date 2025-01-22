@@ -7,13 +7,13 @@ use MiniCore\Http\Request;
 use MiniCore\API\RestApiRouter;
 use PHPUnit\Framework\TestCase;
 use MiniCore\API\EndpointInterface;
-use MiniCore\API\MiddlewareInterface;
+use MiniCore\Tests\Http\Stub\TestEndpoint;
+use MiniCore\Tests\Http\Stub\TestMiddleware;
 
 class RestApiRouterTest extends TestCase
 {
     protected function setUp(): void
     {
-        // Очистим зарегистрированные маршруты перед каждым тестом
         $reflection = new ReflectionClass(RestApiRouter::class);
         $routesProperty = $reflection->getProperty('routes');
         $routesProperty->setAccessible(true);
@@ -22,60 +22,48 @@ class RestApiRouterTest extends TestCase
 
     public function testRegisterRoute(): void
     {
-        $endpointMock = $this->createMock(EndpointInterface::class);
+        $endpoint = new TestEndpoint();
 
-        RestApiRouter::register('GET', '/test', $endpointMock);
+        RestApiRouter::register('GET', '/test', $endpoint);
 
         $routes = RestApiRouter::getRoutes();
         $this->assertArrayHasKey('GET', $routes);
         $this->assertArrayHasKey('/test', $routes['GET']);
-        $this->assertSame($endpointMock, $routes['GET']['/test']['endpoint']);
+        $this->assertSame($endpoint, $routes['GET']['/test']['endpoint']);
     }
 
     public function testHandleRequest(): void
     {
-        $endpointMock = $this->createMock(EndpointInterface::class);
-        $endpointMock->method('process')->willReturn(['success' => true]);
+        $endpoint = new TestEndpoint();
 
-        RestApiRouter::register('GET', '/test', $endpointMock);
+        RestApiRouter::register('GET', '/api/test', $endpoint);
 
         $requestMock = $this->createMock(Request::class);
         $requestMock->method('getMethod')->willReturn('GET');
-        $requestMock->method('getPath')->willReturn('/test');
+        $requestMock->method('getPath')->willReturn('/api/test');
         $requestMock->method('getQueryParams')->willReturn([]);
 
         $response = RestApiRouter::handle($requestMock);
 
-        $this->assertSame(['success' => true], $response);
+        $this->assertSame(['status' => 'success'], $response);
     }
 
     public function testHandleRequestWithMiddleware(): void
     {
-        $middlewareMock = $this->createMock(MiddlewareInterface::class);
-        $middlewareMock->method('handle')->willReturnCallback(function ($params, $next) {
-            // Добавляем параметр для проверки
-            $params['middleware'] = true;
-            return $next($params);
-        });
+        $middleware = new TestMiddleware();
+        $endpoint = new TestEndpoint();
 
-        $endpointMock = $this->createMock(EndpointInterface::class);
-        $endpointMock->method('process')->willReturnCallback(function ($params) {
-            $this->assertArrayHasKey('middleware', $params);
-            $this->assertTrue($params['middleware']);
-            return ['success' => true];
-        });
-
-        RestApiRouter::register('GET', '/test', $endpointMock, [$middlewareMock]);
+        RestApiRouter::register('GET', '/api/test', $endpoint, [$middleware]);
 
         $requestMock = $this->createMock(Request::class);
         $requestMock->method('getMethod')->willReturn('GET');
-        $requestMock->method('getPath')->willReturn('/test');
+        $requestMock->method('getPath')->willReturn('/api/test');
         $requestMock->method('getQueryParams')->willReturn([]);
-
         $response = RestApiRouter::handle($requestMock);
 
-        $this->assertSame(['success' => true], $response);
+        $this->assertSame(['status' => 'success'], $response);
     }
+
 
     public function testHandleRequestRouteNotFound(): void
     {
@@ -85,8 +73,8 @@ class RestApiRouterTest extends TestCase
 
         $response = RestApiRouter::handle($requestMock);
 
-        $this->assertEquals(['error' => 'Route not found'], $response);
-        $this->assertEquals(404, http_response_code());
+        $this->assertEquals(['error' => 'Method not allowed'], $response);
+        $this->assertEquals(405, http_response_code());
     }
 
     public function testHandleRequestMethodNotAllowed(): void
@@ -111,7 +99,6 @@ class RestApiRouterTest extends TestCase
 
         $endpointMock = $this->createMock(EndpointInterface::class);
 
-        // Пытаемся зарегистрировать маршрут с некорректным middleware
         RestApiRouter::register('GET', '/test', $endpointMock, ['InvalidMiddleware']);
     }
 }

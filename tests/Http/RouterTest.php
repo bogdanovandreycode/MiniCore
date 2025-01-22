@@ -5,7 +5,7 @@ namespace MiniCore\Tests\Http;
 use PHPUnit\Framework\TestCase;
 use MiniCore\Http\Router;
 use MiniCore\Http\Request;
-use MiniCore\API\EndpointInterface;
+use MiniCore\Http\RouteInterface;
 
 /**
  * Unit tests for the Router class.
@@ -38,7 +38,7 @@ class RouterTest extends TestCase
      */
     public function testRegisterRoute()
     {
-        $endpointMock = $this->createMock(EndpointInterface::class);
+        $endpointMock = $this->createMock(RouteInterface::class);
         Router::register('GET', '/test', $endpointMock);
 
         $routes = Router::getRoutes();
@@ -53,7 +53,7 @@ class RouterTest extends TestCase
      */
     public function testHandleRequestWithRegisteredRoute()
     {
-        $endpointMock = $this->createMock(EndpointInterface::class);
+        $endpointMock = $this->createMock(RouteInterface::class);
         $endpointMock->expects($this->once())
             ->method('handle')
             ->with(['param' => 'value'])

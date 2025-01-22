@@ -82,12 +82,4 @@ interface EndpointInterface
      * }
      */
     public function getRoute(): string;
-
-    /**
-     * Process middleware and execute the endpoint logic.
-     *
-     * @param array $params Parameters for the endpoint.
-     * @return mixed The response from the endpoint.
-     */
-    public function process(array $params): mixed;
 }

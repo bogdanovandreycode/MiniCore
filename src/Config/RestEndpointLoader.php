@@ -46,13 +46,19 @@ class RestEndpointLoader
 
         $data = Yaml::parseFile($configPath);
 
+        if (!is_array($data)) {
+            throw new \RuntimeException("Invalid configuration format in: $configPath");
+        }
+
         // Extract global middlewares if defined
         $globalMiddlewares = [];
+
         if (!empty($data['middlewares'])) {
             foreach ($data['middlewares'] as $middlewareClass) {
                 if (!class_exists($middlewareClass)) {
                     throw new \RuntimeException("Middleware class not found: $middlewareClass");
                 }
+
                 $globalMiddlewares[] = new $middlewareClass();
             }
         }
@@ -132,11 +138,13 @@ class RestEndpointLoader
 
         // Extract route-specific middleware
         $routeMiddlewares = [];
+
         if (!empty($endpoint['middlewares'])) {
             foreach ($endpoint['middlewares'] as $middlewareClass) {
                 if (!class_exists($middlewareClass)) {
                     throw new \RuntimeException("Middleware class not found: $middlewareClass");
                 }
+
                 $routeMiddlewares[] = new $middlewareClass();
             }
         }
