@@ -86,7 +86,7 @@ class ModuleManager
                 continue; // Skip disabled modules
             }
 
-            $className = self::findModuleClass($moduleId);
+            $className = self::getModuleClassNameFromFile($moduleId, $modulesDir);
 
             if (!$className || !class_exists($className)) {
                 throw new \Exception("Module class for '$moduleId' not found. Ensure proper PSR-4 autoloading.");
@@ -132,26 +132,34 @@ class ModuleManager
     }
 
     /**
-     * Dynamically searches for a module class in the declared classes.
+     * Reads the namespace and class name dynamically from the module file.
      *
-     * Looks for a class matching the pattern 'Modules\{ModuleName}\Module'.
-     *
-     * @param string $moduleId Module identifier from the configuration.
+     * @param string $moduleId Module identifier.
+     * @param string $modulesDir Base directory for modules.
      * @return string|null Fully qualified class name or null if not found.
      *
      * @example
-     * $className = ModuleManager::findModuleClass('UserModule');
-     * echo $className; // Output: MiniCore\Modules\UserModule\Module
+     * $className = ModuleManager::getModuleClassNameFromFile('UserModule', '/path/to/modules');
+     * echo $className; // Output: SomeNamespace\UserModule\Module
      */
-    private static function findModuleClass(string $moduleId): ?string
+    private static function getModuleClassNameFromFile(string $moduleId, string $modulesDir): ?string
     {
-        foreach (get_declared_classes() as $className) {
-            if (preg_match('/Modules\\\\' . preg_quote($moduleId, '/') . '\\\\Module$/', $className)) {
-                return $className;
-            }
+        $moduleFile = rtrim($modulesDir, '/') . "/{$moduleId}/Module.php";
+
+        if (!file_exists($moduleFile)) {
+            throw new \Exception("Module file not found for '$moduleId'.");
         }
 
-        return null;
+        // Read the file content
+        $fileContent = file_get_contents($moduleFile);
+
+        // Extract the namespace using a regex
+        if (preg_match('/namespace\s+([^;]+);/', $fileContent, $matches)) {
+            $namespace = trim($matches[1]);
+            return $namespace . '\\Module'; // Construct full class name
+        }
+
+        return null; // Namespace not found
     }
 
     /**
