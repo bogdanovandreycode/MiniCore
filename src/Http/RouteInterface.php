@@ -10,13 +10,6 @@ namespace MiniCore\Http;
 interface RouteInterface
 {
     /**
-     * Get the HTTP method(s) supported by this route.
-     *
-     * @return array List of supported HTTP methods.
-     */
-    public function getMethods(): array;
-
-    /**
      * Get the route associated with this handler.
      *
      * @return string The route string.

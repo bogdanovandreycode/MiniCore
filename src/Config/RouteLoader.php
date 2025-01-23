@@ -27,8 +27,8 @@ class RouteLoader
     /**
      * Load routes from a YAML configuration file and register them in the router.
      *
-     * This method reads the specified YAML file and registers each route
-     * by mapping HTTP methods, paths, and handlers.
+     * This path reads the specified YAML file and registers each route
+     * by mapping paths and handlers.
      *
      * @param string $configPath The path to the `routes.yml` file.
      * @return void
@@ -91,17 +91,15 @@ class RouteLoader
      *
      * @example
      * // Example YAML route configuration:
-     * // - method: GET
-     * //   path: "/users"
+     * // - path: "/users"
      * //   handler: "Modules\\UserModule\\Controllers\\UserController"
      */
     private static function registerRoute(array $route): void
     {
-        if (!isset($route['method'], $route['path'], $route['handler'])) {
+        if (!isset($route['path'], $route['handler'])) {
             throw new \RuntimeException("Invalid route configuration.");
         }
 
-        $method = strtoupper($route['method']);
         $path = $route['path'];
         $handlerClass = $route['handler'];
 
@@ -115,6 +113,6 @@ class RouteLoader
             throw new \RuntimeException("Handler must implement RouteInterface: $handlerClass");
         }
 
-        Router::register($method, $path, $handler);
+        Router::register($path, $handler);
     }
 }

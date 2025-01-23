@@ -48,11 +48,10 @@ class Router
      * @example
      * Router::register('POST', '/api/user', new CreateUserEndpoint());
      */
-    public static function register(string $method, string $path, RouteInterface $endpoint): void
+    public static function register(string $path, RouteInterface $endpoint): void
     {
-        $normalizedMethod = strtoupper($method);
         $normalizedPath = self::normalizePath($path);
-        self::$routes[$normalizedMethod][$normalizedPath] = $endpoint;
+        self::$routes[$normalizedPath] = $endpoint;
     }
 
     /**
@@ -68,18 +67,13 @@ class Router
      */
     public static function handle(Request $request): mixed
     {
-        $method = $request->getMethod();
         $path = $request->getPath();
 
-        if (!isset(self::$routes[$method])) {
-            throw new \Exception('Method not allowed', 405);
-        }
-
-        if (!isset(self::$routes[$method][$path])) {
+        if (!isset(self::$routes[$path])) {
             throw new \Exception('Route not found', 404);
         }
 
-        $endpoint = self::$routes[$method][$path];
+        $endpoint = self::$routes[$path];
         return $endpoint->handle($request->getQueryParams());
     }
 
