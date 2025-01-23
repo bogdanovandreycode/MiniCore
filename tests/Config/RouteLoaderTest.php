@@ -68,12 +68,8 @@ class RouteLoaderTest extends TestCase
     public function testLoadValidRoute()
     {
         RouteLoader::load($this->tempConfigPath);
-
         $routes = Router::getRoutes();
-
-        $this->assertArrayHasKey('GET', $routes);
-        $this->assertArrayHasKey('/api/example', $routes['GET']);
-        $this->assertInstanceOf(TestRouteHandler::class, $routes['GET']['/api/example']);
+        $this->assertInstanceOf(TestRouteHandler::class, $routes['/api/example']);
     }
 
     /**

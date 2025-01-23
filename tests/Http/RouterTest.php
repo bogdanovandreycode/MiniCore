@@ -39,13 +39,9 @@ class RouterTest extends TestCase
     public function testRegisterRoute()
     {
         $endpointMock = $this->createMock(RouteInterface::class);
-        Router::register('GET', '/test', $endpointMock);
-
+        Router::register('/test', $endpointMock);
         $routes = Router::getRoutes();
-
-        $this->assertArrayHasKey('GET', $routes, 'Route method GET should be registered.');
-        $this->assertArrayHasKey('/test', $routes['GET'], 'Route /test should be registered.');
-        $this->assertSame($endpointMock, $routes['GET']['/test'], 'Registered endpoint should match.');
+        $this->assertSame($endpointMock, $routes['/test'], 'Registered endpoint should match.');
     }
 
     /**
@@ -59,10 +55,9 @@ class RouterTest extends TestCase
             ->with(['param' => 'value'])
             ->willReturn('Handled Response');
 
-        Router::register('GET', '/test', $endpointMock);
+        Router::register('/test', $endpointMock);
 
         $requestMock = $this->createMock(Request::class);
-        $requestMock->method('getMethod')->willReturn('GET');
         $requestMock->method('getPath')->willReturn('/test');
         $requestMock->method('getQueryParams')->willReturn(['param' => 'value']);
 
@@ -77,11 +72,10 @@ class RouterTest extends TestCase
     public function testHandleRequestWithUnregisteredRoute()
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Method not allowed');
-        $this->expectExceptionCode(405);
+        $this->expectExceptionMessage('Route not found');
+        $this->expectExceptionCode(404);
 
         $requestMock = $this->createMock(Request::class);
-        $requestMock->method('getMethod')->willReturn('GET');
         $requestMock->method('getPath')->willReturn('/not-registered');
 
         Router::handle($requestMock);
@@ -93,8 +87,8 @@ class RouterTest extends TestCase
     public function testHandleRequestWithUnsupportedMethod()
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Method not allowed');
-        $this->expectExceptionCode(405);
+        $this->expectExceptionMessage('Route not found');
+        $this->expectExceptionCode(404);
 
         $requestMock = $this->createMock(Request::class);
         $requestMock->method('getMethod')->willReturn('DELETE');
