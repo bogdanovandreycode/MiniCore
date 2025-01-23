@@ -137,7 +137,7 @@ class RestEndpointLoader
         }
 
         // Extract route-specific middleware
-        $routeMiddlewares = self::extractRouteMiddleware($endpoint['middlewares']);
+        $routeMiddlewares = self::extractRouteMiddleware($endpoint['middlewares'] ?? []);
 
         // Combine global and route-specific middleware
         $middlewares = array_merge($globalMiddlewares, $routeMiddlewares);
