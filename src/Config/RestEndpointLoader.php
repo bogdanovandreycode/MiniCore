@@ -137,22 +137,39 @@ class RestEndpointLoader
         }
 
         // Extract route-specific middleware
-        $routeMiddlewares = [];
-
-        if (!empty($endpoint['middlewares'])) {
-            foreach ($endpoint['middlewares'] as $middlewareClass) {
-                if (!class_exists($middlewareClass)) {
-                    throw new \RuntimeException("Middleware class not found: $middlewareClass");
-                }
-
-                $routeMiddlewares[] = new $middlewareClass();
-            }
-        }
+        $routeMiddlewares = self::extractRouteMiddleware($endpoint['middlewares']);
 
         // Combine global and route-specific middleware
         $middlewares = array_merge($globalMiddlewares, $routeMiddlewares);
 
         // Register the endpoint with RestApiRouter
         RestApiRouter::register($method, $route, $handler, $middlewares);
+    }
+
+    /**
+     * Extract route-specific middleware
+     *
+     * @param array $middlewares List of middleware class names.
+     * @return array List of middleware instances for the route.
+     *
+     * @throws \RuntimeException If the endpoint configuration is invalid or the handler is missing.
+     */
+    private static function extractRouteMiddleware(?array $middlewares): array
+    {
+        $routeMiddlewares = [];
+
+        if (empty($middlewares)) {
+            return [];
+        }
+
+        foreach ($middlewares as $middlewareClass) {
+            if (!class_exists($middlewareClass)) {
+                throw new \RuntimeException("Middleware class not found: $middlewareClass");
+            }
+
+            $routeMiddlewares[] = new $middlewareClass();
+        }
+
+        return $routeMiddlewares;
     }
 }

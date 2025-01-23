@@ -11,27 +11,64 @@ namespace MiniCore\Auth;
  *
  * @example
  * // Example of using AuthController for user authentication:
- * $authController = new AuthController('user_id');
- *
+ * if(!AuthController::isSessionKey()) {
+ *    AuthController::setSessionKey('user_id');
+ * }
+ * 
  * // Log in user with ID 5
- * $authController->login(5);
+ * AuthController::login(5);
  *
  * // Check if the user is authenticated
- * if ($authController->isAuthenticated()) {
- *     echo "User ID: " . $authController->getUserId();
+ * if (AuthController::isAuthenticated()) {
+ *     echo "User ID: " . AuthController::getUserId();
  * }
  *
  * // Log out the user
- * $authController->logout();
+ * AuthController::logout();
  */
 class AuthController
 {
     /**
      * @var string The session key used to store the user ID.
      */
-    public function __construct(
-        public string $sessionKey = '' // Key for storing the user ID in the session.
-    ) {}
+    private static string $sessionKey = '';
+
+    /**
+     * Setter for session key propery.
+     * @param string $sessionKey The ID of the authenticated user.
+     * @return void
+     *
+     * @example
+     * AuthController::setSessionKey('user_id');
+     */
+    public static function setSessionKey(string $sessionKey): void
+    {
+        self::$sessionKey = $sessionKey;
+    }
+
+    /**
+     * Getter for session key propery.
+     * @return string $sessionKey The ID of the authenticated user.
+     *
+     * @example
+     * $userId = AuthController::getSessionKey();
+     */
+    public static function getSessionKey(): string
+    {
+        return self::$sessionKey;
+    }
+
+    /**
+     * Check if the session key exists.
+     * @return bool
+     *
+     * @example
+     * AuthController::isSessionKey();
+     */
+    public static function isSessionKey(): bool
+    {
+        return !empty(self::$sessionKey);
+    }
 
     /**
      * Log in the user by setting their ID in the session.
@@ -46,13 +83,13 @@ class AuthController
      * $authController = new AuthController('user_id');
      * $authController->login(1); // Logs in the user with ID 1
      */
-    public function login(int $userId): void
+    public static function login(int $userId): void
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
 
-        $_SESSION[$this->sessionKey] = $userId;
+        $_SESSION[self::$sessionKey] = $userId;
     }
 
     /**
@@ -67,12 +104,13 @@ class AuthController
      * $authController = new AuthController('user_id');
      * $authController->logout(); // Logs out the current user
      */
-    public function logout(): void
+    public static function logout(): void
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        unset($_SESSION[$this->sessionKey]);
+
+        unset($_SESSION[self::$sessionKey]);
     }
 
     /**
@@ -90,12 +128,13 @@ class AuthController
      *     echo "User is not logged in.";
      * }
      */
-    public function isAuthenticated(): bool
+    public static function isAuthenticated(): bool
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        return isset($_SESSION[$this->sessionKey]);
+
+        return isset($_SESSION[self::$sessionKey]);
     }
 
     /**
@@ -112,11 +151,12 @@ class AuthController
      * $userId = $authController->getUserId(); // Returns 42
      * echo $userId ?? "No user is logged in.";
      */
-    public function getUserId(): ?int
+    public static function getUserId(): ?int
     {
-        if ($this->isAuthenticated()) {
-            return $_SESSION[$this->sessionKey];
+        if (self::isAuthenticated()) {
+            return $_SESSION[self::$sessionKey];
         }
+
         return null;
     }
 }

@@ -19,11 +19,6 @@ use MiniCore\Auth\AuthController;
 class AuthControllerTest extends TestCase
 {
     /**
-     * @var AuthController Instance of the AuthController being tested.
-     */
-    private AuthController $authController;
-
-    /**
      * @var string The session key used to store the authenticated user ID.
      */
     private string $sessionKey = 'user_id';
@@ -41,7 +36,7 @@ class AuthControllerTest extends TestCase
         }
 
         $_SESSION = [];
-        $this->authController = new AuthController($this->sessionKey);
+        AuthController::setSessionKey($this->sessionKey);
     }
 
     /**
@@ -51,8 +46,7 @@ class AuthControllerTest extends TestCase
      */
     public function testLogin()
     {
-        $this->authController->login(42);
-
+        AuthController::login(42);
         $this->assertArrayHasKey($this->sessionKey, $_SESSION);
         $this->assertEquals(42, $_SESSION[$this->sessionKey]);
     }
@@ -65,11 +59,11 @@ class AuthControllerTest extends TestCase
      */
     public function testIsAuthenticated()
     {
-        $this->assertFalse($this->authController->isAuthenticated());
+        $this->assertFalse(AuthController::isAuthenticated());
 
-        $this->authController->login(42);
+        AuthController::login(42);
 
-        $this->assertTrue($this->authController->isAuthenticated());
+        $this->assertTrue(AuthController::isAuthenticated());
     }
 
     /**
@@ -80,11 +74,11 @@ class AuthControllerTest extends TestCase
      */
     public function testGetUserId()
     {
-        $this->assertNull($this->authController->getUserId());
+        $this->assertNull(AuthController::getUserId());
 
-        $this->authController->login(42);
+        AuthController::login(42);
 
-        $this->assertEquals(42, $this->authController->getUserId());
+        $this->assertEquals(42, AuthController::getUserId());
     }
 
     /**
@@ -95,13 +89,13 @@ class AuthControllerTest extends TestCase
      */
     public function testLogout()
     {
-        $this->authController->login(42);
+        AuthController::login(42);
 
-        $this->assertTrue($this->authController->isAuthenticated());
+        $this->assertTrue(AuthController::isAuthenticated());
 
-        $this->authController->logout();
+        AuthController::logout();
 
-        $this->assertFalse($this->authController->isAuthenticated());
+        $this->assertFalse(AuthController::isAuthenticated());
         $this->assertArrayNotHasKey($this->sessionKey, $_SESSION);
     }
 

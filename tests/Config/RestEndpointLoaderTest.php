@@ -85,22 +85,19 @@ class RestEndpointLoaderTest extends TestCase
     /**
      * Tests successful loading of a valid endpoint from a YAML file.
      */
-    /**
-     * Tests successful loading of a valid endpoint from a YAML file.
-     */
     public function testLoadValidEndpoint(): void
     {
-        // Загружаем маршруты из временного файла
+        // Load routes from the temporary file
         RestEndpointLoader::load($this->tempConfigPath);
 
-        // Получаем зарегистрированные маршруты
+        // Get registered routes
         $routes = RestApiRouter::getRoutes();
 
-        // Проверяем структуру маршрутов
+        // Check the structure of the routes
         $this->assertArrayHasKey('GET', $routes);
         $this->assertArrayHasKey('/api/test', $routes['GET']);
 
-        // Проверяем, что endpoint корректно зарегистрирован
+        // Check that the endpoint is correctly registered
         $this->assertInstanceOf(TestEndpoint::class, $routes['GET']['/api/test']['endpoint']);
     }
 

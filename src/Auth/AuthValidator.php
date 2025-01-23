@@ -29,7 +29,7 @@ class AuthValidator
      *     return ['username' => 'admin', 'password_hash' => password_hash('password123', PASSWORD_BCRYPT)];
      * });
      */
-    public function validateCredentials(string $username, string $password, callable $getUserByUsername): bool
+    public static function validateCredentials(string $username, string $password, callable $getUserByUsername): bool
     {
         $user = $getUserByUsername($username);
 
@@ -57,7 +57,7 @@ class AuthValidator
      * $authValidator = new AuthValidator();
      * $isStrong = $authValidator->validatePasswordStrength('StrongPass123!');
      */
-    public function validatePasswordStrength(string $password): bool
+    public static function validatePasswordStrength(string $password): bool
     {
         $minLength = 8;
         $hasUppercase = preg_match('/[A-Z]/', $password);
@@ -82,7 +82,7 @@ class AuthValidator
      * $authValidator = new AuthValidator();
      * $isValidUsername = $authValidator->validateUsername('user_123');
      */
-    public function validateUsername(string $username): bool
+    public static function validateUsername(string $username): bool
     {
         return preg_match('/^[a-zA-Z0-9_]{3,20}$/', $username) === 1;
     }
