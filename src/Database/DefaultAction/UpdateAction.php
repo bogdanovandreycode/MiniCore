@@ -2,9 +2,11 @@
 
 namespace MiniCore\Database\DefaultAction;
 
-use MiniCore\Database\ActionInterface;
-use MiniCore\Database\DataAction;
-use MiniCore\Database\DataBase;
+use MiniCore\Database\Action\DataAction;
+use Minicore\Database\RepositoryManager;
+use MiniCore\Database\Action\AbstractAction;
+use MiniCore\Database\Action\ActionInterface;
+
 
 /**
  * Class UpdateAction
@@ -22,7 +24,7 @@ use MiniCore\Database\DataBase;
  * $updateAction = new UpdateAction('users');
  * $updateAction->execute($dataAction);
  */
-class UpdateAction implements ActionInterface
+class UpdateAction extends AbstractAction implements ActionInterface
 {
     /**
      * UpdateAction constructor.
@@ -31,16 +33,12 @@ class UpdateAction implements ActionInterface
      */
     public function __construct(
         public string $tableName
-    ) {}
+    ) {
+        parent::__construct(
+            'update',
+            ['mysql', 'postgresql']
 
-    /**
-     * Get the name of the action.
-     *
-     * @return string The action name ('update').
-     */
-    public function getName(): string
-    {
-        return 'update';
+        );
     }
 
     /**
@@ -61,7 +59,7 @@ class UpdateAction implements ActionInterface
      * $updateAction = new UpdateAction('users');
      * $updateAction->execute($dataAction);
      */
-    public function execute(DataAction $data): mixed
+    public function execute(string $repositoryName, DataAction $data): mixed
     {
         $updateColumns = $data->getColumns();
         $setClauses = [];
@@ -85,7 +83,12 @@ class UpdateAction implements ActionInterface
         }
 
         $parameters = array_merge($parameters, $data->getParameters());
-        return DataBase::execute($sql, $parameters);
+
+        return RepositoryManager::execute(
+            $repositoryName,
+            $sql,
+            $parameters
+        );
     }
 
     /**

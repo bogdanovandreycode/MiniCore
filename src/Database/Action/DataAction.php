@@ -1,6 +1,6 @@
 <?php
 
-namespace MiniCore\Database;
+namespace MiniCore\Database\Action;
 
 /**
  * Class DataAction

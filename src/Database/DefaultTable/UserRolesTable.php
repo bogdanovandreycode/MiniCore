@@ -3,7 +3,7 @@
 namespace MiniCore\Database\DefaultTable;
 
 use MiniCore\Database\Table;
-use MiniCore\Database\DataAction;
+use MiniCore\Database\Action\DataAction;
 
 /**
  * Class UserRolesTable

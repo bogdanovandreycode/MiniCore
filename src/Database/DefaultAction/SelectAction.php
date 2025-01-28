@@ -2,9 +2,11 @@
 
 namespace MiniCore\Database\DefaultAction;
 
-use MiniCore\Database\ActionInterface;
-use MiniCore\Database\DataAction;
-use MiniCore\Database\DataBase;
+use MiniCore\Database\Action\DataAction;
+use Minicore\Database\RepositoryManager;
+use MiniCore\Database\Action\AbstractAction;
+use MiniCore\Database\Action\ActionInterface;
+
 
 /**
  * Class SelectAction
@@ -22,7 +24,7 @@ use MiniCore\Database\DataBase;
  * $selectAction = new SelectAction('users');
  * $result = $selectAction->execute($dataAction);
  */
-class SelectAction implements ActionInterface
+class SelectAction extends AbstractAction implements ActionInterface
 {
     /**
      * SelectAction constructor.
@@ -31,16 +33,12 @@ class SelectAction implements ActionInterface
      */
     public function __construct(
         public string $tableName
-    ) {}
+    ) {
+        parent::__construct(
+            'select',
+            ['mysql', 'postgresql']
 
-    /**
-     * Get the name of the action.
-     *
-     * @return string The action name ('select').
-     */
-    public function getName(): string
-    {
-        return 'select';
+        );
     }
 
     /**
@@ -64,7 +62,7 @@ class SelectAction implements ActionInterface
      *     echo $user['username'];
      * }
      */
-    public function execute(DataAction $data): mixed
+    public function execute(string $repositoryName, DataAction $data): mixed
     {
         $selectColumns = $data->getColumns();
         $sql = "SELECT " . (!empty($selectColumns) ? implode(', ', $selectColumns) : '*');
@@ -74,8 +72,11 @@ class SelectAction implements ActionInterface
             $sql .= " {$property['type']} {$property['condition']}";
         }
 
-        $parameters = $data->getParameters();
-        return DataBase::query($sql, $parameters);
+        return RepositoryManager::execute(
+            $repositoryName,
+            $sql,
+            $data->getParameters()
+        );
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace MiniCore\Database;
+namespace MiniCore\Database\Action;
 
 /**
  * Interface ActionInterface
@@ -16,18 +16,6 @@ namespace MiniCore\Database;
 interface ActionInterface
 {
     /**
-     * Get the name of the action.
-     *
-     * This method should return a unique name representing the database action (e.g., 'select', 'insert').
-     *
-     * @return string The name of the action.
-     *
-     * @example
-     * $action->getName(); // Output: 'insert'
-     */
-    public function getName(): string;
-
-    /**
      * Execute the action with the provided data.
      *
      * This method executes the action logic, such as building and running an SQL query.
@@ -42,7 +30,7 @@ interface ActionInterface
      * $dataAction->addProperty('WHERE', 'id = :id', ['id' => 1]);
      * $result = $action->execute($dataAction);
      */
-    public function execute(DataAction $data): mixed;
+    public function execute(string $repositoryName, DataAction $data): mixed;
 
     /**
      * Validate the provided data before executing the action.
@@ -60,4 +48,10 @@ interface ActionInterface
      * }
      */
     public function validate(DataAction $data): bool;
+
+    public function getName(): string;
+
+    public function getAvailableRepositories(): array;
+
+    public function checkAvailabilityRepository(string $name): bool;
 }

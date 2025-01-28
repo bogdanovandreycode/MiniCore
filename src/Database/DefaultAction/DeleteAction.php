@@ -2,9 +2,10 @@
 
 namespace MiniCore\Database\DefaultAction;
 
-use MiniCore\Database\ActionInterface;
-use MiniCore\Database\DataAction;
-use MiniCore\Database\DataBase;
+use MiniCore\Database\Action\DataAction;
+use Minicore\Database\RepositoryManager;
+use MiniCore\Database\Action\AbstractAction;
+use MiniCore\Database\Action\ActionInterface;
 
 /**
  * Class DeleteAction
@@ -27,7 +28,7 @@ use MiniCore\Database\DataBase;
  *     echo 'No conditions provided for deletion.';
  * }
  */
-class DeleteAction implements ActionInterface
+class DeleteAction extends AbstractAction implements ActionInterface
 {
     /**
      * DeleteAction constructor.
@@ -39,21 +40,13 @@ class DeleteAction implements ActionInterface
      * $deleteAction = new DeleteAction('products');
      */
     public function __construct(
-        public string $tableName,
-    ) {}
+        public string $tableName
+    ) {
+        parent::__construct(
+            'delete',
+            ['mysql', 'postgresql']
 
-    /**
-     * Get the name of the action.
-     *
-     * @return string The action name ('delete').
-     *
-     * @example
-     * $deleteAction = new DeleteAction('users');
-     * echo $deleteAction->getName(); // Output: delete
-     */
-    public function getName(): string
-    {
-        return 'delete';
+        );
     }
 
     /**
@@ -74,7 +67,7 @@ class DeleteAction implements ActionInterface
      * 
      * $deleteAction->execute($dataAction);
      */
-    public function execute(DataAction $data): mixed
+    public function execute(string $repositoryName, DataAction $data): mixed
     {
         $sql = "DELETE FROM {$this->tableName}";
 
@@ -82,8 +75,11 @@ class DeleteAction implements ActionInterface
             $sql .= " {$property['type']} {$property['condition']}";
         }
 
-        $parameters = $data->getParameters();
-        return DataBase::execute($sql, $parameters);
+        return RepositoryManager::execute(
+            $repositoryName,
+            $sql,
+            $data->getParameters()
+        );
     }
 
     /**

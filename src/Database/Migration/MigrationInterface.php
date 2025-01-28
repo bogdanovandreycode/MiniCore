@@ -1,6 +1,8 @@
 <?php
 
-namespace MiniCore\Database;
+namespace MiniCore\Database\Migration;
+
+use MiniCore\Database\Migration\MigrationStatus;
 
 /**
  * Interface Migration
@@ -54,4 +56,7 @@ interface MigrationInterface
      * }
      */
     public function down(): bool;
+
+    public function getStatus(): MigrationStatus;
+    public function setStatus(MigrationStatus $status): void;
 }

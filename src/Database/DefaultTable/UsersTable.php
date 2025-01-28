@@ -3,6 +3,7 @@
 namespace MiniCore\Database\DefaultTable;
 
 use MiniCore\Database\Table;
+use MiniCore\Database\Action\DataAction;
 
 /**
  * Class UsersTable
@@ -67,7 +68,7 @@ class UsersTable extends Table
      */
     public function getUserByEmail(string $email): ?array
     {
-        $dataAction = new \MiniCore\Database\DataAction();
+        $dataAction = new DataAction();
         $dataAction->addColumn('*');
         $dataAction->addProperty('WHERE', 'email = :email', ['email' => $email]);
         $dataAction->addProperty('LIMIT', '1');
@@ -87,7 +88,7 @@ class UsersTable extends Table
      */
     public function updateUserRole(int $userId, int $roleId): bool
     {
-        $dataAction = new \MiniCore\Database\DataAction();
+        $dataAction = new DataAction();
         $dataAction->addColumn('role_id');
         $dataAction->addParameters(['role_id' => $roleId]);
         $dataAction->addProperty('WHERE', 'id = :id', ['id' => $userId]);

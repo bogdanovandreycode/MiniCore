@@ -1,19 +1,22 @@
 <?php
 
-namespace MiniCore\Database;
+namespace MiniCore\Database\Repository;
 
 use PDO;
+use Exception;
 use PDOException;
+use MiniCore\Database\Table;
+use MiniCore\Database\RepositoryInterface;
 
 /**
- * Class DataBase
+ * Class MySqlDatabase
  *
  * Provides an abstraction layer for interacting with the database using PDO.
  * Supports connection management, query execution, table management, and migrations.
  *
  * @package MiniCore\Database
  */
-class DataBase
+class MySqlDatabase implements RepositoryInterface
 {
     /**
      * @var PDO Active PDO database connection.
@@ -51,15 +54,64 @@ class DataBase
      * @example
      * DataBase::setConnection('localhost', 'my_database', 'root', 'password');
      */
-    public static function setConnection(string $host, string $dbname, string $user, string $password, string $charset = 'utf8mb4')
+    private static function setConnection(string $host, string $dbname, string $user, string $password, string $charset = 'utf8mb4')
     {
         $dsn = "mysql:host=$host;dbname=$dbname;charset=$charset";
+
         try {
             self::$connection = new PDO($dsn, $user, $password);
             self::$connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             self::$connection->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             throw new PDOException("Connection failed: " . $e->getMessage());
+        }
+    }
+
+    public static function connect(array $config): void
+    {
+        self::validateConfig($config);
+        $config['charset'] = empty($config['charset']) ? 'utf8mb4' : $config['charset'];
+
+        self::setConnection(
+            $config['host'],
+            $config['dbname'],
+            $config['user'],
+            $config['password'],
+            $config['charset']
+        );
+    }
+
+    private static function validateConfig(array $config): void
+    {
+        $errorConditions = [
+            [
+                'condition' => empty($config['host']),
+                'message' => 'Host not set'
+            ],
+            [
+                'condition' => empty($config['dbname']),
+                'message' => 'Name database not set'
+            ],
+            [
+                'condition' => empty($config['user']),
+                'message' => 'User not set'
+            ],
+            [
+                'condition' => empty($config['password']),
+                'message' => 'Password not set'
+            ],
+        ];
+
+        $errorMessages = [];
+
+        foreach ($errorConditions as $error) {
+            if ($error['condition']) {
+                $errorMessages[] = $error['message'];
+            }
+        }
+
+        if (!empty($errorMessages)) {
+            throw new Exception(implode("\n", $errorMessages), 1);
         }
     }
 
@@ -157,37 +209,20 @@ class DataBase
         }
     }
 
-    /**
-     * Apply a database migration.
-     *
-     * @param MigrationInterface $migration The migration instance.
-     * 
-     * @example
-     * DataBase::migrate(new CreateUsersTable());
-     */
-    public static function migrate(MigrationInterface $migration): void
+    public static function isConnected(): bool
     {
-        if ($migration->up()) {
-            echo "Migration applied successfully.\n";
-        } else {
-            echo "Migration failed.\n";
-        }
+        //надо добавить реализацию
+        return true;
     }
 
-    /**
-     * Roll back a database migration.
-     *
-     * @param MigrationInterface $migration The migration instance.
-     * 
-     * @example
-     * DataBase::rollback(new CreateUsersTable());
-     */
-    public static function rollback(MigrationInterface $migration): void
+    public static function close(): void
     {
-        if ($migration->down()) {
-            echo "Rollback migration applied successfully.\n";
-        } else {
-            echo "Rollback migration failed.\n";
-        }
+        //надо добавить реализацию
+        return;
+    }
+
+    public static function getNameRepository(): string
+    {
+        return 'mysql';
     }
 }

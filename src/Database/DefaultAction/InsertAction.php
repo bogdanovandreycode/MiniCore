@@ -2,9 +2,11 @@
 
 namespace MiniCore\Database\DefaultAction;
 
-use MiniCore\Database\ActionInterface;
-use MiniCore\Database\DataAction;
-use MiniCore\Database\DataBase;
+use MiniCore\Database\Action\DataAction;
+use Minicore\Database\RepositoryManager;
+use MiniCore\Database\Action\AbstractAction;
+use MiniCore\Database\Action\ActionInterface;
+
 
 /**
  * Class InsertAction
@@ -26,7 +28,7 @@ use MiniCore\Database\DataBase;
  * $insertAction = new InsertAction('users');
  * $insertAction->execute($dataAction);
  */
-class InsertAction implements ActionInterface
+class InsertAction extends AbstractAction implements ActionInterface
 {
     /**
      * InsertAction constructor.
@@ -35,16 +37,12 @@ class InsertAction implements ActionInterface
      */
     public function __construct(
         public string $tableName
-    ) {}
+    ) {
+        parent::__construct(
+            'insert',
+            ['mysql', 'postgresql']
 
-    /**
-     * Get the name of the action.
-     *
-     * @return string The action name ('insert').
-     */
-    public function getName(): string
-    {
-        return 'insert';
+        );
     }
 
     /**
@@ -70,7 +68,7 @@ class InsertAction implements ActionInterface
      * $insertAction = new InsertAction('users');
      * $insertAction->execute($dataAction);
      */
-    public function execute(DataAction $data): mixed
+    public function execute(string $repositoryName, DataAction $data): mixed
     {
         $columns = $data->getColumns();
 
@@ -81,7 +79,12 @@ class InsertAction implements ActionInterface
         $columnsList = implode(', ', $columns);
         $placeholders = implode(', ', array_map(fn($column) => ":$column", $columns));
         $sql = "INSERT INTO {$this->tableName} ($columnsList) VALUES ($placeholders)";
-        return DataBase::execute($sql, $data->getParameters());
+
+        return RepositoryManager::execute(
+            $repositoryName,
+            $sql,
+            $data->getParameters()
+        );
     }
 
     /**

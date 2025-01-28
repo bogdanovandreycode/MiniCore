@@ -3,6 +3,7 @@
 namespace MiniCore\Database\DefaultTable;
 
 use MiniCore\Database\Table;
+use MiniCore\Database\Action\DataAction;
 
 /**
  * Class PostsTable
@@ -55,7 +56,7 @@ class PostsTable extends Table
      */
     public function getPostById(int $postId): ?array
     {
-        $dataAction = new \MiniCore\Database\DataAction();
+        $dataAction = new DataAction();
         $dataAction->addProperty('WHERE', 'id = :id', ['id' => $postId]);
 
         $result = $this->actions['select']->execute($dataAction);

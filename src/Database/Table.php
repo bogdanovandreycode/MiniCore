@@ -2,7 +2,9 @@
 
 namespace MiniCore\Database;
 
-use MiniCore\Database\DataBase;
+use Exception;
+use MiniCore\Database\Action\DataAction;
+use MiniCore\Database\Action\ActionInterface;
 use MiniCore\Database\DefaultAction\DeleteAction;
 use MiniCore\Database\DefaultAction\InsertAction;
 use MiniCore\Database\DefaultAction\SelectAction;
@@ -20,7 +22,7 @@ use MiniCore\Database\DefaultAction\UpdateAction;
 abstract class Table
 {
     /**
-     * @var array<ActionInterface> List of actions (Insert, Select, Update, Delete) associated with the table.
+     * @var ActionInterface[] List of actions (Insert, Select, Update, Delete) associated with the table.
      */
     protected array $actions = [];
 
@@ -62,7 +64,8 @@ abstract class Table
     {
         $fields = $this->getSchemeToString();
 
-        DataBase::query(
+        RepositoryManager::query(
+            'mysql',
             "CREATE TABLE {$this->name} ({$fields})"
         );
     }
@@ -77,7 +80,8 @@ abstract class Table
      */
     public function drop(): void
     {
-        DataBase::query(
+        RepositoryManager::query(
+            'mysql',
             "DROP TABLE `{$this->name}`"
         );
     }
@@ -95,7 +99,13 @@ abstract class Table
     public function exist(): bool
     {
         $query = "SHOW TABLES LIKE :table_name";
-        $result = DataBase::query($query, ['table_name' => $this->name]);
+
+        $result = RepositoryManager::query(
+            'mysql',
+            $query,
+            ['table_name' => $this->name]
+        );
+
         return !empty($result);
     }
 
@@ -162,11 +172,15 @@ abstract class Table
      * $dataAction->addParameters(['name' => 'John']);
      * $table->execute('insert', $dataAction);
      */
-    public function execute(string $actionName, DataAction $data): mixed
+    public function execute(string $repositoryName, string $actionName, DataAction $data): mixed
     {
+        if (empty($repositoryName)) {
+            throw new Exception("Repository name not found", 1);
+        }
+
         foreach ($this->actions as $action) {
-            if ($action->getName() === $actionName) {
-                return $action->execute($data);
+            if ($action->getName() === $actionName && $action->checkAvailabilityRepository($repositoryName)) {
+                return $action->execute($repositoryName, $data);
             }
         }
 
