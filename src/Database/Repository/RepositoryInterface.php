@@ -1,6 +1,8 @@
 <?php
 
-namespace MiniCore\Database;
+namespace MiniCore\Database\Repository;
+
+use MiniCore\Database\Table\AbstractTable;
 
 interface RepositoryInterface
 {
@@ -46,9 +48,9 @@ interface RepositoryInterface
 
     public static function getNameRepository(): string;
 
-    public static function addTable(Table $table): void;
+    public static function addTable(AbstractTable $table): void;
 
-    public static function removeTable(Table $table): void;
+    public static function removeTable(AbstractTable $table): void;
 
     public static function createTables(): void;
 

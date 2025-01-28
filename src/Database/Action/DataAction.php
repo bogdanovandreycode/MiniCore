@@ -73,6 +73,7 @@ final class DataAction
             'type' => strtoupper($type),
             'condition' => $condition,
         ];
+
         $this->addParameters($parameters);
     }
 
@@ -115,6 +116,19 @@ final class DataAction
     public function addParameters(array $parameters): void
     {
         $this->parameters = array_merge($this->parameters, $parameters);
+    }
+
+    /**
+     * Add parameter for the prepared SQL statement.
+     *
+     * @param array $parameters Associative array of parameters.
+     * 
+     * @example
+     * $dataAction->addParameters($key, $value);
+     */
+    public function addParameter($key, $value): void
+    {
+        $this->parameters[$key] = $value;
     }
 
     /**

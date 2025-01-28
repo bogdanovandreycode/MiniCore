@@ -3,10 +3,9 @@
 namespace MiniCore\Database\DefaultAction;
 
 use MiniCore\Database\Action\DataAction;
+use Minicore\Database\RepositoryManager;
 use MiniCore\Database\Action\AbstractAction;
 use MiniCore\Database\Action\ActionInterface;
-use Minicore\Database\Repository\RepositoryManager;
-
 
 /**
  * Class DeleteAction
@@ -41,11 +40,12 @@ class DeleteAction extends AbstractAction implements ActionInterface
      * $deleteAction = new DeleteAction('products');
      */
     public function __construct(
-        public string $tableName,
+        public string $tableName
     ) {
         parent::__construct(
             'delete',
             ['mysql', 'postgresql']
+
         );
     }
 

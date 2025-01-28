@@ -30,7 +30,7 @@ interface ActionInterface
      * $dataAction->addProperty('WHERE', 'id = :id', ['id' => 1]);
      * $result = $action->execute($dataAction);
      */
-    public function execute(string $repositoryName, DataAction $data): mixed;
+    public function execute(string $repositoryName, ?DataAction $data): mixed;
 
     /**
      * Validate the provided data before executing the action.

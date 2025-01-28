@@ -3,10 +3,9 @@
 namespace MiniCore\Database\DefaultAction;
 
 use MiniCore\Database\Action\DataAction;
-use Minicore\Database\RepositoryManager;
 use MiniCore\Database\Action\AbstractAction;
 use MiniCore\Database\Action\ActionInterface;
-
+use Minicore\Database\Repository\RepositoryManager;
 
 /**
  * Class InsertAction
@@ -41,7 +40,6 @@ class InsertAction extends AbstractAction implements ActionInterface
         parent::__construct(
             'insert',
             ['mysql', 'postgresql']
-
         );
     }
 
@@ -68,7 +66,7 @@ class InsertAction extends AbstractAction implements ActionInterface
      * $insertAction = new InsertAction('users');
      * $insertAction->execute($dataAction);
      */
-    public function execute(string $repositoryName, DataAction $data): mixed
+    public function execute(string $repositoryName, ?DataAction $data): mixed
     {
         $columns = $data->getColumns();
 

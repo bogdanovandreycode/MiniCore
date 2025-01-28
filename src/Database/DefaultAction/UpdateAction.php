@@ -3,10 +3,9 @@
 namespace MiniCore\Database\DefaultAction;
 
 use MiniCore\Database\Action\DataAction;
-use Minicore\Database\RepositoryManager;
 use MiniCore\Database\Action\AbstractAction;
 use MiniCore\Database\Action\ActionInterface;
-
+use Minicore\Database\Repository\RepositoryManager;
 
 /**
  * Class UpdateAction
@@ -59,7 +58,7 @@ class UpdateAction extends AbstractAction implements ActionInterface
      * $updateAction = new UpdateAction('users');
      * $updateAction->execute($dataAction);
      */
-    public function execute(string $repositoryName, DataAction $data): mixed
+    public function execute(string $repositoryName, ?DataAction $data): mixed
     {
         $updateColumns = $data->getColumns();
         $setClauses = [];

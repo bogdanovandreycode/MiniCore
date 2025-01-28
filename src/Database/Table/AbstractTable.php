@@ -1,14 +1,17 @@
 <?php
 
-namespace MiniCore\Database;
+namespace MiniCore\Database\Table;
 
 use Exception;
 use MiniCore\Database\Action\DataAction;
 use MiniCore\Database\Action\ActionInterface;
+use MiniCore\Database\DefaultAction\CreateAction;
 use MiniCore\Database\DefaultAction\DeleteAction;
+use MiniCore\Database\DefaultAction\DropAction;
 use MiniCore\Database\DefaultAction\InsertAction;
 use MiniCore\Database\DefaultAction\SelectAction;
 use MiniCore\Database\DefaultAction\UpdateAction;
+use Minicore\Database\Repository\RepositoryManager;
 
 /**
  * Class Table
@@ -19,7 +22,7 @@ use MiniCore\Database\DefaultAction\UpdateAction;
  *
  * @package MiniCore\Database
  */
-abstract class Table
+abstract class AbstractTable
 {
     /**
      * @var ActionInterface[] List of actions (Insert, Select, Update, Delete) associated with the table.
@@ -41,6 +44,7 @@ abstract class Table
      */
     public function __construct(
         protected string $name,
+        protected string $repositoryName,
         protected array $scheme,
     ) {
         // Register default CRUD actions for the table.
@@ -49,6 +53,8 @@ abstract class Table
             new SelectAction($this->name),
             new UpdateAction($this->name),
             new DeleteAction($this->name),
+            new CreateAction($this->name),
+            new DropAction($this->name),
         ];
     }
 
@@ -62,12 +68,28 @@ abstract class Table
      */
     public function create(): void
     {
-        $fields = $this->getSchemeToString();
+        if (!$this->existAvailableAction('create')) {
+            throw new Exception("Error: Action 'create' not found", 1);
+        }
 
-        RepositoryManager::query(
-            'mysql',
-            "CREATE TABLE {$this->name} ({$fields})"
-        );
+        if (empty($this->scheme)) {
+            throw new Exception("Error: Incorrect scheme", 1);
+        }
+
+        $data = new DataAction();
+        $data->addParameters($this->scheme);
+        $this->actions['create']->execute($this->repositoryName, $data);
+    }
+
+    public function existAvailableAction(string $actionName)
+    {
+        foreach ($this->actions as $action) {
+            if ($action->getName() === $actionName && $action->checkAvailabilityRepository($this->repositoryName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -80,10 +102,17 @@ abstract class Table
      */
     public function drop(): void
     {
-        RepositoryManager::query(
-            'mysql',
-            "DROP TABLE `{$this->name}`"
-        );
+        if (!$this->existAvailableAction('drop')) {
+            throw new Exception("Error: Action 'drop' not found", 1);
+        }
+
+        if (empty($this->scheme)) {
+            throw new Exception("Error: Incorrect scheme", 1);
+        }
+
+        $data = new DataAction();
+        $data->addParameters($this->scheme);
+        $this->actions['drop']->execute($this->repositoryName, $data);
     }
 
     /**
@@ -175,7 +204,7 @@ abstract class Table
     public function execute(string $repositoryName, string $actionName, DataAction $data): mixed
     {
         if (empty($repositoryName)) {
-            throw new Exception("Repository name not found", 1);
+            throw new Exception("Error: Repository name not found", 1);
         }
 
         foreach ($this->actions as $action) {

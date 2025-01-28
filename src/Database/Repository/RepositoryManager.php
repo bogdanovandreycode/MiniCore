@@ -1,9 +1,9 @@
 <?php
 
-namespace Minicore\Database;
+namespace Minicore\Database\Repository;
 
 use Exception;
-use MiniCore\Database\RepositoryInterface;
+use MiniCore\Database\Repository\RepositoryInterface;
 
 class RepositoryManager
 {

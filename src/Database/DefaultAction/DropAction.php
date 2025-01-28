@@ -7,45 +7,45 @@ use MiniCore\Database\Action\AbstractAction;
 use MiniCore\Database\Action\ActionInterface;
 use Minicore\Database\Repository\RepositoryManager;
 
-
 /**
- * Class DeleteAction
+ * Class DropAction
  *
  * Handles the deletion of records from a database table.
  * This action dynamically builds and executes a DELETE SQL query
  * with optional conditions and parameters.
  *
  * @example
- * // Example of using DeleteAction to delete a user with ID = 5
- * $deleteAction = new DeleteAction('users');
+ * // Example of using DropAction to delete a user with ID = 5
+ * $DropAction = new DropAction('users');
  * 
  * $dataAction = new DataAction();
  * $dataAction->addProperty('WHERE', 'id = :id', ['id' => 5]);
  * 
- * if ($deleteAction->validate($dataAction)) {
- *     $result = $deleteAction->execute($dataAction);
+ * if ($DropAction->validate($dataAction)) {
+ *     $result = $DropAction->execute($dataAction);
  *     echo $result ? 'User deleted.' : 'Delete failed.';
  * } else {
  *     echo 'No conditions provided for deletion.';
  * }
  */
-class DeleteAction extends AbstractAction implements ActionInterface
+class DropAction extends AbstractAction implements ActionInterface
 {
     /**
-     * DeleteAction constructor.
+     * DropAction constructor.
      *
      * @param string $tableName The name of the table from which data will be deleted.
      *
      * @example
-     * // Initialize DeleteAction for the 'products' table
-     * $deleteAction = new DeleteAction('products');
+     * // Initialize DropAction for the 'products' table
+     * $DropAction = new DropAction('products');
      */
     public function __construct(
-        public string $tableName,
+        public string $tableName
     ) {
         parent::__construct(
-            'delete',
+            'drop',
             ['mysql', 'postgresql']
+
         );
     }
 
@@ -60,20 +60,16 @@ class DeleteAction extends AbstractAction implements ActionInterface
      *
      * @example
      * // Delete a product by ID
-     * $deleteAction = new DeleteAction('products');
+     * $DropAction = new DropAction('products');
      * 
      * $dataAction = new DataAction();
      * $dataAction->addProperty('WHERE', 'id = :id', ['id' => 10]);
      * 
-     * $deleteAction->execute($dataAction);
+     * $DropAction->execute($dataAction);
      */
-    public function execute(string $repositoryName, ?DataAction $data): mixed
+    public function execute(string $repositoryName, ?DataAction $data = null): mixed
     {
-        $sql = "DELETE FROM {$this->tableName}";
-
-        foreach ($data->getProperties() as $property) {
-            $sql .= " {$property['type']} {$property['condition']}";
-        }
+        $sql = "DROP TABLE `{$this->tableName}`";
 
         return RepositoryManager::execute(
             $repositoryName,
@@ -91,11 +87,11 @@ class DeleteAction extends AbstractAction implements ActionInterface
      * @return bool True if conditions are present, false otherwise.
      *
      * @example
-     * $deleteAction = new DeleteAction('users');
+     * $DropAction = new DropAction('users');
      * $dataAction = new DataAction();
      * $dataAction->addProperty('WHERE', 'id = :id', ['id' => 1]);
      * 
-     * if ($deleteAction->validate($dataAction)) {
+     * if ($DropAction->validate($dataAction)) {
      *     echo 'Valid conditions for deletion.';
      * } else {
      *     echo 'No conditions provided.';
@@ -103,7 +99,6 @@ class DeleteAction extends AbstractAction implements ActionInterface
      */
     public function validate(DataAction $data): bool
     {
-        $hasConditions = !empty($data->getProperties());
-        return $hasConditions;
+        return !empty($this->tableName);
     }
 }

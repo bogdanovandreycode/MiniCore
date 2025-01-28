@@ -2,11 +2,11 @@
 
 namespace MiniCore\Database\DefaultAction;
 
+use Exception;
 use MiniCore\Database\Action\DataAction;
 use MiniCore\Database\Action\AbstractAction;
 use MiniCore\Database\Action\ActionInterface;
 use Minicore\Database\Repository\RepositoryManager;
-
 
 /**
  * Class DeleteAction
@@ -29,7 +29,7 @@ use Minicore\Database\Repository\RepositoryManager;
  *     echo 'No conditions provided for deletion.';
  * }
  */
-class DeleteAction extends AbstractAction implements ActionInterface
+class CreateAction extends AbstractAction implements ActionInterface
 {
     /**
      * DeleteAction constructor.
@@ -41,10 +41,10 @@ class DeleteAction extends AbstractAction implements ActionInterface
      * $deleteAction = new DeleteAction('products');
      */
     public function __construct(
-        public string $tableName,
+        public string $tableName
     ) {
         parent::__construct(
-            'delete',
+            'create',
             ['mysql', 'postgresql']
         );
     }
@@ -69,17 +69,31 @@ class DeleteAction extends AbstractAction implements ActionInterface
      */
     public function execute(string $repositoryName, ?DataAction $data): mixed
     {
-        $sql = "DELETE FROM {$this->tableName}";
+        $parameters = $data->getParameters();
 
-        foreach ($data->getProperties() as $property) {
-            $sql .= " {$property['type']} {$property['condition']}";
+        if (empty($selectColumns)) {
+            throw new Exception("Error creating table {$this->tableName}. columns not found", 1);
         }
+
+        $parametersString = $this->getParametersToString($parameters);
+        $sql = "CREATE TABLE {$this->tableName} ({$parametersString})";
 
         return RepositoryManager::execute(
             $repositoryName,
             $sql,
             $data->getParameters()
         );
+    }
+
+    private function getParametersToString($parameters): string
+    {
+        $fields = '';
+
+        foreach ($this->$parameters as $fieldName => $fieldDefinition) {
+            $fields .= "$fieldName $fieldDefinition, ";
+        }
+
+        return rtrim($fields, ', ');
     }
 
     /**
@@ -103,7 +117,6 @@ class DeleteAction extends AbstractAction implements ActionInterface
      */
     public function validate(DataAction $data): bool
     {
-        $hasConditions = !empty($data->getProperties());
-        return $hasConditions;
+        return !empty($data->getParameters()) && !empty($this->tableName);
     }
 }

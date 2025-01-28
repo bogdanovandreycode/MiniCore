@@ -3,10 +3,9 @@
 namespace MiniCore\Database\DefaultAction;
 
 use MiniCore\Database\Action\DataAction;
-use Minicore\Database\RepositoryManager;
 use MiniCore\Database\Action\AbstractAction;
 use MiniCore\Database\Action\ActionInterface;
-
+use Minicore\Database\Repository\RepositoryManager;
 
 /**
  * Class SelectAction
@@ -37,7 +36,6 @@ class SelectAction extends AbstractAction implements ActionInterface
         parent::__construct(
             'select',
             ['mysql', 'postgresql']
-
         );
     }
 
@@ -62,7 +60,7 @@ class SelectAction extends AbstractAction implements ActionInterface
      *     echo $user['username'];
      * }
      */
-    public function execute(string $repositoryName, DataAction $data): mixed
+    public function execute(string $repositoryName, ?DataAction $data): mixed
     {
         $selectColumns = $data->getColumns();
         $sql = "SELECT " . (!empty($selectColumns) ? implode(', ', $selectColumns) : '*');

@@ -5,8 +5,8 @@ namespace MiniCore\Database\Repository;
 use PDO;
 use Exception;
 use PDOException;
-use MiniCore\Database\Table;
-use MiniCore\Database\RepositoryInterface;
+use MiniCore\Database\Table\AbstractTable;
+
 
 /**
  * Class MySqlDatabase
@@ -151,12 +151,12 @@ class MySqlDatabase implements RepositoryInterface
     /**
      * Register a new table for database management.
      *
-     * @param Table $table The table instance to register.
+     * @param AbstractTable $table The table instance to register.
      * 
      * @example
      * DataBase::addTable(new UsersTable());
      */
-    public static function addTable(Table $table): void
+    public static function addTable(AbstractTable $table): void
     {
         self::$tables[] = $table;
     }
@@ -164,12 +164,12 @@ class MySqlDatabase implements RepositoryInterface
     /**
      * Unregister a table from the database manager.
      *
-     * @param Table $table The table instance to remove.
+     * @param AbstractTable $table The table instance to remove.
      * 
      * @example
      * DataBase::removeTable(new UsersTable());
      */
-    public static function removeTable(Table $table): void
+    public static function removeTable(AbstractTable $table): void
     {
         $index = array_search($table, self::$tables, true);
 
@@ -224,5 +224,32 @@ class MySqlDatabase implements RepositoryInterface
     public static function getNameRepository(): string
     {
         return 'mysql';
+    }
+
+    /**
+     * Получить список всех таблиц в базе данных.
+     *
+     * @return array Массив с именами таблиц.
+     * 
+     * @throws Exception Если подключение к базе данных отсутствует.
+     *
+     * @example
+     * $tables = MySqlDatabase::getTables();
+     * foreach ($tables as $table) {
+     *     echo $table;
+     * }
+     */
+    public static function getTables(): array
+    {
+        //надо переписать и сделать чтобы подгружалось 1 раз
+        if (!isset(self::$connection)) {
+            throw new Exception('No database connection established.');
+        }
+
+        $sql = "SHOW TABLES";
+
+        $result = self::query($sql);
+
+        return array_map('current', $result);
     }
 }
