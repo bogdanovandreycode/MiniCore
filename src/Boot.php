@@ -8,17 +8,17 @@ use MiniCore\Http\Request;
 use MiniCore\Http\Response;
 use MiniCore\View\ViewLoader;
 use MiniCore\API\RestApiRouter;
-use MiniCore\Database\DataBase;
 use MiniCore\Config\RouteLoader;
 use MiniCore\Module\ModuleManager;
 use MiniCore\Config\RestEndpointLoader;
-use MiniCore\Database\DefaultTable\PostsTable;
-use MiniCore\Database\DefaultTable\RolesTable;
-use MiniCore\Database\DefaultTable\UsersTable;
-use MiniCore\Database\DefaultTable\PostMetaTable;
-use MiniCore\Database\DefaultTable\SettingsTable;
-use MiniCore\Database\DefaultTable\UserMetaTable;
-use MiniCore\Database\DefaultTable\UserRolesTable;
+use MiniCore\Database\Repository\MySqlDatabase;
+use MiniCore\Database\DefaultTable\MySql\PostsTable;
+use MiniCore\Database\DefaultTable\MySql\RolesTable;
+use MiniCore\Database\DefaultTable\MySql\UsersTable;
+use MiniCore\Database\DefaultTable\MySql\PostMetaTable;
+use MiniCore\Database\DefaultTable\MySql\SettingsTable;
+use MiniCore\Database\DefaultTable\MySql\UserMetaTable;
+use MiniCore\Database\DefaultTable\MySql\UserRolesTable;
 
 /**
  * Class Boot
@@ -144,15 +144,23 @@ class Boot
      */
     private static function setupDatabase(): void
     {
-        DataBase::setConnection(Env::get('DB_HOST'), Env::get('DB_NAME'), Env::get('DB_USER'), Env::get('DB_PASSWORD'));
-        DataBase::addTable(new UsersTable());
-        DataBase::addTable(new UserMetaTable());
-        DataBase::addTable(new PostsTable());
-        DataBase::addTable(new PostMetaTable());
-        DataBase::addTable(new RolesTable());
-        DataBase::addTable(new UserRolesTable());
-        DataBase::addTable(new SettingsTable());
-        DataBase::createTables();
+        new MySqlDatabase(
+            [
+                'host' => Env::get('DB_HOST'),
+                'dbname' => Env::get('DB_NAME'),
+                'user' => Env::get('DB_USER'),
+                'password' => Env::get('DB_PASSWORD')
+            ],
+            [
+                new UsersTable(),
+                new UserMetaTable(),
+                new PostsTable(),
+                new PostMetaTable(),
+                new RolesTable(),
+                new UserRolesTable(),
+                new SettingsTable(),
+            ]
+        );
     }
 
     /**

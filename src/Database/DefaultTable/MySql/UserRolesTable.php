@@ -1,6 +1,6 @@
 <?php
 
-namespace MiniCore\Database\DefaultTable;
+namespace MiniCore\Database\DefaultTable\MySql;
 
 use MiniCore\Database\Action\DataAction;
 use MiniCore\Database\Table\AbstractTable;

@@ -29,6 +29,7 @@ class MySqlDatabase implements RepositoryInterface
     ) {
         $this->list = new TableManager($this, $tables);
         $this->connect($config);
+        RepositoryManager::addRepository($this);
     }
 
     public function getList(): TableManager

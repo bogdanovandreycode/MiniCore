@@ -28,6 +28,7 @@ class TableManager
         private array $tables = [],
     ) {
         $this->updateExistingTables();
+        $this->createTables();
     }
 
     /**
