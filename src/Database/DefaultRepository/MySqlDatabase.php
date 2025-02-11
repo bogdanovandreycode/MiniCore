@@ -18,7 +18,7 @@ use MiniCore\Database\Table\TableManager;
 class MySqlDatabase implements RepositoryInterface
 {
     /**
-     * @var PDO Active PDO database connection.
+     * @var PDO|null Active PDO database connection.
      */
     private PDO $connection;
     private TableManager $list;
@@ -140,16 +140,31 @@ class MySqlDatabase implements RepositoryInterface
         return $stmt->execute($params);
     }
 
+    /**
+     * Check if the database connection is active.
+     *
+     * @return bool True if connected, false otherwise.
+     */
     public function isConnected(): bool
     {
-        //надо добавить реализацию
-        return true;
+        if ($this->connection instanceof PDO) {
+            try {
+                // Проверяем соединение простым SQL-запросом
+                $this->connection->query("SELECT 1");
+                return true;
+            } catch (PDOException) {
+                return false;
+            }
+        }
+        return false;
     }
 
+    /**
+     * Close the database connection.
+     */
     public function close(): void
     {
-        //надо добавить реализацию
-        return;
+        $this->connection = null;
     }
 
     public function getNameRepository(): string
