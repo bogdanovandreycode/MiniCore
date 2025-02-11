@@ -149,7 +149,6 @@ class MySqlDatabase implements RepositoryInterface
     {
         if ($this->connection instanceof PDO) {
             try {
-                // Проверяем соединение простым SQL-запросом
                 $this->connection->query("SELECT 1");
                 return true;
             } catch (PDOException) {

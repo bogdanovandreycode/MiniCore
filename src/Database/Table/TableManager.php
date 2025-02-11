@@ -5,6 +5,7 @@ namespace MiniCore\Database\Table;
 use Exception;
 use MiniCore\Database\Table\AbstractTable;
 use MiniCore\Database\Repository\MySqlDatabase;
+use MiniCore\Database\DefaultAction\ShowTablesAction;
 use MiniCore\Database\Repository\RepositoryInterface;
 
 /**
@@ -17,13 +18,17 @@ use MiniCore\Database\Repository\RepositoryInterface;
  */
 class TableManager
 {
+    private array $existingTables = [];
+
     /**
      * @var array List of registered tables for management.
      */
     public function __construct(
         private RepositoryInterface $repository,
         private array $tables = [],
-    ) {}
+    ) {
+        $this->updateExistingTables();
+    }
 
     /**
      * Register a new table for database management.
@@ -65,10 +70,12 @@ class TableManager
     public function createTables(): void
     {
         foreach (self::$tables as $table) {
-            if (!$table->exist()) {
+            if (!in_array($table->name, $this->existingTables)) {
                 $table->create();
             }
         }
+
+        $this->updateExistingTables();
     }
 
     /**
@@ -80,21 +87,22 @@ class TableManager
     public function dropTables(): void
     {
         foreach (self::$tables as $table) {
-            if ($table->exist()) {
+            if (in_array($table->name, $this->existingTables)) {
                 $table->drop();
             }
         }
+
+        $this->updateExistingTables();
     }
 
     public function getTables(): array
     {
-        //надо переписать и сделать чтобы подгружалось 1 раз
-        if (!isset(self::$connection)) {
-            throw new Exception('No database connection established.');
-        }
+        return $this->tables;
+    }
 
-        $sql = "SHOW TABLES";
-        $result = $this->repository->query($sql);
-        return array_map('current', $result);
+    private function updateExistingTables()
+    {
+        $showTablesAction = new ShowTablesAction();
+        $this->existingTables = $showTablesAction->execute($this->repository->getNameRepository());
     }
 }
