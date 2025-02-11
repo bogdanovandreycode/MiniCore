@@ -43,7 +43,7 @@ class RepositoryManager
         self::validateNameRepository($nameRepository);
 
         try {
-            $result = self::$repositories[$nameRepository]::query($sql, $params);
+            $result = self::$repositories[$nameRepository]->query($sql, $params);
         } catch (Exception $e) {
             throw new Exception("Error during query execution: " . $e->getMessage(), 1, $e);
         }
@@ -56,7 +56,7 @@ class RepositoryManager
         self::validateNameRepository($nameRepository);
 
         try {
-            $result = self::$repositories[$nameRepository]::execute($sql, $params);
+            $result = self::$repositories[$nameRepository]->execute($sql, $params);
         } catch (Exception $e) {
             throw new Exception("Error during query execution: " . $e->getMessage(), 1, $e);
         }

@@ -4,6 +4,7 @@ namespace MiniCore\Database\DefaultTable;
 
 use MiniCore\Database\Table;
 use MiniCore\Database\Action\DataAction;
+use MiniCore\Database\Table\AbstractTable;
 
 /**
  * Class UsersTable
@@ -34,7 +35,7 @@ use MiniCore\Database\Action\DataAction;
  * // Example: Get user by email
  * $user = $usersTable->getUserByEmail('john@example.com');
  */
-class UsersTable extends Table
+class UsersTable extends AbstractTable
 {
     /**
      * UsersTable constructor.
@@ -45,6 +46,7 @@ class UsersTable extends Table
     {
         parent::__construct(
             'users',
+            'mysql',
             [
                 'id'            => 'INT AUTO_INCREMENT PRIMARY KEY',  // Unique user ID
                 'username'      => 'VARCHAR(255) NOT NULL',           // Username
@@ -72,7 +74,7 @@ class UsersTable extends Table
         $dataAction->addColumn('*');
         $dataAction->addProperty('WHERE', 'email = :email', ['email' => $email]);
         $dataAction->addProperty('LIMIT', '1');
-        $result = $this->actions['select']->execute($dataAction);
+        $result = $this->actions['select']->execute($this->repositoryName, $dataAction);
         return $result[0] ?? null;
     }
 
@@ -92,6 +94,6 @@ class UsersTable extends Table
         $dataAction->addColumn('role_id');
         $dataAction->addParameters(['role_id' => $roleId]);
         $dataAction->addProperty('WHERE', 'id = :id', ['id' => $userId]);
-        return $this->actions['update']->execute($dataAction);
+        return $this->actions['update']->execute($this->repositoryName, $dataAction);
     }
 }

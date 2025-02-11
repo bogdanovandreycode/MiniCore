@@ -2,8 +2,8 @@
 
 namespace MiniCore\Database\DefaultTable;
 
-use MiniCore\Database\Table;
 use MiniCore\Database\Action\DataAction;
+use MiniCore\Database\Table\AbstractTable;
 
 /**
  * Class SettingsTable
@@ -29,7 +29,7 @@ use MiniCore\Database\Action\DataAction;
  * // Get a setting value
  * $siteName = $settingsTable->getOption('site_name');
  */
-class SettingsTable extends Table
+class SettingsTable extends AbstractTable
 {
     /**
      * SettingsTable constructor.
@@ -40,6 +40,7 @@ class SettingsTable extends Table
     {
         parent::__construct(
             'settings',
+            'mysql',
             [
                 'id'        => 'INT AUTO_INCREMENT PRIMARY KEY', // Unique setting ID
                 'key_name'  => 'VARCHAR(255) NOT NULL UNIQUE',   // Unique key for the setting
@@ -64,7 +65,7 @@ class SettingsTable extends Table
         $dataAction->addColumn('value');
         $dataAction->addProperty('WHERE', 'key_name = :key_name', ['key_name' => $key]);
 
-        $result = $this->actions['select']->execute($dataAction);
+        $result = $this->actions['select']->execute($this->repositoryName, $dataAction);
         return $result[0]['value'] ?? null;
     }
 
@@ -91,7 +92,7 @@ class SettingsTable extends Table
         $dataAction->addParameters(['value' => $value]);
         $dataAction->addProperty('WHERE', 'key_name = :key_name', ['key_name' => $key]);
 
-        return $this->actions['update']->execute($dataAction);
+        return $this->actions['update']->execute($this->repositoryName, $dataAction);
     }
 
     /**
@@ -115,6 +116,6 @@ class SettingsTable extends Table
             'value'    => $value,
         ]);
 
-        return $this->actions['insert']->execute($dataAction);
+        return $this->actions['insert']->execute($this->repositoryName, $dataAction);
     }
 }

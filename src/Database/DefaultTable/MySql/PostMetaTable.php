@@ -2,8 +2,8 @@
 
 namespace MiniCore\Database\DefaultTable\MySql;
 
-use MiniCore\Database\Table;
 use MiniCore\Database\Action\DataAction;
+use MiniCore\Database\Table\AbstractTable;
 
 /**
  * Class PostMetaTable
@@ -30,7 +30,7 @@ use MiniCore\Database\Action\DataAction;
  * // Retrieve metadata
  * $metaValue = $postMetaTable->getMeta('featured');
  */
-class PostMetaTable extends Table
+class PostMetaTable extends AbstractTable
 {
     /**
      * PostMetaTable constructor.
@@ -41,6 +41,7 @@ class PostMetaTable extends Table
     {
         parent::__construct(
             'postmeta',
+            'mysql',
             [
                 'meta_id'     => 'INT AUTO_INCREMENT PRIMARY KEY',
                 'post_id'     => 'INT NOT NULL',
@@ -73,7 +74,7 @@ class PostMetaTable extends Table
         $dataAction->addColumn('meta_value');
         $dataAction->addProperty('WHERE', 'meta_key = :meta_key', ['meta_key' => $key]);
 
-        $result = $this->actions['select']->execute($dataAction);
+        $result = $this->actions['select']->execute($this->repositoryName, $dataAction);
 
         if ($result) {
             return $isSingle
@@ -113,7 +114,7 @@ class PostMetaTable extends Table
             'post_id'  => $postId,
         ]);
 
-        return $this->actions['update']->execute($dataAction);
+        return $this->actions['update']->execute($this->repositoryName, $dataAction);
     }
 
     /**
@@ -141,6 +142,6 @@ class PostMetaTable extends Table
             'meta_value' => $value,
         ]);
 
-        return $this->actions['insert']->execute($dataAction);
+        return $this->actions['insert']->execute($this->repositoryName, $dataAction);
     }
 }

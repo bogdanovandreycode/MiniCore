@@ -36,7 +36,7 @@ abstract class AbstractAction implements ActionInterface
         return in_array($name, $this->availableRepositories);
     }
 
-    abstract public function execute(string $repositoryName, DataAction $data): mixed;
+    abstract public function execute(string $repositoryName, ?DataAction $data): mixed;
 
     abstract public function validate(DataAction $data): bool;
 }

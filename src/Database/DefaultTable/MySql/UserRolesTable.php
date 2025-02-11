@@ -2,8 +2,8 @@
 
 namespace MiniCore\Database\DefaultTable;
 
-use MiniCore\Database\Table;
 use MiniCore\Database\Action\DataAction;
+use MiniCore\Database\Table\AbstractTable;
 
 /**
  * Class UserRolesTable
@@ -28,7 +28,7 @@ use MiniCore\Database\Action\DataAction;
  * // Remove a role from a user
  * $userRolesTable->removeRoleFromUser(1, 2);
  */
-class UserRolesTable extends Table
+class UserRolesTable extends AbstractTable
 {
     /**
      * UserRolesTable constructor.
@@ -39,6 +39,7 @@ class UserRolesTable extends Table
     {
         parent::__construct(
             'user_roles',
+            'mysql',
             [
                 'id'     => 'INT AUTO_INCREMENT PRIMARY KEY', // Unique ID
                 'userId' => 'INT NOT NULL',                  // User ID
@@ -61,7 +62,7 @@ class UserRolesTable extends Table
         $dataAction = new DataAction();
         $dataAction->addColumn('roleId');
         $dataAction->addProperty('WHERE', 'userId = :userId', ['userId' => $userId]);
-        return $this->actions['select']->execute($dataAction);
+        return $this->actions['select']->execute($this->repositoryName, $dataAction);
     }
 
     /**
@@ -78,7 +79,7 @@ class UserRolesTable extends Table
         $dataAction = new DataAction();
         $dataAction->addColumn('userId');
         $dataAction->addProperty('WHERE', 'roleId = :roleId', ['roleId' => $roleId]);
-        return $this->actions['select']->execute($dataAction);
+        return $this->actions['select']->execute($this->repositoryName, $dataAction);
     }
 
     /**
@@ -102,7 +103,7 @@ class UserRolesTable extends Table
             'roleId' => $roleId,
         ]);
 
-        return $this->actions['insert']->execute($dataAction);
+        return $this->actions['insert']->execute($this->repositoryName, $dataAction);
     }
 
     /**
@@ -124,7 +125,7 @@ class UserRolesTable extends Table
             'roleId' => $roleId,
         ]);
 
-        return $this->actions['delete']->execute($dataAction);
+        return $this->actions['delete']->execute($this->repositoryName, $dataAction);
     }
 
     /**
@@ -150,7 +151,7 @@ class UserRolesTable extends Table
         ]);
 
         $dataAction->addProperty('LIMIT', '1');
-        $result = $this->actions['select']->execute($dataAction);
+        $result = $this->actions['select']->execute($this->repositoryName, $dataAction);
         return !empty($result);
     }
 }

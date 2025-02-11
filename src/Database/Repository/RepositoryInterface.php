@@ -2,25 +2,27 @@
 
 namespace MiniCore\Database\Repository;
 
-use MiniCore\Database\Table\AbstractTable;
+use MiniCore\Database\Table\TableManager;
 
 interface RepositoryInterface
 {
+    public function __construct(array $config, array $tables = [],);
     /**
      * Установить соединение с базой данных.
      *
      * @param array $config Конфигурация подключения.
      * @return void
      */
-    public static function connect(array $config): void;
+    public function connect(array $config): void;
 
     /**
      * Проверить активность соединения.
      *
      * @return bool True, если соединение активно.
      */
-    public static function isConnected(): bool;
+    public function isConnected(): bool;
 
+    public function getList(): TableManager;
     /**
      * Выполнить SQL-запрос SELECT.
      *
@@ -28,7 +30,7 @@ interface RepositoryInterface
      * @param array $params Параметры для подготовленного запроса.
      * @return array Результат выполнения запроса.
      */
-    public static function query(string $sql, array $params = []): array;
+    public function query(string $sql, array $params = []): array;
 
     /**
      * Выполнить SQL-запрос INSERT, UPDATE, DELETE.
@@ -37,22 +39,14 @@ interface RepositoryInterface
      * @param array $params Параметры для подготовленного запроса.
      * @return bool Успешность выполнения запроса.
      */
-    public static function execute(string $sql, array $params = []): bool;
+    public function execute(string $sql, array $params = []): bool;
 
     /**
      * Закрыть соединение с базой данных.
      *
      * @return void
      */
-    public static function close(): void;
+    public function close(): void;
 
-    public static function getNameRepository(): string;
-
-    public static function addTable(AbstractTable $table): void;
-
-    public static function removeTable(AbstractTable $table): void;
-
-    public static function createTables(): void;
-
-    public static function dropTables(): void;
+    public function getNameRepository(): string;
 }

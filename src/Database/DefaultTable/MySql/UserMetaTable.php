@@ -2,8 +2,8 @@
 
 namespace MiniCore\Database\DefaultTable;
 
-use MiniCore\Database\Table;
 use MiniCore\Database\Action\DataAction;
+use MiniCore\Database\Table\AbstractTable;
 
 /**
  * Class UserMetaTable
@@ -31,7 +31,7 @@ use MiniCore\Database\Action\DataAction;
  * // Retrieve user metadata
  * $theme = $userMetaTable->getMeta('theme');
  */
-class UserMetaTable extends Table
+class UserMetaTable extends AbstractTable
 {
     /**
      * UserMetaTable constructor.
@@ -42,6 +42,7 @@ class UserMetaTable extends Table
     {
         parent::__construct(
             'usermeta',
+            'mysql',
             [
                 'meta_id'    => 'INT AUTO_INCREMENT PRIMARY KEY', // Unique meta ID
                 'user_id'    => 'INT NOT NULL',                   // Associated user ID
@@ -74,7 +75,7 @@ class UserMetaTable extends Table
         $dataAction->addColumn('meta_value');
         $dataAction->addProperty('WHERE', 'meta_key = :meta_key', ['meta_key' => $key]);
 
-        $result = $this->actions['select']->execute($dataAction);
+        $result = $this->actions['select']->execute($this->repositoryName, $dataAction);
 
         if ($result) {
             return $isSingle
@@ -112,7 +113,7 @@ class UserMetaTable extends Table
             'user_id' => $userId,
         ]);
 
-        return $this->actions['update']->execute($dataAction);
+        return $this->actions['update']->execute($this->repositoryName, $dataAction);
     }
 
     /**
@@ -139,6 +140,6 @@ class UserMetaTable extends Table
             'meta_value' => $value,
         ]);
 
-        return $this->actions['insert']->execute($dataAction);
+        return $this->actions['insert']->execute($this->repositoryName, $dataAction);
     }
 }

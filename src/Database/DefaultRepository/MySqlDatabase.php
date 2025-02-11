@@ -5,8 +5,7 @@ namespace MiniCore\Database\Repository;
 use PDO;
 use Exception;
 use PDOException;
-use MiniCore\Database\Table\AbstractTable;
-
+use MiniCore\Database\Table\TableManager;
 
 /**
  * Class MySqlDatabase
@@ -21,12 +20,21 @@ class MySqlDatabase implements RepositoryInterface
     /**
      * @var PDO Active PDO database connection.
      */
-    private static PDO $connection;
+    private PDO $connection;
+    private TableManager $list;
 
-    /**
-     * @var array List of registered tables for management.
-     */
-    private static array $tables = [];
+    public function __construct(
+        array $config,
+        array $tables = [],
+    ) {
+        $this->list = new TableManager($this, $tables);
+        $this->connect($config);
+    }
+
+    public function getList(): TableManager
+    {
+        return $this->list;
+    }
 
     /**
      * Get the active database connection.
@@ -36,26 +44,24 @@ class MySqlDatabase implements RepositoryInterface
      * @example
      * $pdo = DataBase::getConnection();
      */
-    public static function getConnection(): PDO
+    public function getConnection(): PDO
     {
         return self::$connection;
     }
 
-    /**
-     * Establish a new database connection.
-     *
-     * @param string $host Database host (e.g., 'localhost').
-     * @param string $dbname Database name.
-     * @param string $user Database username.
-     * @param string $password Database password.
-     * @param string $charset Character set for the connection (default: utf8mb4).
-     * @throws PDOException If the connection fails.
-     * 
-     * @example
-     * DataBase::setConnection('localhost', 'my_database', 'root', 'password');
-     */
-    private static function setConnection(string $host, string $dbname, string $user, string $password, string $charset = 'utf8mb4')
+    public function connect(array $config): void
     {
+        if ($this->isConnected()) {
+            return;
+        }
+
+        self::validateConfig($config);
+        $config['charset'] = empty($config['charset']) ? 'utf8mb4' : $config['charset'];
+        $host = $config['host'];
+        $dbname = $config['dbname'];
+        $user = $config['user'];
+        $password = $config['password'];
+        $charset = $config['charset'];
         $dsn = "mysql:host=$host;dbname=$dbname;charset=$charset";
 
         try {
@@ -67,21 +73,7 @@ class MySqlDatabase implements RepositoryInterface
         }
     }
 
-    public static function connect(array $config): void
-    {
-        self::validateConfig($config);
-        $config['charset'] = empty($config['charset']) ? 'utf8mb4' : $config['charset'];
-
-        self::setConnection(
-            $config['host'],
-            $config['dbname'],
-            $config['user'],
-            $config['password'],
-            $config['charset']
-        );
-    }
-
-    private static function validateConfig(array $config): void
+    private function validateConfig(array $config): void
     {
         $errorConditions = [
             [
@@ -125,7 +117,7 @@ class MySqlDatabase implements RepositoryInterface
      * @example
      * $users = DataBase::query("SELECT * FROM users WHERE role_id = :role_id", ['role_id' => 1]);
      */
-    public static function query(string $sql, array $params = []): array
+    public function query(string $sql, array $params = []): array
     {
         $stmt = self::$connection->prepare($sql);
         $stmt->execute($params);
@@ -142,114 +134,26 @@ class MySqlDatabase implements RepositoryInterface
      * @example
      * DataBase::execute("DELETE FROM users WHERE id = :id", ['id' => 5]);
      */
-    public static function execute(string $sql, array $params = []): bool
+    public function execute(string $sql, array $params = []): bool
     {
         $stmt = self::$connection->prepare($sql);
         return $stmt->execute($params);
     }
 
-    /**
-     * Register a new table for database management.
-     *
-     * @param AbstractTable $table The table instance to register.
-     * 
-     * @example
-     * DataBase::addTable(new UsersTable());
-     */
-    public static function addTable(AbstractTable $table): void
-    {
-        self::$tables[] = $table;
-    }
-
-    /**
-     * Unregister a table from the database manager.
-     *
-     * @param AbstractTable $table The table instance to remove.
-     * 
-     * @example
-     * DataBase::removeTable(new UsersTable());
-     */
-    public static function removeTable(AbstractTable $table): void
-    {
-        $index = array_search($table, self::$tables, true);
-
-        if ($index !== false) {
-            unset(self::$tables[$index]);
-            self::$tables = array_values(self::$tables); // Reindex the array
-        }
-    }
-
-    /**
-     * Create all registered tables if they do not exist.
-     * 
-     * @example
-     * DataBase::createTables();
-     */
-    public static function createTables(): void
-    {
-        foreach (self::$tables as $table) {
-            if (!$table->exist()) {
-                $table->create();
-            }
-        }
-    }
-
-    /**
-     * Drop all registered tables if they exist.
-     * 
-     * @example
-     * DataBase::dropTables();
-     */
-    public static function dropTables(): void
-    {
-        foreach (self::$tables as $table) {
-            if ($table->exist()) {
-                $table->drop();
-            }
-        }
-    }
-
-    public static function isConnected(): bool
+    public function isConnected(): bool
     {
         //надо добавить реализацию
         return true;
     }
 
-    public static function close(): void
+    public function close(): void
     {
         //надо добавить реализацию
         return;
     }
 
-    public static function getNameRepository(): string
+    public function getNameRepository(): string
     {
         return 'mysql';
-    }
-
-    /**
-     * Получить список всех таблиц в базе данных.
-     *
-     * @return array Массив с именами таблиц.
-     * 
-     * @throws Exception Если подключение к базе данных отсутствует.
-     *
-     * @example
-     * $tables = MySqlDatabase::getTables();
-     * foreach ($tables as $table) {
-     *     echo $table;
-     * }
-     */
-    public static function getTables(): array
-    {
-        //надо переписать и сделать чтобы подгружалось 1 раз
-        if (!isset(self::$connection)) {
-            throw new Exception('No database connection established.');
-        }
-
-        $sql = "SHOW TABLES";
-
-        $result = self::query($sql);
-
-        return array_map('current', $result);
     }
 }

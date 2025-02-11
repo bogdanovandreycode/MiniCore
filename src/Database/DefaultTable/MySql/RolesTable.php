@@ -2,8 +2,8 @@
 
 namespace MiniCore\Database\DefaultTable;
 
-use MiniCore\Database\Table;
 use MiniCore\Database\Action\DataAction;
+use MiniCore\Database\Table\AbstractTable;
 
 /**
  * Class RolesTable
@@ -30,7 +30,7 @@ use MiniCore\Database\Action\DataAction;
  * // Get permissions for a specific role by its name
  * $permissions = $rolesTable->getPermissionsByRole('editor');
  */
-class RolesTable extends Table
+class RolesTable extends AbstractTable
 {
     /**
      * RolesTable constructor.
@@ -41,6 +41,7 @@ class RolesTable extends Table
     {
         parent::__construct(
             'roles',
+            'mysql',
             [
                 'id'          => 'INT AUTO_INCREMENT PRIMARY KEY',  // Unique role identifier
                 'name'        => 'VARCHAR(255) NOT NULL UNIQUE',   // Role name (must be unique)
@@ -63,7 +64,7 @@ class RolesTable extends Table
         $dataAction = new DataAction();
         $dataAction->addColumn('permissions');
         $dataAction->addProperty('WHERE', 'name = :name', ['name' => $roleName]);
-        $result = $this->actions['select']->execute($dataAction);
+        $result = $this->actions['select']->execute($this->repositoryName, $dataAction);
         return $result ? json_decode($result[0]['permissions'], true) : null;
     }
 }

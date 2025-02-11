@@ -3,107 +3,58 @@
 namespace MiniCore\Database\DefaultAction;
 
 use MiniCore\Database\Action\DataAction;
-use Minicore\Database\RepositoryManager;
 use MiniCore\Database\Action\AbstractAction;
 use MiniCore\Database\Action\ActionInterface;
+use Minicore\Database\Repository\RepositoryManager;
 
 /**
- * Class DeleteAction
+ * Class ShowTablesAction
  *
- * Handles the deletion of records from a database table.
- * This action dynamically builds and executes a DELETE SQL query
- * with optional conditions and parameters.
+ * Retrieves a list of all tables in the database.
  *
  * @example
- * // Example of using DeleteAction to delete a user with ID = 5
- * $deleteAction = new DeleteAction('users');
- * 
- * $dataAction = new DataAction();
- * $dataAction->addProperty('WHERE', 'id = :id', ['id' => 5]);
- * 
- * if ($deleteAction->validate($dataAction)) {
- *     $result = $deleteAction->execute($dataAction);
- *     echo $result ? 'User deleted.' : 'Delete failed.';
- * } else {
- *     echo 'No conditions provided for deletion.';
- * }
+ * $showTablesAction = new ShowTablesAction();
+ * $tables = $showTablesAction->execute('mysql_repository');
+ * print_r($tables); // Array of table names
  */
-class DeleteAction extends AbstractAction implements ActionInterface
+class ShowTablesAction extends AbstractAction implements ActionInterface
 {
     /**
-     * DeleteAction constructor.
-     *
-     * @param string $tableName The name of the table from which data will be deleted.
-     *
-     * @example
-     * // Initialize DeleteAction for the 'products' table
-     * $deleteAction = new DeleteAction('products');
+     * ShowTablesAction constructor.
      */
-    public function __construct(
-        public string $tableName
-    ) {
-        parent::__construct(
-            'delete',
-            ['mysql', 'postgresql']
-
-        );
-    }
-
-    /**
-     * Execute the DELETE SQL query.
-     *
-     * Builds a DELETE SQL query with optional conditions (e.g., WHERE) 
-     * and executes it using prepared statements.
-     *
-     * @param DataAction $data Contains the conditions and parameters for the query.
-     * @return mixed The result of the query execution.
-     *
-     * @example
-     * // Delete a product by ID
-     * $deleteAction = new DeleteAction('products');
-     * 
-     * $dataAction = new DataAction();
-     * $dataAction->addProperty('WHERE', 'id = :id', ['id' => 10]);
-     * 
-     * $deleteAction->execute($dataAction);
-     */
-    public function execute(string $repositoryName, ?DataAction $data): mixed
+    public function __construct()
     {
-        $sql = "DELETE FROM {$this->tableName}";
-
-        foreach ($data->getProperties() as $property) {
-            $sql .= " {$property['type']} {$property['condition']}";
-        }
-
-        return RepositoryManager::execute(
-            $repositoryName,
-            $sql,
-            $data->getParameters()
+        parent::__construct(
+            'show_tables',
+            ['mysql', 'postgresql']
         );
     }
 
     /**
-     * Validate the provided data for the DELETE action.
+     * Retrieves a list of all tables in the database.
      *
-     * Ensures that at least one condition is specified to prevent accidental mass deletion.
-     *
-     * @param DataAction $data The data used for validation.
-     * @return bool True if conditions are present, false otherwise.
+     * @param string $repositoryName The repository from which to fetch tables.
+     * @param DataAction|null $data Not used in this action.
+     * @return array The list of table names.
      *
      * @example
-     * $deleteAction = new DeleteAction('users');
-     * $dataAction = new DataAction();
-     * $dataAction->addProperty('WHERE', 'id = :id', ['id' => 1]);
-     * 
-     * if ($deleteAction->validate($dataAction)) {
-     *     echo 'Valid conditions for deletion.';
-     * } else {
-     *     echo 'No conditions provided.';
-     * }
+     * $tables = $showTablesAction->execute('mysql_repository');
+     * print_r($tables);
      */
+    public function execute(string $repositoryName, ?DataAction $data = null): array
+    {
+        $sql = match ($repositoryName) {
+            'mysql' => "SHOW TABLES",
+            'postgresql' => "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'",
+            default => throw new \Exception("Unsupported database type: {$repositoryName}"),
+        };
+
+        $result = RepositoryManager::query($repositoryName, $sql);
+        return array_map('current', $result);
+    }
+
     public function validate(DataAction $data): bool
     {
-        $hasConditions = !empty($data->getProperties());
-        return $hasConditions;
+        return true;
     }
 }

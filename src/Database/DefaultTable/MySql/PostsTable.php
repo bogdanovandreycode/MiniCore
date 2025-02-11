@@ -2,8 +2,8 @@
 
 namespace MiniCore\Database\DefaultTable;
 
-use MiniCore\Database\Table;
 use MiniCore\Database\Action\DataAction;
+use MiniCore\Database\Table\AbstractTable;
 
 /**
  * Class PostsTable
@@ -21,7 +21,7 @@ use MiniCore\Database\Action\DataAction;
  * $dataAction->addProperty('WHERE', 'type = :type', ['type' => 'post']);
  * $postsTable->actions['select']->execute($dataAction);
  */
-class PostsTable extends Table
+class PostsTable extends AbstractTable
 {
     /**
      * PostsTable constructor.
@@ -32,6 +32,7 @@ class PostsTable extends Table
     {
         parent::__construct(
             'posts',
+            'mysql',
             [
                 'id'         => 'INT AUTO_INCREMENT PRIMARY KEY',    // Unique identifier for each post
                 'type'       => 'VARCHAR(255) NOT NULL',             // Post type (e.g., article, page)
@@ -58,8 +59,7 @@ class PostsTable extends Table
     {
         $dataAction = new DataAction();
         $dataAction->addProperty('WHERE', 'id = :id', ['id' => $postId]);
-
-        $result = $this->actions['select']->execute($dataAction);
+        $result = $this->actions['select']->execute($this->repositoryName, $dataAction);
         return $result[0] ?? null;
     }
 }
