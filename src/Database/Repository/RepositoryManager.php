@@ -1,6 +1,6 @@
 <?php
 
-namespace Minicore\Database\Repository;
+namespace MiniCore\Database\Repository;
 
 use Exception;
 use MiniCore\Database\Repository\RepositoryInterface;

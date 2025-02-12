@@ -6,7 +6,7 @@ use PDO;
 use Exception;
 use PDOException;
 use MiniCore\Database\Table\TableManager;
-use Minicore\Database\Repository\RepositoryManager;
+use MiniCore\Database\Repository\RepositoryManager;
 use MiniCore\Database\Repository\RepositoryInterface;
 
 /**

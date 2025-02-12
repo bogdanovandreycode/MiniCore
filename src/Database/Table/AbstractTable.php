@@ -11,7 +11,7 @@ use MiniCore\Database\DefaultAction\DropAction;
 use MiniCore\Database\DefaultAction\InsertAction;
 use MiniCore\Database\DefaultAction\SelectAction;
 use MiniCore\Database\DefaultAction\UpdateAction;
-use Minicore\Database\Repository\RepositoryManager;
+use MiniCore\Database\Repository\RepositoryManager;
 
 /**
  * Class AbstractTable

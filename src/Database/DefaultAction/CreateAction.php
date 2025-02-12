@@ -6,7 +6,7 @@ use Exception;
 use MiniCore\Database\Action\DataAction;
 use MiniCore\Database\Action\AbstractAction;
 use MiniCore\Database\Action\ActionInterface;
-use Minicore\Database\Repository\RepositoryManager;
+use MiniCore\Database\Repository\RepositoryManager;
 
 /**
  * Class CreateAction

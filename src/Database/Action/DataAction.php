@@ -116,7 +116,7 @@ final class DataAction
      */
     public function getProperty(string $name): array
     {
-        return $this->properties[$name] ?? [];
+        return array_values(array_filter($this->properties, fn($prop) => $prop['type'] === strtoupper($name)));
     }
 
     /**
