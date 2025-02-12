@@ -176,9 +176,15 @@ class Boot
         error_reporting(E_ALL);
 
         if (Env::get('APP_DEBUG', false)) {
-            ini_set('display_errors', '1');
-        } else {
             ini_set('display_errors', '0');
+
+            set_exception_handler(function ($e) {
+                http_response_code(500);
+                echo 'An error occurred: ' . htmlspecialchars($e->getMessage());
+                error_log($e);
+            });
+        } else {
+            ini_set('display_errors', '1');
             ini_set('log_errors', '1');
             ini_set('error_log', self::$rootDir . '/../storage/logs/error.log');
         }
