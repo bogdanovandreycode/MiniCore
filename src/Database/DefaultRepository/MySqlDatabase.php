@@ -64,9 +64,9 @@ class MySqlDatabase implements RepositoryInterface
         array $config,
         array $tables = []
     ) {
-        $this->list = new TableManager($this, $tables);
         $this->connect($config);
         RepositoryManager::addRepository($this);
+        $this->list = new TableManager($this, $tables);
     }
 
     /**
@@ -104,7 +104,7 @@ class MySqlDatabase implements RepositoryInterface
             return;
         }
 
-        self::validateConfig($config);
+        $this->validateConfig($config);
         $config['charset'] = empty($config['charset']) ? 'utf8mb4' : $config['charset'];
         $host = $config['host'];
         $dbname = $config['dbname'];
@@ -114,9 +114,9 @@ class MySqlDatabase implements RepositoryInterface
         $dsn = "mysql:host=$host;dbname=$dbname;charset=$charset";
 
         try {
-            self::$connection = new PDO($dsn, $user, $password);
-            self::$connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            self::$connection->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+            $this->connection = new PDO($dsn, $user, $password);
+            $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->connection->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             throw new PDOException("Connection failed: " . $e->getMessage());
         }
@@ -144,7 +144,7 @@ class MySqlDatabase implements RepositoryInterface
                 'message' => 'User not set'
             ],
             [
-                'condition' => empty($config['password']),
+                'condition' => !isset($config['password']),
                 'message' => 'Password not set'
             ],
         ];
