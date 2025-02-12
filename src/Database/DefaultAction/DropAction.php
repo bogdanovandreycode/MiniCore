@@ -10,22 +10,20 @@ use Minicore\Database\Repository\RepositoryManager;
 /**
  * Class DropAction
  *
- * Handles the deletion of records from a database table.
- * This action dynamically builds and executes a DELETE SQL query
- * with optional conditions and parameters.
+ * Handles the deletion of an entire database table.
+ * This action dynamically builds and executes a DROP TABLE SQL query.
+ *
+ * @package MiniCore\Database\DefaultAction
  *
  * @example
- * // Example of using DropAction to delete a user with ID = 5
- * $DropAction = new DropAction('users');
+ * // Example of using DropAction to drop a table named 'users'
+ * $dropAction = new DropAction('users');
  * 
- * $dataAction = new DataAction();
- * $dataAction->addProperty('WHERE', 'id = :id', ['id' => 5]);
- * 
- * if ($DropAction->validate($dataAction)) {
- *     $result = $DropAction->execute($dataAction);
- *     echo $result ? 'User deleted.' : 'Delete failed.';
+ * if ($dropAction->validate()) {
+ *     $result = $dropAction->execute('mysql');
+ *     echo $result ? 'Table deleted.' : 'Drop failed.';
  * } else {
- *     echo 'No conditions provided for deletion.';
+ *     echo 'Invalid table name.';
  * }
  */
 class DropAction extends AbstractAction implements ActionInterface
@@ -33,11 +31,13 @@ class DropAction extends AbstractAction implements ActionInterface
     /**
      * DropAction constructor.
      *
-     * @param string $tableName The name of the table from which data will be deleted.
+     * Initializes a new instance for dropping a database table.
+     *
+     * @param string $tableName The name of the table to be dropped.
      *
      * @example
      * // Initialize DropAction for the 'products' table
-     * $DropAction = new DropAction('products');
+     * $dropAction = new DropAction('products');
      */
     public function __construct(
         public string $tableName
@@ -45,56 +45,51 @@ class DropAction extends AbstractAction implements ActionInterface
         parent::__construct(
             'drop',
             ['mysql', 'postgresql']
-
         );
     }
 
     /**
-     * Execute the DELETE SQL query.
+     * Execute the DROP TABLE SQL query.
      *
-     * Builds a DELETE SQL query with optional conditions (e.g., WHERE) 
-     * and executes it using prepared statements.
+     * Builds and executes a DROP TABLE SQL statement.
+     * This operation **permanently deletes** the specified table from the database.
      *
-     * @param DataAction $data Contains the conditions and parameters for the query.
+     * @param string $repositoryName The repository where the table should be dropped.
+     * @param DataAction|null $data Optional data (not used in this operation).
      * @return mixed The result of the query execution.
      *
      * @example
-     * // Delete a product by ID
-     * $DropAction = new DropAction('products');
-     * 
-     * $dataAction = new DataAction();
-     * $dataAction->addProperty('WHERE', 'id = :id', ['id' => 10]);
-     * 
-     * $DropAction->execute($dataAction);
+     * // Drop the 'products' table
+     * $dropAction = new DropAction('products');
+     * $dropAction->execute('mysql');
      */
     public function execute(string $repositoryName, ?DataAction $data = null): mixed
     {
+        if (!$this->validate($data)) {
+            throw new \InvalidArgumentException("Invalid table name provided for DROP TABLE operation.");
+        }
+
         $sql = "DROP TABLE `{$this->tableName}`";
 
         return RepositoryManager::execute(
             $repositoryName,
-            $sql,
-            $data->getParameters()
+            $sql
         );
     }
 
     /**
-     * Validate the provided data for the DELETE action.
+     * Validate the provided table name for the DROP action.
      *
-     * Ensures that at least one condition is specified to prevent accidental mass deletion.
+     * Ensures that the table name is not empty and does not contain illegal characters.
      *
-     * @param DataAction $data The data used for validation.
-     * @return bool True if conditions are present, false otherwise.
+     * @return bool True if the table name is valid, false otherwise.
      *
      * @example
-     * $DropAction = new DropAction('users');
-     * $dataAction = new DataAction();
-     * $dataAction->addProperty('WHERE', 'id = :id', ['id' => 1]);
-     * 
-     * if ($DropAction->validate($dataAction)) {
-     *     echo 'Valid conditions for deletion.';
+     * $dropAction = new DropAction('users');
+     * if ($dropAction->validate()) {
+     *     echo 'Valid table name.';
      * } else {
-     *     echo 'No conditions provided.';
+     *     echo 'Invalid table name.';
      * }
      */
     public function validate(DataAction $data): bool

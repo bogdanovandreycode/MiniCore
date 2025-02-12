@@ -8,8 +8,8 @@ use MiniCore\Database\Table\AbstractTable;
 /**
  * Class UserMetaTable
  *
- * This class manages the `usermeta` table, providing methods to interact with user-specific metadata.
- * It allows for retrieving, updating, and adding custom metadata for users.
+ * Manages user-specific metadata stored in the `usermeta` table.
+ * Provides methods to retrieve, update, and insert custom metadata for users.
  *
  * Table structure:
  * - `meta_id`: Unique identifier for each metadata entry (auto-increment).
@@ -19,7 +19,10 @@ use MiniCore\Database\Table\AbstractTable;
  * - `created_at`: Timestamp when the metadata was created.
  * - `updated_at`: Timestamp when the metadata was last updated.
  *
+ * @package MiniCore\Database\DefaultTable\MySql
+ *
  * @example
+ * // Example usage:
  * $userMetaTable = new UserMetaTable();
  *
  * // Add new user metadata
@@ -29,7 +32,8 @@ use MiniCore\Database\Table\AbstractTable;
  * $userMetaTable->updateMeta(1, 'theme', 'light');
  *
  * // Retrieve user metadata
- * $theme = $userMetaTable->getMeta('theme');
+ * $theme = $userMetaTable->getMeta(1, 'theme');
+ * echo $theme;
  */
 class UserMetaTable extends AbstractTable
 {
@@ -37,6 +41,9 @@ class UserMetaTable extends AbstractTable
      * UserMetaTable constructor.
      *
      * Initializes the `usermeta` table with its structure and columns.
+     *
+     * @example
+     * $userMetaTable = new UserMetaTable();
      */
     public function __construct()
     {
@@ -55,25 +62,30 @@ class UserMetaTable extends AbstractTable
     }
 
     /**
-     * Retrieve user metadata by key.
+     * Retrieve user metadata by user ID and key.
      *
+     * @param int $userId The ID of the user.
      * @param string $key The metadata key to search for.
-     * @param bool $isSingle Whether to return a single value or all values as an array.
-     * @return mixed|null The metadata value or an array of key-value pairs.
+     * @param bool $isSingle Whether to return a single value (default: true).
+     * @return string|array|null The metadata value if `$isSingle` is `true`, or an array of key-value pairs otherwise.
      *
      * @example
-     * // Get a single value
-     * $theme = $userMetaTable->getMeta('theme');
+     * // Get a single metadata value
+     * $theme = $userMetaTable->getMeta(1, 'theme');
+     * echo $theme;
      *
-     * // Get all values for the key
-     * $allThemes = $userMetaTable->getMeta('theme', false);
+     * // Get all metadata values for the key
+     * $allThemes = $userMetaTable->getMeta(1, 'theme', false);
+     * print_r($allThemes);
      */
-    public function getMeta(string $key, bool $isSingle = true)
+    public function getMeta(int $userId, string $key, bool $isSingle = true): string|array|null
     {
         $dataAction = new DataAction();
-        $dataAction->addColumn('meta_key');
         $dataAction->addColumn('meta_value');
-        $dataAction->addProperty('WHERE', 'meta_key = :meta_key', ['meta_key' => $key]);
+        $dataAction->addProperty('WHERE', 'user_id = :user_id AND meta_key = :meta_key', [
+            'user_id'  => $userId,
+            'meta_key' => $key,
+        ]);
 
         $result = $this->actions['select']->execute($this->repositoryName, $dataAction);
 
@@ -87,7 +99,7 @@ class UserMetaTable extends AbstractTable
     }
 
     /**
-     * Update an existing user metadata or insert if it doesn't exist.
+     * Update an existing user metadata or insert it if it does not exist.
      *
      * @param int $userId The ID of the user.
      * @param string $key The metadata key.
@@ -95,22 +107,21 @@ class UserMetaTable extends AbstractTable
      * @return bool True if the update or insert was successful, false otherwise.
      *
      * @example
+     * // Update or insert user metadata
      * $userMetaTable->updateMeta(1, 'theme', 'light');
      */
     public function updateMeta(int $userId, string $key, string $value): bool
     {
-        $existingMeta = $this->getMeta($key, true);
-
-        if ($existingMeta === null) {
+        if ($this->getMeta($userId, $key, true) === null) {
             return $this->addMeta($userId, $key, $value);
         }
 
         $dataAction = new DataAction();
         $dataAction->addColumn('meta_value');
         $dataAction->addParameters(['meta_value' => $value]);
-        $dataAction->addProperty('WHERE', 'meta_key = :meta_key AND user_id = :user_id', [
+        $dataAction->addProperty('WHERE', 'user_id = :user_id AND meta_key = :meta_key', [
+            'user_id'  => $userId,
             'meta_key' => $key,
-            'user_id' => $userId,
         ]);
 
         return $this->actions['update']->execute($this->repositoryName, $dataAction);
@@ -125,6 +136,7 @@ class UserMetaTable extends AbstractTable
      * @return bool True if the insert was successful, false otherwise.
      *
      * @example
+     * // Add new metadata for a user
      * $userMetaTable->addMeta(1, 'theme', 'dark');
      */
     public function addMeta(int $userId, string $key, string $value): bool
@@ -141,5 +153,27 @@ class UserMetaTable extends AbstractTable
         ]);
 
         return $this->actions['insert']->execute($this->repositoryName, $dataAction);
+    }
+
+    /**
+     * Delete metadata for a user by key.
+     *
+     * @param int $userId The ID of the user.
+     * @param string $key The metadata key to delete.
+     * @return bool True if the deletion was successful, false otherwise.
+     *
+     * @example
+     * // Delete metadata for a user
+     * $userMetaTable->deleteMeta(1, 'theme');
+     */
+    public function deleteMeta(int $userId, string $key): bool
+    {
+        $dataAction = new DataAction();
+        $dataAction->addProperty('WHERE', 'user_id = :user_id AND meta_key = :meta_key', [
+            'user_id'  => $userId,
+            'meta_key' => $key,
+        ]);
+
+        return $this->actions['delete']->execute($this->repositoryName, $dataAction);
     }
 }

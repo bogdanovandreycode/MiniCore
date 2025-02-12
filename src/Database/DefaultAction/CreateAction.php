@@ -9,36 +9,44 @@ use MiniCore\Database\Action\ActionInterface;
 use Minicore\Database\Repository\RepositoryManager;
 
 /**
- * Class DeleteAction
+ * Class CreateAction
  *
- * Handles the deletion of records from a database table.
- * This action dynamically builds and executes a DELETE SQL query
- * with optional conditions and parameters.
+ * Handles the creation of a new database table dynamically.
+ * This action builds and executes a CREATE TABLE SQL query using
+ * the provided column definitions and constraints.
+ *
+ * @package MiniCore\Database\DefaultAction
  *
  * @example
- * // Example of using DeleteAction to delete a user with ID = 5
- * $deleteAction = new DeleteAction('users');
+ * // Example of using CreateAction to create a "users" table
+ * $createAction = new CreateAction('users');
  * 
  * $dataAction = new DataAction();
- * $dataAction->addProperty('WHERE', 'id = :id', ['id' => 5]);
+ * $dataAction->addParameters([
+ *     'id' => 'INT PRIMARY KEY AUTO_INCREMENT',
+ *     'username' => 'VARCHAR(255) NOT NULL',
+ *     'email' => 'VARCHAR(255) UNIQUE NOT NULL'
+ * ]);
  * 
- * if ($deleteAction->validate($dataAction)) {
- *     $result = $deleteAction->execute($dataAction);
- *     echo $result ? 'User deleted.' : 'Delete failed.';
+ * if ($createAction->validate($dataAction)) {
+ *     $result = $createAction->execute('mysql', $dataAction);
+ *     echo $result ? 'Table created.' : 'Creation failed.';
  * } else {
- *     echo 'No conditions provided for deletion.';
+ *     echo 'Invalid table structure.';
  * }
  */
 class CreateAction extends AbstractAction implements ActionInterface
 {
     /**
-     * DeleteAction constructor.
+     * CreateAction constructor.
      *
-     * @param string $tableName The name of the table from which data will be deleted.
+     * Initializes a new instance for creating a database table.
+     *
+     * @param string $tableName The name of the table to be created.
      *
      * @example
-     * // Initialize DeleteAction for the 'products' table
-     * $deleteAction = new DeleteAction('products');
+     * // Initialize CreateAction for the 'products' table
+     * $createAction = new CreateAction('products');
      */
     public function __construct(
         public string $tableName
@@ -50,29 +58,35 @@ class CreateAction extends AbstractAction implements ActionInterface
     }
 
     /**
-     * Execute the DELETE SQL query.
+     * Execute the CREATE TABLE SQL query.
      *
-     * Builds a DELETE SQL query with optional conditions (e.g., WHERE) 
-     * and executes it using prepared statements.
+     * Builds a CREATE TABLE SQL statement using the provided columns and constraints,
+     * then executes it using the specified repository.
      *
-     * @param DataAction $data Contains the conditions and parameters for the query.
+     * @param string $repositoryName The repository where the table should be created.
+     * @param DataAction|null $data Contains column definitions and constraints for the table.
      * @return mixed The result of the query execution.
+     * @throws Exception If column definitions are missing.
      *
      * @example
-     * // Delete a product by ID
-     * $deleteAction = new DeleteAction('products');
+     * // Create a "users" table with columns
+     * $createAction = new CreateAction('users');
      * 
      * $dataAction = new DataAction();
-     * $dataAction->addProperty('WHERE', 'id = :id', ['id' => 10]);
+     * $dataAction->addParameters([
+     *     'id' => 'INT PRIMARY KEY AUTO_INCREMENT',
+     *     'username' => 'VARCHAR(255) NOT NULL',
+     *     'email' => 'VARCHAR(255) UNIQUE NOT NULL'
+     * ]);
      * 
-     * $deleteAction->execute($dataAction);
+     * $createAction->execute('mysql', $dataAction);
      */
     public function execute(string $repositoryName, ?DataAction $data): mixed
     {
         $parameters = $data->getParameters();
 
-        if (empty($selectColumns)) {
-            throw new Exception("Error creating table {$this->tableName}. columns not found", 1);
+        if (empty($parameters)) {
+            throw new Exception("Error creating table {$this->tableName}. Columns not found.", 1);
         }
 
         $parametersString = $this->getParametersToString($parameters);
@@ -80,39 +94,56 @@ class CreateAction extends AbstractAction implements ActionInterface
 
         return RepositoryManager::execute(
             $repositoryName,
-            $sql,
-            $data->getParameters()
+            $sql
         );
     }
 
-    private function getParametersToString($parameters): string
+    /**
+     * Convert column definitions into a formatted SQL string.
+     *
+     * @param array $parameters Associative array of column definitions.
+     * @return string The formatted SQL column definition string.
+     *
+     * @example
+     * $parameters = [
+     *     'id' => 'INT PRIMARY KEY AUTO_INCREMENT',
+     *     'username' => 'VARCHAR(255) NOT NULL',
+     *     'email' => 'VARCHAR(255) UNIQUE NOT NULL'
+     * ];
+     * echo $this->getParametersToString($parameters);
+     * // Output: "id INT PRIMARY KEY AUTO_INCREMENT, username VARCHAR(255) NOT NULL, email VARCHAR(255) UNIQUE NOT NULL"
+     */
+    private function getParametersToString(array $parameters): string
     {
-        $fields = '';
+        $fields = [];
 
-        foreach ($this->$parameters as $fieldName => $fieldDefinition) {
-            $fields .= "$fieldName $fieldDefinition, ";
+        foreach ($parameters as $fieldName => $fieldDefinition) {
+            $fields[] = "$fieldName $fieldDefinition";
         }
 
-        return rtrim($fields, ', ');
+        return implode(', ', $fields);
     }
 
     /**
-     * Validate the provided data for the DELETE action.
+     * Validate the provided data for the CREATE action.
      *
-     * Ensures that at least one condition is specified to prevent accidental mass deletion.
+     * Ensures that the table name and column definitions are provided.
      *
-     * @param DataAction $data The data used for validation.
-     * @return bool True if conditions are present, false otherwise.
+     * @param DataAction $data The data containing table column definitions.
+     * @return bool True if valid, false otherwise.
      *
      * @example
-     * $deleteAction = new DeleteAction('users');
+     * $createAction = new CreateAction('users');
      * $dataAction = new DataAction();
-     * $dataAction->addProperty('WHERE', 'id = :id', ['id' => 1]);
+     * $dataAction->addParameters([
+     *     'id' => 'INT PRIMARY KEY AUTO_INCREMENT',
+     *     'username' => 'VARCHAR(255) NOT NULL'
+     * ]);
      * 
-     * if ($deleteAction->validate($dataAction)) {
-     *     echo 'Valid conditions for deletion.';
+     * if ($createAction->validate($dataAction)) {
+     *     echo 'Valid table structure.';
      * } else {
-     *     echo 'No conditions provided.';
+     *     echo 'Invalid structure.';
      * }
      */
     public function validate(DataAction $data): bool

@@ -14,54 +14,77 @@ use MiniCore\Database\DefaultAction\UpdateAction;
 use Minicore\Database\Repository\RepositoryManager;
 
 /**
- * Class Table
+ * Class AbstractTable
  *
- * Abstract class that serves as a base for database table operations.
- * Provides core functionalities for managing tables, such as creation, deletion,
- * existence checks, and executing CRUD operations through actions.
+ * Provides an abstraction for database tables, allowing CRUD operations,
+ * table creation, deletion, and structure management.
  *
- * @package MiniCore\Database
+ * **Core functionalities:**
+ * - Defines table schema
+ * - Supports table creation and deletion
+ * - Executes CRUD operations using actions
+ * - Checks if a table exists in the database
+ *
+ * @package MiniCore\Database\Table
+ *
+ * @example
+ * // Example usage:
+ * class UsersTable extends AbstractTable {
+ *     public function __construct() {
+ *         parent::__construct(
+ *             'users',
+ *             'mysql',
+ *             [
+ *                 'id' => 'INT AUTO_INCREMENT PRIMARY KEY',
+ *                 'name' => 'VARCHAR(255) NOT NULL',
+ *                 'email' => 'VARCHAR(255) UNIQUE NOT NULL',
+ *                 'created_at' => 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
+ *             ]
+ *         );
+ *     }
+ * }
+ * 
+ * $usersTable = new UsersTable();
+ * $usersTable->create(); // Create table in the database
  */
 abstract class AbstractTable
 {
     /**
-     * @var ActionInterface[] List of actions (Insert, Select, Update, Delete) associated with the table.
+     * @var ActionInterface[] List of available actions for the table.
      */
     protected array $actions = [];
 
     /**
-     * Table constructor.
+     * AbstractTable constructor.
      *
-     * @param string $name The name of the database table.
+     * @param string $name The table name.
+     * @param string $repositoryName The database repository name.
      * @param array $scheme The schema definition of the table as an associative array.
      *
      * @example
-     * [
-     *     'id' => 'INT AUTO_INCREMENT PRIMARY KEY',
-     *     'name' => 'VARCHAR(255) NOT NULL',
-     *     'created_at' => 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
-     * ]
+     * $table = new UsersTable();
      */
     public function __construct(
         protected string $name,
         protected string $repositoryName,
-        protected array $scheme,
+        protected array $scheme
     ) {
-        // Register default CRUD actions for the table.
+        // Register default CRUD actions
         $this->actions = [
-            new InsertAction($this->name),
-            new SelectAction($this->name),
-            new UpdateAction($this->name),
-            new DeleteAction($this->name),
-            new CreateAction($this->name),
-            new DropAction($this->name),
+            'insert' => new InsertAction($this->name),
+            'select' => new SelectAction($this->name),
+            'update' => new UpdateAction($this->name),
+            'delete' => new DeleteAction($this->name),
+            'create' => new CreateAction($this->name),
+            'drop' => new DropAction($this->name),
         ];
     }
 
     /**
-     * Create the table in the database based on the defined schema.
+     * Create the table in the database.
      *
      * @return void
+     * @throws Exception If the schema is incorrect or the action is unavailable.
      *
      * @example
      * $table->create();
@@ -73,7 +96,7 @@ abstract class AbstractTable
         }
 
         if (empty($this->scheme)) {
-            throw new Exception("Error: Incorrect scheme", 1);
+            throw new Exception("Error: Incorrect schema", 1);
         }
 
         $data = new DataAction();
@@ -81,21 +104,28 @@ abstract class AbstractTable
         $this->actions['create']->execute($this->repositoryName, $data);
     }
 
-    public function existAvailableAction(string $actionName)
+    /**
+     * Check if a specific action is available for the table.
+     *
+     * @param string $actionName The name of the action to check.
+     * @return bool True if the action is available, false otherwise.
+     *
+     * @example
+     * if ($table->existAvailableAction('drop')) {
+     *     echo "Drop action is available.";
+     * }
+     */
+    public function existAvailableAction(string $actionName): bool
     {
-        foreach ($this->actions as $action) {
-            if ($action->getName() === $actionName && $action->checkAvailabilityRepository($this->repositoryName)) {
-                return true;
-            }
-        }
-
-        return false;
+        return isset($this->actions[$actionName]) &&
+            $this->actions[$actionName]->checkAvailabilityRepository($this->repositoryName);
     }
 
     /**
      * Drop the table from the database.
      *
      * @return void
+     * @throws Exception If the schema is incorrect or the action is unavailable.
      *
      * @example
      * $table->drop();
@@ -130,7 +160,7 @@ abstract class AbstractTable
         $query = "SHOW TABLES LIKE :table_name";
 
         $result = RepositoryManager::query(
-            'mysql',
+            $this->repositoryName,
             $query,
             ['table_name' => $this->name]
         );
@@ -139,22 +169,21 @@ abstract class AbstractTable
     }
 
     /**
-     * Convert the schema array into a string for SQL execution.
+     * Convert the table schema into a formatted SQL string.
      *
-     * @return string The formatted schema string for SQL.
+     * @return string The formatted schema string.
      *
      * @example
-     * id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255) NOT NULL
+     * echo $table->getSchemeToString();
+     * // Output: "id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255) NOT NULL"
      */
     public function getSchemeToString(): string
     {
-        $fields = '';
-
-        foreach ($this->scheme as $fieldName => $fieldDefinition) {
-            $fields .= "$fieldName $fieldDefinition, ";
-        }
-
-        return rtrim($fields, ', ');
+        return implode(', ', array_map(
+            fn($field, $definition) => "$field $definition",
+            array_keys($this->scheme),
+            $this->scheme
+        ));
     }
 
     /**
@@ -167,7 +196,7 @@ abstract class AbstractTable
      */
     public function addAction(ActionInterface $action): void
     {
-        $this->actions[] = $action;
+        $this->actions[$action->getName()] = $action;
     }
 
     /**
@@ -180,26 +209,23 @@ abstract class AbstractTable
      */
     public function removeAction(string $actionName): void
     {
-        foreach ($this->actions as $key => $action) {
-            if ($action->getName() === $actionName) {
-                unset($this->actions[$key]);
-                break;
-            }
-        }
+        unset($this->actions[$actionName]);
     }
 
     /**
      * Execute an action by its name with the provided data.
      *
+     * @param string $repositoryName The name of the repository.
      * @param string $actionName The name of the action to execute.
      * @param DataAction $data The data for the action.
-     * @return mixed The result of the executed action or null if not found.
+     * @return mixed The result of the executed action or null if the action is unavailable.
+     * @throws Exception If the repository name is not found.
      *
      * @example
      * $dataAction = new DataAction();
      * $dataAction->addColumn('name');
      * $dataAction->addParameters(['name' => 'John']);
-     * $table->execute('insert', $dataAction);
+     * $table->execute('mysql', 'insert', $dataAction);
      */
     public function execute(string $repositoryName, string $actionName, DataAction $data): mixed
     {
@@ -207,12 +233,23 @@ abstract class AbstractTable
             throw new Exception("Error: Repository name not found", 1);
         }
 
-        foreach ($this->actions as $action) {
-            if ($action->getName() === $actionName && $action->checkAvailabilityRepository($repositoryName)) {
-                return $action->execute($repositoryName, $data);
-            }
+        if ($this->existAvailableAction($actionName)) {
+            return $this->actions[$actionName]->execute($repositoryName, $data);
         }
 
         return null;
+    }
+
+    /**
+     * Get the name of the table.
+     *
+     * @return string The name of the table.
+     *
+     * @example
+     * echo $table->getName(); // Output: "users"
+     */
+    public function getName(): string
+    {
+        return $this->name;
     }
 }

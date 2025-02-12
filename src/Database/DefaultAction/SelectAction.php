@@ -11,7 +11,10 @@ use Minicore\Database\Repository\RepositoryManager;
  * Class SelectAction
  *
  * Handles the selection of data from a database table.
- * Dynamically builds and executes a `SELECT` SQL query with optional conditions and parameters.
+ * This action dynamically builds and executes a `SELECT` SQL query
+ * with optional conditions, filters, and parameters using prepared statements.
+ *
+ * @package MiniCore\Database\DefaultAction
  *
  * @example
  * // Example of selecting user data from the 'users' table:
@@ -21,14 +24,25 @@ use Minicore\Database\Repository\RepositoryManager;
  * $dataAction->addProperty('WHERE', 'status = :status', ['status' => 'active']);
  *
  * $selectAction = new SelectAction('users');
- * $result = $selectAction->execute($dataAction);
+ * if ($selectAction->validate($dataAction)) {
+ *     $result = $selectAction->execute('mysql', $dataAction);
+ *     foreach ($result as $user) {
+ *         echo $user['username'];
+ *     }
+ * }
  */
 class SelectAction extends AbstractAction implements ActionInterface
 {
     /**
      * SelectAction constructor.
      *
+     * Initializes a new instance for selecting data from a database table.
+     *
      * @param string $tableName The name of the table to select data from.
+     *
+     * @example
+     * // Initialize SelectAction for the 'products' table
+     * $selectAction = new SelectAction('products');
      */
     public function __construct(
         public string $tableName
@@ -42,11 +56,13 @@ class SelectAction extends AbstractAction implements ActionInterface
     /**
      * Execute the `SELECT` SQL query.
      *
-     * Dynamically builds a `SELECT` query using provided columns, conditions, and parameters,
-     * and executes it using prepared statements for security.
+     * Constructs a `SELECT` SQL statement dynamically based on the provided columns,
+     * conditions, and parameters. The query is executed using prepared statements
+     * to ensure security.
      *
-     * @param DataAction $data The data containing columns, conditions, and parameters for the query.
-     * @return mixed The result of the query execution (an array of results or false on failure).
+     * @param string $repositoryName The repository where the select operation should be executed.
+     * @param DataAction|null $data The data containing columns, conditions, and parameters for the query.
+     * @return array|false The result set as an array of records or `false` on failure.
      *
      * @example
      * $dataAction = new DataAction();
@@ -54,17 +70,21 @@ class SelectAction extends AbstractAction implements ActionInterface
      * $dataAction->addProperty('WHERE', 'status = :status', ['status' => 'active']);
      *
      * $selectAction = new SelectAction('users');
-     * $result = $selectAction->execute($dataAction);
+     * $result = $selectAction->execute('mysql', $dataAction);
      *
      * foreach ($result as $user) {
      *     echo $user['username'];
      * }
      */
-    public function execute(string $repositoryName, ?DataAction $data): mixed
+    public function execute(string $repositoryName, ?DataAction $data): array|false
     {
-        $selectColumns = $data->getColumns();
-        $sql = "SELECT " . (!empty($selectColumns) ? implode(', ', $selectColumns) : '*');
-        $sql .= " FROM {$this->tableName}";
+        if (!$this->validate($data)) {
+            throw new \RuntimeException("No columns provided for SELECT operation.");
+        }
+
+        $columns = $data->getColumns();
+        $columnsList = !empty($columns) ? implode(', ', array_map(fn($col) => "`$col`", $columns)) : '*';
+        $sql = "SELECT $columnsList FROM `{$this->tableName}`";
 
         foreach ($data->getProperties() as $property) {
             $sql .= " {$property['type']} {$property['condition']}";
@@ -82,12 +102,12 @@ class SelectAction extends AbstractAction implements ActionInterface
      *
      * Ensures that at least one column is specified for the `SELECT` query.
      *
-     * @param DataAction $data The data used for validation.
+     * @param DataAction $data The data containing the query configuration.
      * @return bool True if at least one column is provided, false otherwise.
      *
      * @example
      * if ($selectAction->validate($dataAction)) {
-     *     $result = $selectAction->execute($dataAction);
+     *     $result = $selectAction->execute('mysql', $dataAction);
      * } else {
      *     echo "No columns specified for selection.";
      * }

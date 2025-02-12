@@ -8,26 +8,29 @@ use MiniCore\Database\Table\AbstractTable;
 /**
  * Class SettingsTable
  *
- * This class manages the `settings` table in the database, providing methods
- * to interact with application-wide settings or configurations.
+ * Manages application-wide settings stored in the `settings` table.
+ * Provides methods to retrieve, update, and add configuration settings.
  *
  * Table structure:
  * - `id`: Unique identifier for each setting (auto-increment).
  * - `key_name`: The unique key representing the setting.
  * - `value`: The value associated with the key.
  *
+ * @package MiniCore\Database\DefaultTable\MySql
+ *
  * @example
  * // Example usage:
  * $settingsTable = new SettingsTable();
- * 
+ *
  * // Add a new setting
  * $settingsTable->addOption('site_name', 'My Website');
- * 
+ *
  * // Update an existing setting
  * $settingsTable->updateOption('site_name', 'Updated Website');
- * 
+ *
  * // Get a setting value
  * $siteName = $settingsTable->getOption('site_name');
+ * echo $siteName;
  */
 class SettingsTable extends AbstractTable
 {
@@ -35,6 +38,9 @@ class SettingsTable extends AbstractTable
      * SettingsTable constructor.
      *
      * Initializes the `settings` table with its structure and columns.
+     *
+     * @example
+     * $settingsTable = new SettingsTable();
      */
     public function __construct()
     {
@@ -53,37 +59,38 @@ class SettingsTable extends AbstractTable
      * Retrieve a setting value by its key.
      *
      * @param string $key The key of the setting to retrieve.
-     * @return mixed|null The setting value or null if not found.
+     * @return string|null The setting value or null if not found.
      *
      * @example
+     * // Get a setting value
      * $siteName = $settingsTable->getOption('site_name');
+     * echo $siteName;
      */
-    public function getOption(string $key)
+    public function getOption(string $key): ?string
     {
         $dataAction = new DataAction();
-        $dataAction->addColumn('key_name');
         $dataAction->addColumn('value');
         $dataAction->addProperty('WHERE', 'key_name = :key_name', ['key_name' => $key]);
 
         $result = $this->actions['select']->execute($this->repositoryName, $dataAction);
+
         return $result[0]['value'] ?? null;
     }
 
     /**
-     * Update an existing setting or insert it if it doesn't exist.
+     * Update an existing setting or insert it if it does not exist.
      *
      * @param string $key The key of the setting to update.
      * @param string $value The new value for the setting.
      * @return bool True if the update or insert was successful, false otherwise.
      *
      * @example
+     * // Update an existing setting
      * $settingsTable->updateOption('site_name', 'New Website Name');
      */
     public function updateOption(string $key, string $value): bool
     {
-        $existingOption = $this->getOption($key);
-
-        if ($existingOption === null) {
+        if ($this->getOption($key) === null) {
             return $this->addOption($key, $value);
         }
 
@@ -103,6 +110,7 @@ class SettingsTable extends AbstractTable
      * @return bool True if the insert was successful, false otherwise.
      *
      * @example
+     * // Add a new setting
      * $settingsTable->addOption('theme_color', '#FFFFFF');
      */
     public function addOption(string $key, string $value): bool
@@ -117,5 +125,23 @@ class SettingsTable extends AbstractTable
         ]);
 
         return $this->actions['insert']->execute($this->repositoryName, $dataAction);
+    }
+
+    /**
+     * Delete a setting by its key.
+     *
+     * @param string $key The key of the setting to delete.
+     * @return bool True if the deletion was successful, false otherwise.
+     *
+     * @example
+     * // Delete a setting
+     * $settingsTable->deleteOption('site_name');
+     */
+    public function deleteOption(string $key): bool
+    {
+        $dataAction = new DataAction();
+        $dataAction->addProperty('WHERE', 'key_name = :key_name', ['key_name' => $key]);
+
+        return $this->actions['delete']->execute($this->repositoryName, $dataAction);
     }
 }

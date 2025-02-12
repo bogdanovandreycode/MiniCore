@@ -5,16 +5,24 @@ namespace MiniCore\Database\Action;
 /**
  * Class DataAction
  *
- * A data container for building SQL queries dynamically.
- * This class helps in constructing SQL statements by managing columns, conditions, and parameters.
- * It is used by different database actions like SELECT, INSERT, UPDATE, and DELETE.
+ * A data container for dynamically building SQL queries.
+ * This class provides methods for managing columns, conditions, and parameters
+ * in SQL statements used by various database actions such as SELECT, INSERT, UPDATE, and DELETE.
  *
- * @package MiniCore\Database
+ * @package MiniCore\Database\Action
+ *
+ * @example
+ * // Example usage:
+ * $dataAction = new DataAction();
+ * $dataAction->addColumn('username');
+ * $dataAction->addColumn('email');
+ * $dataAction->addProperty('WHERE', 'id = :id', ['id' => 1]);
+ * $dataAction->addParameters(['status' => 'active']);
  */
 final class DataAction
 {
     /**
-     * @var array Columns used in SQL queries (e.g., SELECT, INSERT).
+     * @var array List of columns used in the SQL query (e.g., for SELECT, INSERT).
      */
     private array $columns = [];
 
@@ -30,10 +38,11 @@ final class DataAction
     private array $parameters = [];
 
     /**
-     * Add a column for the SQL query (e.g., SELECT, INSERT).
+     * Add a column for the SQL query.
      *
      * @param string $name The name of the column.
-     * 
+     * @return void
+     *
      * @example
      * $dataAction->addColumn('username');
      * $dataAction->addColumn('email');
@@ -46,10 +55,11 @@ final class DataAction
     /**
      * Get all columns added for the query.
      *
-     * @return array List of columns.
-     * 
+     * @return array List of column names.
+     *
      * @example
-     * $columns = $dataAction->getColumns(); // ['username', 'email']
+     * $columns = $dataAction->getColumns();
+     * print_r($columns); // ['username', 'email']
      */
     public function getColumns(): array
     {
@@ -62,7 +72,8 @@ final class DataAction
      * @param string $type The type of the property (e.g., 'WHERE', 'ORDER BY').
      * @param string $condition The condition or clause for the query.
      * @param array $parameters Parameters to bind in the query.
-     * 
+     * @return void
+     *
      * @example
      * $dataAction->addProperty('WHERE', 'id = :id', ['id' => 1]);
      * $dataAction->addProperty('ORDER BY', 'created_at DESC');
@@ -81,10 +92,12 @@ final class DataAction
      * Get all properties added to the query.
      *
      * @return array List of properties with their types and conditions.
-     * 
+     *
      * @example
      * $properties = $dataAction->getProperties();
-     * // Output: [['type' => 'WHERE', 'condition' => 'id = :id']]
+     * print_r($properties);
+     * // Output:
+     * // [['type' => 'WHERE', 'condition' => 'id = :id']]
      */
     public function getProperties(): array
     {
@@ -95,10 +108,11 @@ final class DataAction
      * Get a specific property by type.
      *
      * @param string $name The property type (e.g., 'WHERE').
-     * @return array The condition(s) for the specified property type.
-     * 
+     * @return array List of conditions for the specified property type.
+     *
      * @example
      * $where = $dataAction->getProperty('WHERE');
+     * print_r($where);
      */
     public function getProperty(string $name): array
     {
@@ -106,10 +120,11 @@ final class DataAction
     }
 
     /**
-     * Add parameters for the prepared SQL statement.
+     * Add multiple parameters for the prepared SQL statement.
      *
      * @param array $parameters Associative array of parameters.
-     * 
+     * @return void
+     *
      * @example
      * $dataAction->addParameters(['id' => 1, 'status' => 'active']);
      */
@@ -119,14 +134,16 @@ final class DataAction
     }
 
     /**
-     * Add parameter for the prepared SQL statement.
+     * Add a single parameter for the prepared SQL statement.
      *
-     * @param array $parameters Associative array of parameters.
-     * 
+     * @param string $key The parameter name.
+     * @param mixed $value The value to assign to the parameter.
+     * @return void
+     *
      * @example
-     * $dataAction->addParameters($key, $value);
+     * $dataAction->addParameter('status', 'active');
      */
-    public function addParameter($key, $value): void
+    public function addParameter(string $key, mixed $value): void
     {
         $this->parameters[$key] = $value;
     }
@@ -135,9 +152,10 @@ final class DataAction
      * Get all parameters for the prepared SQL statement.
      *
      * @return array Associative array of parameters.
-     * 
+     *
      * @example
-     * $params = $dataAction->getParameters(); // ['id' => 1, 'status' => 'active']
+     * $params = $dataAction->getParameters();
+     * print_r($params); // ['id' => 1, 'status' => 'active']
      */
     public function getParameters(): array
     {

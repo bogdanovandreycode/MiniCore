@@ -2,7 +2,6 @@
 
 namespace MiniCore\Database\DefaultTable\MySql;
 
-use MiniCore\Database\Table;
 use MiniCore\Database\Action\DataAction;
 use MiniCore\Database\Table\AbstractTable;
 
@@ -21,19 +20,22 @@ use MiniCore\Database\Table\AbstractTable;
  * - `created_at`: Timestamp of when the user was created (default: current timestamp).
  * - `updated_at`: Timestamp of the last update to the user's record (automatically updated).
  *
- * @package MiniCore\Database\DefaultTable
+ * @package MiniCore\Database\DefaultTable\MySql
  *
  * @example
+ * // Example usage:
  * $usersTable = new UsersTable();
- * 
- * // Use select action
- * $dataAction = new DataAction();
- * $dataAction->addColumn('role_id');
- * $dataAction->addProperty('WHERE', 'role_id = :role_id', ['role_id' => '0']);
- * $postsTable->actions['select']->execute($dataAction);
  *
- * // Example: Get user by email
+ * // Retrieve a user by email
  * $user = $usersTable->getUserByEmail('john@example.com');
+ * print_r($user);
+ *
+ * // Update a user's role
+ * $usersTable->updateUserRole(1, 3);
+ *
+ * // Retrieve all users
+ * $users = $usersTable->getAllUsers();
+ * print_r($users);
  */
 class UsersTable extends AbstractTable
 {
@@ -41,6 +43,9 @@ class UsersTable extends AbstractTable
      * UsersTable constructor.
      *
      * Initializes the `users` table with its columns and structure.
+     *
+     * @example
+     * $usersTable = new UsersTable();
      */
     public function __construct()
     {
@@ -66,7 +71,9 @@ class UsersTable extends AbstractTable
      * @return array|null User data as an associative array or null if not found.
      *
      * @example
+     * // Retrieve user by email
      * $user = $usersTable->getUserByEmail('jane@example.com');
+     * print_r($user);
      */
     public function getUserByEmail(string $email): ?array
     {
@@ -74,8 +81,28 @@ class UsersTable extends AbstractTable
         $dataAction->addColumn('*');
         $dataAction->addProperty('WHERE', 'email = :email', ['email' => $email]);
         $dataAction->addProperty('LIMIT', '1');
+
         $result = $this->actions['select']->execute($this->repositoryName, $dataAction);
+
         return $result[0] ?? null;
+    }
+
+    /**
+     * Retrieve all users from the database.
+     *
+     * @return array List of all users.
+     *
+     * @example
+     * // Retrieve all users
+     * $users = $usersTable->getAllUsers();
+     * print_r($users);
+     */
+    public function getAllUsers(): array
+    {
+        $dataAction = new DataAction();
+        $dataAction->addColumn('*');
+
+        return $this->actions['select']->execute($this->repositoryName, $dataAction);
     }
 
     /**
@@ -86,6 +113,7 @@ class UsersTable extends AbstractTable
      * @return bool True if the update was successful, false otherwise.
      *
      * @example
+     * // Update user role
      * $usersTable->updateUserRole(1, 3);
      */
     public function updateUserRole(int $userId, int $roleId): bool
@@ -94,6 +122,25 @@ class UsersTable extends AbstractTable
         $dataAction->addColumn('role_id');
         $dataAction->addParameters(['role_id' => $roleId]);
         $dataAction->addProperty('WHERE', 'id = :id', ['id' => $userId]);
+
         return $this->actions['update']->execute($this->repositoryName, $dataAction);
+    }
+
+    /**
+     * Delete a user by their ID.
+     *
+     * @param int $userId The ID of the user to delete.
+     * @return bool True if the deletion was successful, false otherwise.
+     *
+     * @example
+     * // Delete user
+     * $usersTable->deleteUser(5);
+     */
+    public function deleteUser(int $userId): bool
+    {
+        $dataAction = new DataAction();
+        $dataAction->addProperty('WHERE', 'id = :id', ['id' => $userId]);
+
+        return $this->actions['delete']->execute($this->repositoryName, $dataAction);
     }
 }

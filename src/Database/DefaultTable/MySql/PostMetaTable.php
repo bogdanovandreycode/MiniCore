@@ -8,27 +8,23 @@ use MiniCore\Database\Table\AbstractTable;
 /**
  * Class PostMetaTable
  *
- * This class manages metadata for posts, allowing retrieval, updating, and insertion of custom post data.
+ * Manages metadata for posts, allowing retrieval, updating, and insertion of custom post data.
+ * This table stores metadata as key-value pairs associated with a specific post.
+ *
+ * @package MiniCore\Database\DefaultTable\MySql
  *
  * @example
- * // Example of usage:
+ * // Example usage:
  * $postMetaTable = new PostMetaTable();
- * 
- * // Use select action
- * $dataAction = new DataAction();
- * $dataAction->addColumn('id');
- * $dataAction->addColumn('username');
- * $dataAction->addProperty('WHERE', 'status = :status', ['status' => 'active']);
- * $postMetaTable->actions['select']->execute($dataAction);
- * 
- * // Add new metadata
- * $postMetaTable->addMeta(1, 'featured', 'true');
- * 
- * // Update metadata
- * $postMetaTable->updateMeta(1, 'featured', 'false');
- * 
+ *
  * // Retrieve metadata
  * $metaValue = $postMetaTable->getMeta('featured');
+ *
+ * // Add new metadata
+ * $postMetaTable->addMeta(1, 'featured', 'true');
+ *
+ * // Update metadata
+ * $postMetaTable->updateMeta(1, 'featured', 'false');
  */
 class PostMetaTable extends AbstractTable
 {
@@ -36,6 +32,9 @@ class PostMetaTable extends AbstractTable
      * PostMetaTable constructor.
      *
      * Initializes the `postmeta` table with its schema.
+     *
+     * @example
+     * $postMetaTable = new PostMetaTable();
      */
     public function __construct()
     {
@@ -57,17 +56,17 @@ class PostMetaTable extends AbstractTable
      * Retrieve metadata for a post by key.
      *
      * @param string $key The metadata key to search for.
-     * @param bool $isSingle Whether to return a single value or an associative array of results.
-     * @return mixed The metadata value or an associative array of key-value pairs.
+     * @param bool $isSingle Whether to return a single value (default: true).
+     * @return mixed The metadata value if `$isSingle` is `true`, or an associative array of key-value pairs otherwise.
      *
      * @example
      * // Get a single meta value
      * $metaValue = $postMetaTable->getMeta('featured');
-     * 
+     *
      * // Get all meta values with the same key
      * $allMetaValues = $postMetaTable->getMeta('featured', false);
      */
-    public function getMeta(string $key, bool $isSingle = true)
+    public function getMeta(string $key, bool $isSingle = true): mixed
     {
         $dataAction = new DataAction();
         $dataAction->addColumn('meta_key');

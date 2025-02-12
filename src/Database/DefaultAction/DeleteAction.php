@@ -7,13 +7,14 @@ use MiniCore\Database\Action\AbstractAction;
 use MiniCore\Database\Action\ActionInterface;
 use Minicore\Database\Repository\RepositoryManager;
 
-
 /**
  * Class DeleteAction
  *
  * Handles the deletion of records from a database table.
  * This action dynamically builds and executes a DELETE SQL query
- * with optional conditions and parameters.
+ * with optional conditions and parameters to ensure data integrity.
+ *
+ * @package MiniCore\Database\DefaultAction
  *
  * @example
  * // Example of using DeleteAction to delete a user with ID = 5
@@ -23,7 +24,7 @@ use Minicore\Database\Repository\RepositoryManager;
  * $dataAction->addProperty('WHERE', 'id = :id', ['id' => 5]);
  * 
  * if ($deleteAction->validate($dataAction)) {
- *     $result = $deleteAction->execute($dataAction);
+ *     $result = $deleteAction->execute('mysql', $dataAction);
  *     echo $result ? 'User deleted.' : 'Delete failed.';
  * } else {
  *     echo 'No conditions provided for deletion.';
@@ -33,6 +34,8 @@ class DeleteAction extends AbstractAction implements ActionInterface
 {
     /**
      * DeleteAction constructor.
+     *
+     * Initializes a new instance for deleting records from a specified table.
      *
      * @param string $tableName The name of the table from which data will be deleted.
      *
@@ -52,10 +55,11 @@ class DeleteAction extends AbstractAction implements ActionInterface
     /**
      * Execute the DELETE SQL query.
      *
-     * Builds a DELETE SQL query with optional conditions (e.g., WHERE) 
-     * and executes it using prepared statements.
+     * Constructs a DELETE SQL query with the specified conditions (e.g., WHERE)
+     * and executes it using a prepared statement.
      *
-     * @param DataAction $data Contains the conditions and parameters for the query.
+     * @param string $repositoryName The repository where the deletion should occur.
+     * @param DataAction|null $data Contains the conditions and parameters for the query.
      * @return mixed The result of the query execution.
      *
      * @example
@@ -65,10 +69,14 @@ class DeleteAction extends AbstractAction implements ActionInterface
      * $dataAction = new DataAction();
      * $dataAction->addProperty('WHERE', 'id = :id', ['id' => 10]);
      * 
-     * $deleteAction->execute($dataAction);
+     * $deleteAction->execute('mysql', $dataAction);
      */
     public function execute(string $repositoryName, ?DataAction $data): mixed
     {
+        if (empty($data) || empty($data->getProperties())) {
+            throw new \InvalidArgumentException("DELETE operation requires at least one condition to prevent mass deletion.");
+        }
+
         $sql = "DELETE FROM {$this->tableName}";
 
         foreach ($data->getProperties() as $property) {
@@ -85,10 +93,11 @@ class DeleteAction extends AbstractAction implements ActionInterface
     /**
      * Validate the provided data for the DELETE action.
      *
-     * Ensures that at least one condition is specified to prevent accidental mass deletion.
+     * Ensures that at least one condition (e.g., WHERE) is specified
+     * to prevent accidental mass deletion.
      *
-     * @param DataAction $data The data used for validation.
-     * @return bool True if conditions are present, false otherwise.
+     * @param DataAction $data The data containing conditions for validation.
+     * @return bool True if at least one condition is present, false otherwise.
      *
      * @example
      * $deleteAction = new DeleteAction('users');
@@ -103,7 +112,6 @@ class DeleteAction extends AbstractAction implements ActionInterface
      */
     public function validate(DataAction $data): bool
     {
-        $hasConditions = !empty($data->getProperties());
-        return $hasConditions;
+        return !empty($data->getProperties());
     }
 }

@@ -1,37 +1,79 @@
 <?php
 
-namespace MiniCore\Database\Repository;
+namespace MiniCore\Database\DefaultRepository;
 
 use PDO;
 use Exception;
 use PDOException;
 use MiniCore\Database\Table\TableManager;
+use Minicore\Database\Repository\RepositoryManager;
+use MiniCore\Database\Repository\RepositoryInterface;
 
 /**
  * Class MySqlDatabase
  *
- * Provides an abstraction layer for interacting with the database using PDO.
+ * Provides an abstraction layer for interacting with a MySQL database using PDO.
  * Supports connection management, query execution, table management, and migrations.
  *
- * @package MiniCore\Database
+ * @package MiniCore\Database\DefaultRepository
+ *
+ * @example
+ * // Example usage:
+ * $config = [
+ *     'host' => 'localhost',
+ *     'dbname' => 'test_db',
+ *     'user' => 'root',
+ *     'password' => 'secret'
+ * ];
+ * 
+ * $database = new MySqlDatabase($config);
+ * if ($database->isConnected()) {
+ *     $users = $database->query("SELECT * FROM users");
+ *     print_r($users);
+ * }
  */
 class MySqlDatabase implements RepositoryInterface
 {
     /**
      * @var PDO|null Active PDO database connection.
      */
-    private PDO $connection;
+    private ?PDO $connection = null;
+
+    /**
+     * @var TableManager Manager for handling database tables.
+     */
     private TableManager $list;
 
+    /**
+     * MySqlDatabase constructor.
+     *
+     * Initializes the database connection and registers the repository.
+     *
+     * @param array $config Database configuration parameters.
+     * @param array $tables List of tables to be managed.
+     *
+     * @example
+     * $database = new MySqlDatabase([
+     *     'host' => 'localhost',
+     *     'dbname' => 'test_db',
+     *     'user' => 'root',
+     *     'password' => 'secret'
+     * ]);
+     */
     public function __construct(
         array $config,
-        array $tables = [],
+        array $tables = []
     ) {
         $this->list = new TableManager($this, $tables);
         $this->connect($config);
         RepositoryManager::addRepository($this);
     }
 
+    /**
+     * Get the table manager instance.
+     *
+     * @return TableManager The table manager instance.
+     */
     public function getList(): TableManager
     {
         return $this->list;
@@ -41,15 +83,21 @@ class MySqlDatabase implements RepositoryInterface
      * Get the active database connection.
      *
      * @return PDO The current PDO connection.
-     * 
+     *
      * @example
-     * $pdo = DataBase::getConnection();
+     * $pdo = $database->getConnection();
      */
     public function getConnection(): PDO
     {
-        return self::$connection;
+        return $this->connection;
     }
 
+    /**
+     * Establish a database connection.
+     *
+     * @param array $config Database configuration parameters.
+     * @throws PDOException If the connection fails.
+     */
     public function connect(array $config): void
     {
         if ($this->isConnected()) {
@@ -74,6 +122,12 @@ class MySqlDatabase implements RepositoryInterface
         }
     }
 
+    /**
+     * Validate the provided database configuration.
+     *
+     * @param array $config The database configuration parameters.
+     * @throws Exception If any required parameter is missing.
+     */
     private function validateConfig(array $config): void
     {
         $errorConditions = [
@@ -114,13 +168,13 @@ class MySqlDatabase implements RepositoryInterface
      * @param string $sql The SQL query.
      * @param array $params Parameters for the prepared statement.
      * @return array The query result as an associative array.
-     * 
+     *
      * @example
-     * $users = DataBase::query("SELECT * FROM users WHERE role_id = :role_id", ['role_id' => 1]);
+     * $users = $database->query("SELECT * FROM users WHERE role_id = :role_id", ['role_id' => 1]);
      */
     public function query(string $sql, array $params = []): array
     {
-        $stmt = self::$connection->prepare($sql);
+        $stmt = $this->connection->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll();
     }
@@ -131,13 +185,13 @@ class MySqlDatabase implements RepositoryInterface
      * @param string $sql The SQL query.
      * @param array $params Parameters for the prepared statement.
      * @return bool True if execution was successful, false otherwise.
-     * 
+     *
      * @example
-     * DataBase::execute("DELETE FROM users WHERE id = :id", ['id' => 5]);
+     * $database->execute("DELETE FROM users WHERE id = :id", ['id' => 5]);
      */
     public function execute(string $sql, array $params = []): bool
     {
-        $stmt = self::$connection->prepare($sql);
+        $stmt = $this->connection->prepare($sql);
         return $stmt->execute($params);
     }
 
@@ -161,12 +215,23 @@ class MySqlDatabase implements RepositoryInterface
 
     /**
      * Close the database connection.
+     *
+     * @example
+     * $database->close();
      */
     public function close(): void
     {
         $this->connection = null;
     }
 
+    /**
+     * Get the repository name.
+     *
+     * @return string The repository name ('mysql').
+     *
+     * @example
+     * echo $database->getNameRepository(); // Output: 'mysql'
+     */
     public function getNameRepository(): string
     {
         return 'mysql';
