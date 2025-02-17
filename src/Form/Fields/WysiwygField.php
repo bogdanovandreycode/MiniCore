@@ -4,28 +4,41 @@ namespace MiniCore\Form\Fields;
 
 use MiniCore\Form\Field;
 use MiniCore\Form\FieldInterface;
+use MiniCore\UI\AssetManager;
 
 /**
  * Class WysiwygField
  *
- * Is a WYSIWYG editor for entering formatted text.
- * upports TinyMCE, Fckeditor and other editors.
+ * A WYSIWYG editor for entering formatted text.
+ * Supports TinyMCE and other editors.
+ * 
+ * @example Using editor field with form 
+ * $form = new FormBuilder('/submit', 'POST');
+ * $form->addField(new WysiwygField('content', 'Description', '', [], 'tiny'));
+ * echo $form->render();
+ * echo AssetManager::renderStyles();
+ * echo AssetManager::renderScripts();
  */
 class WysiwygField extends Field implements FieldInterface
 {
     /**
-     * @var string Specifying an editor (tinymce, ckeditor, quill)
+     * @var string Editor type (only TinyMCE is supported for now).
      */
     private string $editor;
 
     /**
+     * @var string Unique ID for the editor instance.
+     */
+    private string $editorId;
+
+    /**
      * WysiwygField constructor.
      *
-     * @param string $name is the name of the field.
+     * @param string $name Field name.
      * @param string $label Label.
      * @param mixed $value Value.
      * @param array $attributes Additional attributes.
-     * @param string $editor Which WYSIWYG to use (tiny, ckeditor, quill).
+     * @param string $editor Which WYSIWYG to use (only "tiny" supported).
      */
     public function __construct(
         string $name,
@@ -36,6 +49,7 @@ class WysiwygField extends Field implements FieldInterface
     ) {
         parent::__construct($name, $label, $value, $attributes);
         $this->editor = $editor;
+        $this->editorId = 'wysiwyg_' . uniqid(); // Generate unique ID
     }
 
     /**
@@ -45,49 +59,58 @@ class WysiwygField extends Field implements FieldInterface
      */
     public function render(): string
     {
+        // Register TinyMCE assets (only once)
+        $this->registerAssets();
+
         $attributes = $this->buildAttributes();
-        $html = sprintf(
+        return sprintf(
             '<textarea name="%s" id="%s" %s>%s</textarea>',
             htmlspecialchars($this->name),
-            htmlspecialchars($this->name),
+            htmlspecialchars($this->editorId),
             $attributes,
             htmlspecialchars($this->value)
-        );
-
-        $script = $this->getEditorScript();
-
-        return $html . $script;
+        ) . PHP_EOL . $this->getEditorScript();
     }
 
     /**
-     * Returns the JS code for initializing the editor.
+     * Registers required scripts and styles via AssetManager.
+     *
+     * @return void
+     */
+    private function registerAssets(): void
+    {
+        if ($this->editor === 'tiny') {
+            AssetManager::addScript('tinymce', '/assets/js/tinymce/tinymce.min.js');
+            AssetManager::addStyle('tinymce-skin', '/assets/js/tinymce/skins/ui/oxide/skin.min.css');
+        }
+    }
+
+    /**
+     * Returns the JS initialization script for the editor.
      *
      * @return string
      */
     private function getEditorScript(): string
     {
-        switch ($this->editor) {
-            case 'tiny':
-                return '<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-                <script>tinymce.init({ selector: "#' . htmlspecialchars($this->name) . '" });</script>';
-
-            case 'ckeditor':
-                return '<script src="https://cdn.ckeditor.com/4.17.2/standard/ckeditor.js"></script>
-                <script>CKEDITOR.replace("' . htmlspecialchars($this->name) . '");</script>';
-
-            case 'quill':
-                return '<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-                <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-                <div id="editor-container"></div>
-                <script>
-                    var quill = new Quill("#editor-container", { theme: "snow" });
-                    document.querySelector("form").addEventListener("submit", function() {
-                        document.getElementById("' . htmlspecialchars($this->name) . '").value = quill.root.innerHTML;
+        if ($this->editor === 'tiny') {
+            return sprintf(
+                '<script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        if (typeof tinymce !== "undefined") {
+                            tinymce.init({
+                                selector: "#%s",
+                                skin: "oxide",
+                                content_css: "oxide",
+                                plugins: "link image code table",
+                                toolbar: "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | link image | code"
+                            });
+                        }
                     });
-                </script>';
-
-            default:
-                return '';
+                </script>',
+                htmlspecialchars($this->editorId)
+            );
         }
+
+        return '';
     }
 }
