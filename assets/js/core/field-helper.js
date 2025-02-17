@@ -90,13 +90,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    const codeFields = document.querySelectorAll('.code-field');
+    const codeFields = document.querySelectorAll('.code-container');
 
     codeFields.forEach(field => {
-        const inputs = field.querySelectorAll('.code-input');
+        const inputs = field.querySelectorAll('input[type="text"]');
 
         inputs.forEach((input, index) => {
             input.addEventListener('input', () => {
+                input.value = input.value.replace(/[^0-9a-zA-Z]/g, '');
                 if (input.value.length > 0 && index < inputs.length - 1) {
                     inputs[index + 1].focus();
                 }
@@ -105,13 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
             input.addEventListener('keydown', (e) => {
                 if (e.key === 'Backspace' && input.value === '' && index > 0) {
                     inputs[index - 1].focus();
-                }
-            });
-
-            input.addEventListener('input', () => {
-                const allowOnlyDigits = field.getAttribute('data-allow-digits') === 'true';
-                if (allowOnlyDigits && /\D/.test(input.value)) {
-                    input.value = input.value.replace(/\D/g, '');
                 }
             });
         });

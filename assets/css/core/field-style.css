@@ -65,14 +65,14 @@
     align-items: center;
 }
 
-.code-field {
+.code-container {
     display: flex;
     gap: 10px;
     justify-content: center;
     align-items: center;
 }
 
-.code-field .code-input {
+.code-container input {
     width: 40px;
     height: 50px;
     text-align: center;
@@ -82,7 +82,7 @@
     transition: border-color 0.3s ease;
 }
 
-.code-field .code-input:focus {
+.code-container input:focus {
     border-color: #4caf50;
     outline: none;
 }
