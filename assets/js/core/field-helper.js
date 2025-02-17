@@ -64,21 +64,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    const timeFields = document.querySelectorAll(".time-field");
+    const timeFields = document.querySelectorAll('.time-container');
 
     timeFields.forEach(field => {
         field.addEventListener("click", (e) => {
-            if (e.target.matches(".increment, .decrement")) {
+            if (e.target.matches("button[data-type]")) {
                 const button = e.target;
-                const input = button.parentNode.querySelector("input");
+                const input = button.closest('.input-group').querySelector("input");
                 const max = parseInt(input.getAttribute("max"), 10);
                 const min = parseInt(input.getAttribute("min"), 10);
                 const interval = parseInt(field.getAttribute("data-interval") || "1", 10);
 
                 let value = parseInt(input.value || "0", 10);
-                if (button.classList.contains("increment")) {
+                if (button.textContent === "▲") {
                     value += interval;
-                } else if (button.classList.contains("decrement")) {
+                } else if (button.textContent === "▼") {
                     value -= interval;
                 }
 
@@ -87,6 +87,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 input.value = value;
             }
+        });
+
+        field.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener("input", () => {
+                let value = parseInt(input.value, 10);
+                const max = parseInt(input.getAttribute("max"), 10);
+                const min = parseInt(input.getAttribute("min"), 10);
+
+                if (isNaN(value) || value < min) value = min;
+                if (value > max) value = max;
+
+                input.value = value;
+            });
         });
     });
 
