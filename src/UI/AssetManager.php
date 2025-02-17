@@ -6,16 +6,21 @@ namespace MiniCore\UI;
  * Class AssetManager
  *
  * Handles the registration and rendering of CSS and JavaScript assets in the application.
- * This class simplifies the process of adding styles and scripts to the front-end by managing them centrally.
+ * Now supports aliases for asset paths, allowing flexibility in specifying different asset sources.
  *
  * @package MiniCore\UI
  *
  * @example
- * // Registering a CSS file
- * AssetManager::addStyle('main-style', '/assets/css/style.css');
+ * // Defining asset aliases
+ * AssetManager::addAlias('core-assets', '/vendor/arraydev/minicore/assets/');
+ * AssetManager::addAlias('site-assets', '/assets/');
+ * AssetManager::addAlias('admin-module-assets', '/modules/adminpanel/assets/');
  *
- * // Registering a JS file to load in the footer
- * AssetManager::addScript('main-script', '/assets/js/app.js', true);
+ * // Registering a CSS file using an alias
+ * AssetManager::addStyle('main-style', '@core-assets/css/style.css');
+ *
+ * // Registering a JS file using an alias
+ * AssetManager::addScript('main-script', '@site-assets/js/app.js', true);
  *
  * // Rendering all registered styles in the <head>
  * echo AssetManager::renderStyles();
@@ -36,6 +41,43 @@ class AssetManager
     private static array $scripts = [];
 
     /**
+     * @var array $aliases Array of registered path aliases.
+     */
+    private static array $aliases = [];
+
+    /**
+     * Add an alias for an asset path.
+     *
+     * @param string $alias The alias name (e.g., 'core-assets').
+     * @param string $path The actual base path.
+     * @return void
+     *
+     * @example
+     * AssetManager::addAlias('core-assets', '/vendor/arraydev/minicore/assets/');
+     */
+    public static function addAlias(string $alias, string $path): void
+    {
+        self::$aliases[$alias] = rtrim($path, '/') . '/';
+    }
+
+    /**
+     * Resolve an alias to its actual path.
+     *
+     * @param string $path The path with an alias (e.g., '@core-assets/css/style.css').
+     * @return string The resolved path.
+     */
+    private static function resolvePath(string $path): string
+    {
+        if (str_starts_with($path, '@')) {
+            $aliasName = substr($path, 1, strpos($path, '/') - 1);
+            if (isset(self::$aliases[$aliasName])) {
+                return str_replace("@{$aliasName}", self::$aliases[$aliasName], $path);
+            }
+        }
+        return $path;
+    }
+
+    /**
      * Add a CSS style to the head section.
      *
      * @param string $handle A unique identifier for the style.
@@ -43,12 +85,12 @@ class AssetManager
      * @return void
      *
      * @example
-     * AssetManager::addStyle('theme', '/assets/css/theme.css');
+     * AssetManager::addStyle('theme', '@core-assets/css/theme.css');
      */
     public static function addStyle(string $handle, string $href): void
     {
         if (!isset(self::$styles[$handle])) {
-            self::$styles[$handle] = $href;
+            self::$styles[$handle] = self::resolvePath($href);
         }
     }
 
@@ -61,14 +103,13 @@ class AssetManager
      * @return void
      *
      * @example
-     * // Add script to the footer
-     * AssetManager::addScript('analytics', '/assets/js/analytics.js', true);
+     * AssetManager::addScript('analytics', '@site-assets/js/analytics.js', true);
      */
     public static function addScript(string $handle, string $src, bool $inFooter = false): void
     {
         if (!isset(self::$scripts[$handle])) {
             self::$scripts[$handle] = [
-                'src' => $src,
+                'src' => self::resolvePath($src),
                 'in_footer' => $inFooter,
             ];
         }
