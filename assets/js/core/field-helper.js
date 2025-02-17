@@ -33,11 +33,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    const avatarFields = document.querySelectorAll('.avatar-field');
+    const avatarFields = document.querySelectorAll('.avatar-container');
 
     avatarFields.forEach(field => {
         const fileInput = field.querySelector('input[type="file"]');
-        const previewImage = field.querySelector('.avatar-preview');
+        const previewImage = field.querySelector('img');
 
         fileInput.addEventListener('change', () => {
             const file = fileInput.files[0];
@@ -48,6 +48,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
                 reader.readAsDataURL(file);
             }
+        });
+        
+        previewImage.addEventListener('click', () => {
+            fileInput.click();
         });
     });
 
