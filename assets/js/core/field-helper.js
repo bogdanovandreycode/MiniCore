@@ -1,21 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const fileFields = document.querySelectorAll('.file-field');
+    const fileInputs = document.querySelectorAll('input[type="file"]');
 
-    fileFields.forEach(field => {
-        const fileInput = field.querySelector('input[type="file"]');
-        const fileName = field.querySelector('.file-name');
-        const progressBar = field.querySelector('.progress-bar');
-        const progress = field.querySelector('.progress');
-        const successMessage = field.querySelector('.success-message');
-        const errorMessage = field.querySelector('.error-message');
+    fileInputs.forEach(fileInput => {
+        const fileContainer = fileInput.closest('.mb-3');
+        if (!fileContainer) return;
+
+        const fileName = fileContainer.querySelector('.file-name');
+        const progressBar = fileContainer.querySelector('.progress');
+        const progress = fileContainer.querySelector('.progress-bar');
+        const successMessage = fileContainer.querySelector('.text-success');
+        const errorMessage = fileContainer.querySelector('.text-danger');
 
         fileInput.addEventListener('change', () => {
             if (fileInput.files.length > 0) {
                 fileName.textContent = fileInput.files[0].name;
                 progressBar.style.display = 'block';
                 progress.style.width = '0%';
-
-                // Simulate file upload progress
+                
                 setTimeout(() => {
                     progress.style.width = '100%';
                     setTimeout(() => {
@@ -26,6 +27,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 2000);
             } else {
                 fileName.textContent = 'No file chosen';
+                successMessage.style.display = 'none';
+                errorMessage.style.display = 'inline';
             }
         });
     });
